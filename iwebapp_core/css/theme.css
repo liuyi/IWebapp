@@ -1,0 +1,51 @@
+.button{
+    background: #55aa99;
+    border-radius: 8px;
+    padding: 5px;
+    color: #eeeeee;
+    cursor:pointer;
+
+}
+
+
+
+.button[class~="tap"]{
+    background: #aaffaa;
+    color: #ffffff;
+
+}
+
+.button[class~="longtap"] {
+    background: #ff0000;
+    color: #ffffff;
+    -webkit-box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+
+    zoom: 1.3;
+
+    margin-left: -2px;
+    margin-top: -2px;
+
+
+}
+
+.confirmPage{
+
+    background: #cccccc;
+    webkit-box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+    padding: 20px;
+    width: 50%;
+
+
+}
+
+.notify{
+    background: #33ffee;
+
+    width: 100%;
+}
+
+.notify_wrapper{
+    padding:  8px;
+}

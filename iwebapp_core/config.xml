@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data>
+    <lang>
+        <en>lang/en.js</en>
+        <zh>lang/zh.js</zh>
+    </lang>
+    <textFile>css/core.css;css/theme.css</textFile>
+    <images>
+        <img src="images/loading.gif" />
+    </images>
+    <views confirmViewId="confirmView" notifyViewId="notificationView">
+        <view id="loadingView">html/loadingView.html</view>
+        <view id="loginView">html/loginView.html</view>
+        <view id="homeView">html/homeView.html</view>
+        <view id="announceView">html/announceView.html</view>
+        <view id="confirmView">html/confirmView.html</view>
+        <view id="notificationView">html/notificationView.html</view>
+    </views>
+</data>
