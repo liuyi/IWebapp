@@ -3,6 +3,7 @@ function DemoApp() {
 
     this.username = null;
     this.password = null;
+    this.userChangeHash=false;
 }
 DemoApp._instance = null;
 DemoApp.getInstance = function () {
@@ -14,7 +15,19 @@ DemoApp.prototype.init = function () {
 
 
     core.openPage("LoginPage", {username: "liu yi"})
+    window.onhashchange=function(){
+        var currentHash=core.currentHash();
+       // trace("currentHASH:"+currentHash+"================="+window.location.hash);
+        if(window.location.hash!="#"+currentHash){
+            trace("HASH CHANGED!!!")
+            //check is forward or back
+            //or is a new link
+            //var currentHashArray=currentHash.split("/");
+            //var updateHashArray=window.location.hash.split("/").splice(1);
 
+           // trace(updateHashArray)
+        }
+    }
 }
 
 
@@ -39,7 +52,7 @@ function LoginPage() {
     this.usernameTxt = null;
     this.passwordTxt = null;
     this.learnLink = null;
-
+    this.name="login"
 
 }
 
@@ -101,7 +114,7 @@ LoginPage.prototype.onTap = function (e, context) {
         trace("learnLink tap!!");
     }
 
-    iwp.getInstance().notify("HI, welcome to here!")
+    //iwp.getInstance().notify("HI, welcome to here!")
     return false
 
 }
@@ -123,7 +136,7 @@ IWebapp.extend(HomePage, IWPPage);
 function HomePage() {
     HomePage.$super(this);
     this.logoutBtn = null;
-
+    this.name="home"
 }
 
 HomePage.prototype.onCreate = function (pageData) {
@@ -155,11 +168,18 @@ HomePage.prototype.onClicked = function (e, context) {
 }
 
 
+HomePage.prototype.onBack=function(){
+
+    iwp.getInstance().notify("Do you realy want logout?")
+    return true;
+}
+
+
 IWebapp.extend(AnnouncePage, IWPPage);
 function AnnouncePage() {
 
     AnnouncePage.$super(this);
-
+    this.name="annouce"
 }
 
 AnnouncePage.prototype.onCreate = function (pageData) {

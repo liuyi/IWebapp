@@ -107,6 +107,13 @@ function IWebapp() {
     this._confirmViewId=null;
     this._alertViewId=null;
 
+    /**
+     * Store all the history data to this list.
+     * @type {Array}
+     * @private
+     */
+    this._history=[];
+   // this._userChangeHash=false;//If is user press back button or forward button, set it to true;
 
     /*attach pages to this HTMLElement*/
     this._container = null;
@@ -331,13 +338,14 @@ IWebapp.prototype.openPage = function (pageObj, pageData) {
     this._pages[page.id] = page;
 
     page.onCreate(pageData);
-
-    
+    this._addToHistory(page,pageData);
     page = null;
 
 
 
 }
+
+
 
 IWebapp.prototype.openChildPage = function (pageObj, pageData, parentObj) {
 
@@ -366,11 +374,13 @@ IWebapp.prototype.openChildPage = function (pageObj, pageData, parentObj) {
 
 
     page.onCreate(pageData);
+    this._addToHistory(page,pageData,parentPage);
+
+
 
     parentPage = null;
     page = null;
 }
-
 
 
 
@@ -409,16 +419,53 @@ IWebapp.prototype.removePage = function (pageObj) {
         }
     }
 
+    //remove hash tag
+    if(page.type==IWPPage.PAGE_TYPE_NORMAL && page._parentPageId!=null){
+        var hash= window.location.hash.split("/");
+        hash.splice(0,1)
+        index=hash.indexOf(page.name);
+        var hash2=hash.splice(0,index);
+        this._setHash("/"+hash2.join("/"));
+
+    }
+
+
     //destroy self
     this._destroyPage(page);
 
     page = null;
 }
 
+/**
+ * @desc if user pressed back button or forward button, it should return true else return false.
+ * @returns {boolean}
+ */
+IWebapp.prototype.currentHash=function(){
+    if(this._history.length==0) {
+        return "";
+    }else{
+        return this._history[this._history.length-1].hash;
+    }
 
 
-IWebapp.prototype.navBack = function () {
+}
 
+IWebapp.prototype.back = function () {
+
+    //find current page.
+    var pageId=this._pages[_pages.length-1];
+    var currentPage=this._pages[pageId];
+
+    if(currentPage==null){
+        trace("no current page right now.")
+    }else{
+        if(currentPage.onBack()==false){
+            //system hold back event
+
+        }
+    }
+
+    trace(this._history)
 }
 
 
@@ -1181,9 +1228,54 @@ IWebapp.prototype._getTouchTarget = function (target) {
 
     }
 
-    trace("have not get touch target>>>")
+
     return null;
 
+
+}
+
+
+IWebapp.prototype._addToHistory=function(page,pageData,parentPage){
+    if(page.type!=IWPPage.PAGE_TYPE_NORMAL) return;
+    var hash= window.location.hash.split("/");
+
+    var pageItem={};
+    pageItem.constructorName=page.constructor.name;
+    pageItem.params=pageData;
+    pageItem.type=page.type;
+    pageItem.parentPageId=page._parentPageId;
+
+
+
+    if(parentPage){
+        //set hash tag
+        hash.splice(0,1)
+        var parentHash=parentPage.name;
+        var index=hash.indexOf(parentHash);
+        hash.splice(index+1);
+
+        hash.push(page.name);
+        pageItem.hash="/"+hash.join("/");
+
+
+
+    }else{
+        //set hash tag
+        pageItem.hash="/"+page.name;
+
+
+    }
+
+    this._history.push(pageItem);
+
+    this._setHash(pageItem.hash);
+
+
+}
+
+
+IWebapp.prototype._setHash=function(hash){
+    window.location.hash=hash;
 
 }
 //==============OTHER CLASS=================================
@@ -1231,6 +1323,8 @@ function IWPPage() {
      * @type {string}
      */
     this.id = "IWPPage_" + IWPPage._index++;
+    this.name=arguments.callee.name;
+
 
     /**
      * @desc the IWPPage object used by the page
@@ -1313,6 +1407,15 @@ IWPPage.prototype.onRestart = function () {
 IWPPage.prototype.onDestroy = function () {
 
 }
+
+
+/**
+ * @desc IWPPage can hold back event come from device or browser.
+ * @returns {boolean} If return false, use default function of IWEBAPP hold back event.
+ */
+IWPPage.prototype.onBack=function(){
+    return false;
+};
 
 
 /**
@@ -1468,6 +1571,12 @@ IWPNotify.prototype.show=function(content,delay){
     setTimeout(function(){
         IWebapp.getInstance().removeNotify(target)
     },this.delay);
+}
+
+var IWPHistoryData={
+    pageName:"",
+    pageClass:"",
+    params:null
 }
 
 /**
