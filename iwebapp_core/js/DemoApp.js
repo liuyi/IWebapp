@@ -16,18 +16,28 @@ DemoApp.prototype.init = function () {
 
     core.openPage("LoginPage", {username: "liu yi"})
     window.onhashchange=function(){
-        var currentHash=core.currentHash();
-       // trace("currentHASH:"+currentHash+"================="+window.location.hash);
+        var currentHash=core.getCurrentHash();
+        // trace("currentHASH:"+currentHash+"================="+window.location.hash);
         if(window.location.hash!="#"+currentHash){
             trace("HASH CHANGED!!!")
             //check is forward or back
             //or is a new link
-            //var currentHashArray=currentHash.split("/");
-            //var updateHashArray=window.location.hash.split("/").splice(1);
+//            var currentHashArray=getCurrentHash.split("/");
+//            var updateHashArray=window.location.hash.split("/")
+//            updateHashArray.splice(1);
+
+
+            core.onHashChange(window.location.hash);
+
 
            // trace(updateHashArray)
+
         }
     }
+
+
+
+
 }
 
 
@@ -52,7 +62,7 @@ function LoginPage() {
     this.usernameTxt = null;
     this.passwordTxt = null;
     this.learnLink = null;
-    this.name="login"
+
 
 }
 
@@ -136,7 +146,7 @@ IWebapp.extend(HomePage, IWPPage);
 function HomePage() {
     HomePage.$super(this);
     this.logoutBtn = null;
-    this.name="home"
+
 }
 
 HomePage.prototype.onCreate = function (pageData) {
@@ -174,12 +184,25 @@ HomePage.prototype.onBack=function(){
     return true;
 }
 
+HomePage.prototype.onHashChange=function(hash){
+
+    trace("homepage hash changed:"+hash)
+    hash.splice(0,1);
+    var childHash=hash[0];
+    if(childHash=="annouce"){
+        core.openChildPage("AnnouncePage", null, this);
+    }else if(childHash==""|| childHash==null){
+        trace("no child hash");
+        this.removeChildPage();
+    }
+}
+
 
 IWebapp.extend(AnnouncePage, IWPPage);
 function AnnouncePage() {
 
     AnnouncePage.$super(this);
-    this.name="annouce"
+
 }
 
 AnnouncePage.prototype.onCreate = function (pageData) {

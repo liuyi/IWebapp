@@ -16,4 +16,12 @@
         <view id="confirmView">html/confirmView.html</view>
         <view id="notificationView">html/notificationView.html</view>
     </views>
+    <pages mode="web" defualtPageAlias="login">
+        <page alias="login" name="LoginPage" />
+        <page alias="home" name="HomePage" >
+            <page alias="annouce" name="AnnouncePage" />
+        </page>
+        <page alias="aa" name="aaaaa" />
+        <page alias="bbbb" name="bbb" />
+    </pages>
 </data>

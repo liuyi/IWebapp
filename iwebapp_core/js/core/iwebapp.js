@@ -113,6 +113,10 @@ function IWebapp() {
      * @private
      */
     this._history=[];
+    this._historyIndex=-1;
+    this._hashList=[];
+    this._currentPageAlias="";
+    this._defualtPageId="";
    // this._userChangeHash=false;//If is user press back button or forward button, set it to true;
 
     /*attach pages to this HTMLElement*/
@@ -421,11 +425,25 @@ IWebapp.prototype.removePage = function (pageObj) {
 
     //remove hash tag
     if(page.type==IWPPage.PAGE_TYPE_NORMAL && page._parentPageId!=null){
+
+       // trace(window.location.hash +"==="+this._currentPageAlias)
         var hash= window.location.hash.split("/");
-        hash.splice(0,1)
-        index=hash.indexOf(page.name);
-        var hash2=hash.splice(0,index);
-        this._setHash("/"+hash2.join("/"));
+        hash.splice(0,1);
+
+        //if app remove this page, not by browser, updata hash.
+        if(window.location.hash== "#"+this._currentPageAlias){
+
+            index=hash.indexOf(page.name);
+            hash.splice(index);
+
+            this._setHash("/"+hash.join("/"));
+        }else {
+            //else only update current alias
+
+            this._currentPageAlias="/"+hash.join("/");
+            trace("ONLY update _currentPageAlias:"+ this._currentPageAlias)
+        }
+
 
     }
 
@@ -440,15 +458,116 @@ IWebapp.prototype.removePage = function (pageObj) {
  * @desc if user pressed back button or forward button, it should return true else return false.
  * @returns {boolean}
  */
-IWebapp.prototype.currentHash=function(){
-    if(this._history.length==0) {
-        return "";
-    }else{
-        return this._history[this._history.length-1].hash;
+IWebapp.prototype.getCurrentHash=function(){
+//    if(this._history.length==0) {
+//        return "";
+//    }else{
+//        return this._history[this._historyIndex].hash;
+//    }
+    trace("this._currentPageAlias:"+this._currentPageAlias);
+    return this._currentPageAlias;
+
+}
+
+/**
+ * @desc if the hash tag has changed by user or want back/forward, execute this method.
+ * @param hash [string] current hash from browse
+ * @param act [string] if only want back or forward, set the value to "back | forward".
+ */
+IWebapp.prototype.onHashChange=function(hash,act){
+
+    //remove "#" from hash tag.
+    if(hash.indexOf("#/")==0){
+        hash=hash.substring(2);
     }
 
 
+//
+//    if(this._historyIndex-1 >=0 && hash==this._history[this._historyIndex-1].hash){
+//        //back
+//        trace("BACK TO:"+hash);
+//        var pageItem=this._history[this._historyIndex-1];
+//        if(pageItem.parentPageId==null){
+//            this.openPage(pageItem.constructorName,pageItem.params)
+//        }else{
+//            this.openChildPage(pageItem.constructorName,pageItem.params,pageItem.parentPageId)
+//        }
+//
+//
+//    }else if(this._historyIndex+1< this._history.length && hash==this._history[this._historyIndex+1].hash){
+//        //forward
+//        trace("FORWARD TO:"+hash)
+//
+//          pageItem=this._history[this._historyIndex+1];
+//        if(pageItem.parentPageId==null){
+//            this.openPage(pageItem.constructorName,pageItem.params)
+//        }else{
+//            this.openChildPage(pageItem.constructorName,pageItem.params,pageItem.parentPageId)
+//        }
+//    }else{
+//        //change to a new page.
+//        trace("SWITCH TO NEW PAGE:" +hash);
+//        var hashArray=hash.split("/");
+//        //need change hash to page constructor name
+//       // this.openPage(hashArray[],pageItem.params)
+//    }
+
+    var hashArray=hash.split("/");
+
+
+
+
+    var currentHash=this._currentPageAlias;
+    if(currentHash.indexOf("/")==0) currentHash=currentHash.substring(1);
+
+    var currentHashArray=currentHash.split("/");
+
+
+    var diffIndex=0;
+    var maxLen=(currentHashArray.length>hashArray.length)?currentHashArray.length:hashArray.length;
+    for(var i=0;i<maxLen;i++){
+        if(currentHashArray[i]==null || hashArray[i]==null ||  currentHashArray[i]!=hashArray[i]){
+            diffIndex=i;
+            break;
+        }
+    }
+
+    trace("diffIndex:"+diffIndex+">>currentHashArray: "+currentHashArray+"=====hashArray: "+hashArray)
+    if(diffIndex>0){
+        trace("find the parent page:"+diffIndex)
+        //find the parent page:
+        var len=this._pages.length;
+        var page=null;
+        var parentAlias=hashArray[diffIndex-1];
+        for(i=len-1;i>=0;i--){
+            page=this._pages[this._pages[i]];
+            if(page.alias==parentAlias){
+                break;
+            }
+        }
+
+        if(page!=null){
+            page.onHashChange(hashArray)
+        }
+
+
+
+    }else{
+        var rootPage=this._hashList[hashArray[0]];
+        if(rootPage==null) rootPage=this._defualtPageId;
+        else rootPage=rootPage.name;
+
+        this.openPage(rootPage);
+    }
+
+
+
+
+
+
+
 }
+
 
 IWebapp.prototype.back = function () {
 
@@ -824,6 +943,51 @@ IWebapp.prototype._onReady=function(){
 
     views=null;
 
+    //these data are use for web mode, not app mode.
+    var pages=this._assetsXML.find("data > pages");
+
+    var alias=pages.attr("defualtPageAlias")
+    var pagesMap=this._hashList;
+    if(pages!=null){
+        pages.children("page").each(function(){
+            var pageObj=initPageMap(this,alias)
+            pagesMap.push(pageObj.alias);
+            pagesMap[pageObj.alias]=pageObj;
+            if(alias==pageObj.alias){
+                IWebapp.getInstance()._defualtPageId=pageObj.name;
+            }
+        })
+    }
+    trace("this._defualtPageId:"+this._defualtPageId)
+    trace(pagesMap)
+    pages=null;
+    pagesMap=null;
+
+    function initPageMap(target,parentAlias){
+        var pageObj={};
+        var page=$(target);
+        pageObj.name=page.attr("name");
+        pageObj.alias=page.attr("alias");
+
+        if(parentAlias!=pageObj.alias){
+            pageObj.parentAlias=parentAlias;
+        }else{
+            pageObj.parentAlias="";
+        }
+
+        pageObj.pages=[]
+
+
+        page.children("page").each(function(){
+
+            var childObj=initPageMap(this,pageObj.alias);
+            pageObj.pages.push( childObj.alias);
+            pagesMap[childObj.alias]=childObj;
+        })
+
+        page=null;
+        return pageObj;
+    }
 
     if (this._configData.onReady != null){
         this._configData.onReady();
@@ -1239,45 +1403,55 @@ IWebapp.prototype._addToHistory=function(page,pageData,parentPage){
     if(page.type!=IWPPage.PAGE_TYPE_NORMAL) return;
     var hash= window.location.hash.split("/");
 
-    var pageItem={};
-    pageItem.constructorName=page.constructor.name;
-    pageItem.params=pageData;
-    pageItem.type=page.type;
-    pageItem.parentPageId=page._parentPageId;
+//    var pageItem={};
+//    pageItem.constructorName=page.constructor.name;
+//    pageItem.params=pageData;
+//    pageItem.type=page.type;
+//    pageItem.parentPageId=page._parentPageId;
 
 
-
+    var hash2="";
     if(parentPage){
         //set hash tag
         hash.splice(0,1)
-        var parentHash=parentPage.name;
+        var parentHash=parentPage.alias;
         var index=hash.indexOf(parentHash);
         hash.splice(index+1);
 
-        hash.push(page.name);
-        pageItem.hash="/"+hash.join("/");
+        hash.push(page.alias);
+        hash2="/"+hash.join("/");
 
 
 
     }else{
         //set hash tag
-        pageItem.hash="/"+page.name;
+        hash2="/"+page.alias;
 
 
     }
 
-    this._history.push(pageItem);
+    //don't need history,use native history instead of this. (for web mode)
+    //this._history.push(pageItem);
+    //this._historyIndex=this._history.length-1;
 
-    this._setHash(pageItem.hash);
+    this._setHash(hash2);
+
+
+
 
 
 }
 
 
 IWebapp.prototype._setHash=function(hash){
+    this._currentPageAlias=hash;
     window.location.hash=hash;
+    trace("set hash:"+hash)
 
 }
+
+
+
 //==============OTHER CLASS=================================
 
 
@@ -1322,8 +1496,31 @@ function IWPPage() {
      * Unique id
      * @type {string}
      */
-    this.id = "IWPPage_" + IWPPage._index++;
-    this.name=arguments.callee.name;
+
+    /**
+     * @desc The class name, don't set it.
+     * @type {string}
+     */
+    this.name=this.constructor.name;
+    this.id = this.name+"_" + IWPPage._index++;
+
+    /**
+     * @desc alias will display in url.
+     * @type {string} default value is the page's name, maybe it's not friendly for user, should reset it.
+     */
+    //trace("name:"+this.name)
+    //trace(IWebapp.getInstance()._hashList)
+    //this.alias=IWebapp.getInstance()._hashList[this.name].alias;
+    this.alias=this.name;
+
+    for (var i in IWebapp.getInstance()._hashList){
+        var item=IWebapp.getInstance()._hashList[i];
+        if(item.name==this.name){
+            this.alias=item.alias;
+            break;
+        }
+
+    }
 
 
     /**
@@ -1351,6 +1548,10 @@ function IWPPage() {
 
     this._status = IWPPage.STATUS_UNREADY;
     this._viewItemId = 1;
+    /**
+     * @desc the page's type.
+     * @type {number}  value should be: [IWPPage.PAGE_TYPE_NORMAL|IWPPage.PAGE_TYPE_DIALOG|IWPPage.PAGE_TYPE_NOTIFY]
+     */
     this.type=IWPPage.PAGE_TYPE_NORMAL;
 
 
@@ -1417,7 +1618,21 @@ IWPPage.prototype.onBack=function(){
     return false;
 };
 
+IWPPage.prototype.onHashChange=function(hash){
+    trace("page hash changed:"+hash)
+}
 
+IWPPage.prototype.removeChildPage=function(){
+    var len=this._childPages.length;
+
+    if(len>0){
+        for(var i=0;i<len;i++){
+            IWebapp.getInstance().removePage(this._childPages[i]);
+
+        }
+
+    }
+}
 /**
  * @desc get HTMLElement in the view of the page.
  * @param id {string}
