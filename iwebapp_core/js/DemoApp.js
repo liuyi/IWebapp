@@ -20,14 +20,42 @@ DemoApp.prototype.init = function () {
         core.openPage("LoginPage", {username: "liu yi"})
     }
 
-    window.onhashchange=function(){
-        core.onHashChange(window.location.hash);
+
+
+    //handle deeplink, if this app is a web.
+
+
+
+    if(checkIEVersion(8)==true ){
+        window.onhashchange=function(){
+            core.onHashChange(window.location.hash);
+        }
+    }else{
+
+        setInterval(function(){
+
+            core.onHashChange(window.location.hash);
+        },100)
     }
 
 
 
 
+
 }
+
+
+    function checkIEVersion(requireVersion){
+        var userAgent = navigator.userAgent.toLowerCase();
+// Test if the browser is IE and check the version number is lower than 9
+        if (/msie/.test(userAgent) &&
+            parseFloat((userAgent.match(/.*(?:rv|ie)[\/: ](.+?)([ \);]|$)/) || [])[1]) < requireVersion) {
+            // Navigate to error page
+            return false
+        }
+
+        return true
+    }
 
 
 DemoApp.prototype.login = function (obj) {
@@ -71,9 +99,20 @@ LoginPage.prototype.onCreate = function (pageData) {
     this.learnLink = this.findViewItem("learnLink", true)
 
 
-   // addEvent(this.view.html, "click", this.onClicked, this);
+
+
+
+    // addEvent(this.view.html, "click", this.onClicked, this);
     addEvent(this.view.html, "tap", this.onTap, this);
     addEvent(this.view.html, "longtap", this.onLongTap, this);
+
+
+    var context=this;
+    this.timer=setTimeout(function(){
+        context.view.html.style.transition="left 1s ";
+        context.view.html.style.left="-200px"
+
+    },10000000000000)
 
 
 
@@ -91,6 +130,9 @@ LoginPage.prototype.onDestroy = function () {
     this.learnLink = null;
     removeEvent(this.view.html, "tap", this.onTap);
     removeEvent(this.view.html, "longtap", this.onLongTap);
+
+    clearTimeout(this.timer);
+    this.timer=null;
 
 }
 
@@ -146,12 +188,25 @@ HomePage.prototype.onCreate = function (pageData) {
     this.logoutBtn = this.findViewItem("logoutBtn", true);
     this.announceBtn = this.findViewItem("announceBtn", true);
 
-    addEvent(this.view.html, "click", this.onClicked, this);
+    addEvent(this.view.html, "tap", this.onClicked, this);
+
+    var btn=this.announceBtn
+    this.timer=setTimeout(function(){
+
+        iwp.resumeNode(btn)
+    },1000)
+
+    this.timer2=setTimeout(function(){
+
+        iwp.disableNode(btn)
+    },3000)
 
 }
 
 HomePage.prototype.onDestroy = function () {
-    removeEvent(this.view.html, "click", this.onClicked);
+    removeEvent(this.view.html, "tap", this.onClicked);
+    clearTimeout(this.timer)
+    clearTimeout(this.timer2)
 }
 
 HomePage.prototype.onClicked = function (e, context) {
@@ -200,13 +255,13 @@ AnnouncePage.prototype.onCreate = function (pageData) {
     this.backBtn = this.findViewItem("backBtn");
     this.detailBtn=this.findViewItem("detailBtn");
 
-    addEvent(this.view.html, "click", this.onClicked, this);
+    addEvent(this.view.html, "tap", this.onClicked, this);
 
 
 }
 
 AnnouncePage.prototype.onDestroy = function () {
-    removeEvent(this.view.html, "click", this.onClicked);
+    removeEvent(this.view.html, "tap", this.onClicked);
 }
 
 

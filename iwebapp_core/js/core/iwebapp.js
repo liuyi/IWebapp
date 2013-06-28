@@ -158,7 +158,7 @@ function IWebapp() {
     this._tapEventTag = "tap";
     this._longTapEventTag = "longtap";
     this._ignoreTouchTag = "ignore";
-    this._disableTag = "disbale";
+    this._disableTag = "disabled";
 
 
     this._touchTarget = null;
@@ -243,7 +243,7 @@ IWebapp.removeClass = function (target, className) {
         var has = target.className.match(regx);
 
         if (has != null && has.length >= 0) {
-            target.className = target.className.replace(className, "");
+            target.className = target.className.replace(className, "").trim();
 
         }
     }
@@ -256,13 +256,24 @@ IWebapp.addClass = function (target, className) {
         var regx = new RegExp("\\b" + className + "\\b", "gi");
         var has = target.className.match(regx);
         if (has == null || has.length < 0) {
-            target.className += (" " + className);
+            target.className =target.className.trim()+" " + className;
 
           //  trace("className:"+className)
         }
     }
 
 
+}
+IWebapp.disableNode=function(htmlElement){
+    IWebapp.addClass(htmlElement,IWebapp.getInstance()._disableTag);
+    htmlElement.setAttribute(IWebapp.getInstance()._disableTag)
+}
+
+IWebapp.resumeNode=function(htmlElement){
+
+
+    IWebapp.removeClass(htmlElement,IWebapp.getInstance()._disableTag);
+    htmlElement.removeAttribute(IWebapp.getInstance()._disableTag)
 }
 
 
@@ -342,11 +353,15 @@ IWebapp.prototype.openPage = function (pageObj, pageData,hash) {
     this._pages[page.id] = page;
 
     page.onCreate(pageData);
-    if(hash==null || hash.length==0){
-
+    if(hash==null || hash.length===0){
+        trace("ssdsd")
          this._addToHistory(page,pageData);
     }else{
+        trace("ccccc:"+typeof hash);
+        trace(hash);
+        this._currentPageAlias="/"+page.alias;
 
+        trace("open  page:"+ this._currentPageAlias)
         page.onHashChange(hash);
     }
     page = null;
@@ -384,7 +399,7 @@ IWebapp.prototype.openChildPage = function (pageObj, pageData, parentObj,hash) {
 
 
     page.onCreate(pageData);
-    if(hash==null || hash.length==0){
+    if(hash==null || hash.length===0){
 
         this._addToHistory(page,pageData,parentPage);
     }else{
@@ -393,6 +408,10 @@ IWebapp.prototype.openChildPage = function (pageObj, pageData, parentObj,hash) {
         //var childHash=hash.splice(0,1);
         //var childPageName=this._hashList[childHash].name;
         //this.openChildPage(childPageName,null,page)
+
+         this._currentPageAlias+="/"+page.alias;
+        trace("====page.alias>"+page.alias)
+        trace("open child page hash:"+ this._currentPageAlias)
         page.onHashChange(hash);
     }
 
@@ -492,8 +511,12 @@ IWebapp.prototype.getCurrentHash=function(){
  */
 IWebapp.prototype.onHashChange=function(hash){
 
-    if(window.location.hash=="#"+this._currentPageAlias) return;
+    if(window.location.hash=="#"+this._currentPageAlias){
+        //trace("this is the same hash as app");
+        return;
+    }
 
+   trace("****************change hash*******************_currentPageAlias:"+this._currentPageAlias)
    // trace("iweb app ===========hash change==========")
     //remove "#" from hash tag.
     if(hash.indexOf("#/")==0){
@@ -535,11 +558,17 @@ IWebapp.prototype.onHashChange=function(hash){
 
 
 
-
-    var currentHash=this._currentPageAlias;
+    if(this._currentPageAlias==null) this._currentPageAlias="";
+    var currentHash=this._currentPageAlias.toString();
     if(currentHash.indexOf("/")==0) currentHash=currentHash.substring(1);
+   // trace("currentHash:"+currentHash+">"+(typeof currentHash))
+    if(currentHash.length>0){
+        var currentHashArray=currentHash.split("/");
+    }
 
-    var currentHashArray=currentHash.split("/");
+    else{
+         currentHashArray=[]
+    }
 
 
     var diffIndex=0;
@@ -551,7 +580,7 @@ IWebapp.prototype.onHashChange=function(hash){
         }
     }
 
-    // trace("diffIndex:"+diffIndex+">>currentHashArray: "+currentHashArray+"=====hashArray: "+hashArray)
+      trace("diffIndex:"+diffIndex+">>currentHashArray: "+currentHashArray+"=====hashArray: "+hashArray)
     if(diffIndex>0){
        // trace("find the parent page:"+diffIndex)
         //find the parent page:
@@ -582,13 +611,13 @@ IWebapp.prototype.onHashChange=function(hash){
 
         var rootPage=this._hashList[hashArray[0]];
 
-      //  trace("root page:"+rootPage+":"+hashArray[0])
+        trace("root page:"+rootPage+":"+hashArray)
         if(rootPage==null) rootPage=this._defualtPageId;
         else rootPage=rootPage.name;
 
         hashArray.splice(0,1)
-
-       // trace(hashArray)
+        trace("hash array====>>>>")
+         trace(hashArray)
         this.openPage(rootPage,null,hashArray);
     }
 
@@ -604,7 +633,7 @@ IWebapp.prototype.onHashChange=function(hash){
 IWebapp.prototype.back = function () {
 
     //find current page.
-    var pageId=this._pages[_pages.length-1];
+    var pageId=this._pages[this._pages.length-1];
     var currentPage=this._pages[pageId];
 
     if(currentPage==null){
@@ -1340,6 +1369,7 @@ IWebapp.prototype._dispatchEvent = function (target, EventType) {
 
 IWebapp.prototype._onMouseDown = function (e, context) {
 
+
     //
     if (context._touchTarget != null) {
         var preTarget = context._touchTarget;
@@ -1351,7 +1381,7 @@ IWebapp.prototype._onMouseDown = function (e, context) {
 
 
     if (context._touchTarget != null) {
-        //trace("got touch target:" + context._touchTarget.nodeName)
+       //trace("got touch target:" + context._touchTarget.nodeName)
 
 
         context._touchTarget.touchTime = (e.timestamp || Date.now());
@@ -1417,14 +1447,17 @@ IWebapp.prototype._onMouseUp = function (e, context) {
 
 IWebapp.prototype._getTouchTarget = function (target) {
 
-    //  trace("_getTouchTarget:"+target+"  :"+target.parentNode.nodeName)
+    // trace("_getTouchTarget:"+target+"  :"+target.parentNode.nodeName)
 
 
     while (target != null) {
 
 
 
-        if (target.getAttribute != null && (target.getAttribute(this._ignoreTouchTag) == null) && (this._touchableNodes.indexOf(target.nodeName) >= 0 || target.getAttribute(this._touchableAttr) == this._touchableAttr)) {
+
+
+
+        if (target.getAttribute != null &&  (target.getAttribute(this._disableTag)===null ||target.getAttribute(this._disableTag)===false) && (target.getAttribute(this._ignoreTouchTag) == null) && (this._touchableNodes.indexOf(target.nodeName) >= 0 || target.getAttribute(this._touchableAttr) == this._touchableAttr)) {
 
             return target;
         } else {
@@ -1439,6 +1472,10 @@ IWebapp.prototype._getTouchTarget = function (target) {
 //
 //            trace("touchable:"+this._touchableNodes.indexOf(target.nodeName)+">>"+target.nodeName+"?"+this._touchableNodes);
 //            trace("continure find:"+target.nodeName+ " parent:"+target.parentNode);
+
+          // trace("===>"+target.nodeName +">>"+">"+(target.getAttribute("disabled").value)+">"+ (target.getAttribute(this._ignoreTouchTag) == null)+">"+(this._touchableNodes.indexOf(target.nodeName) >= 0 || target.getAttribute(this._touchableAttr) == this._touchableAttr))
+
+           // trace("<"+target.getAttribute("disabled")+">")
             target = target.parentNode;
         }
 
@@ -1498,9 +1535,18 @@ IWebapp.prototype._addToHistory=function(page,pageData,parentPage){
 
 
 IWebapp.prototype._setHash=function(hash){
+
+
+    trace("will set hash to :"+hash)
+
+    if(hash==null || hash =="undefined"){
+        hash="";
+        //window.location.href = window.location.href.replace(/#.*$/, '#');
+    }
     this._currentPageAlias=hash;
     window.location.hash=hash;
-    //trace("set hash:"+hash)
+
+    trace("set hash:"+hash)
 
 }
 
@@ -1556,6 +1602,13 @@ function IWPPage() {
      * @type {string}
      */
     this.name=this.constructor.name;
+
+    //fix ie
+    if(this.name==null){
+        this.name=this.constructor.toString();
+        this.name=this.name.substring(0, this.name.indexOf("(")).replace("function","").trim();
+    }
+
     this.id = this.name+"_" + IWPPage._index++;
 
     /**
@@ -1570,9 +1623,11 @@ function IWPPage() {
 
     for (var i in IWebapp.getInstance()._hashList){
         var item=IWebapp.getInstance()._hashList[i];
+       // trace("item.name:"+item.name  +"/"+ this.name)
         if(item.name==this.name){
             this.alias=item.alias;
-            //this.childAliasList
+
+            trace(item)
             for(var k=0;k<item.pages.length;k++){
                 this.childAliasList[k]=item.pages[k];
 
@@ -1698,7 +1753,8 @@ IWPPage.prototype.onHashChange=function(hash){
         }
 
     }else{
-        trace("can not find child page")
+        trace("can not find child page, current alias is:"+IWebapp.getInstance()._currentPageAlias);
+        IWebapp.getInstance()._setHash(IWebapp.getInstance()._currentPageAlias)
     }
 //    if(childHash=="annouce"){
 //        core.openChildPage("AnnouncePage", null, this);
@@ -1874,10 +1930,14 @@ IWPNotify.prototype.show=function(content,delay){
     },this.delay);
 }
 
-var IWPHistoryData={
-    pageName:"",
-    pageClass:"",
-    params:null
+
+function IWPSwitch(){
+
+}
+
+IWPSwitch.prototype.start=function(prevItem,nextItem,container,onComplete){
+    prevItem.style.transition="left";
+    prevItem.style.transform("left","-1000px");
 }
 
 /**
