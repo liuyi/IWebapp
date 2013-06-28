@@ -174,7 +174,7 @@ iwp = window.iwp = IWebapp;
  * Sometimes we want know if the target device is touchable.
  */
 IWebapp.checkTouchable = function () {
-    trace("check touch")
+    //trace("check touch")
     if (IWebapp.touchable == true) {
         IWebapp.getInstance().handleTouch();
     } else {
@@ -186,7 +186,7 @@ IWebapp.checkTouchable = function () {
             removeEvent(window.document.body, "mousemove", mouseResult)
 
             IWebapp.getInstance().handleTouch();
-            trace(IWebapp.touchable)
+           // trace(IWebapp.touchable)
         }
 
         var mouseResult = function (e, context) {
@@ -198,7 +198,7 @@ IWebapp.checkTouchable = function () {
 
             IWebapp.getInstance().handleMouse();
 
-            trace("mouse handle" + IWebapp.touchable)
+            //trace("mouse handle" + IWebapp.touchable)
         }
 
         addEvent(window.document.body, "touchstart", touchResult)
@@ -333,7 +333,7 @@ IWebapp.prototype.init = function (container, configPath, configData) {
  * @param pageName
  * @param pageData
  */
-IWebapp.prototype.openPage = function (pageObj, pageData) {
+IWebapp.prototype.openPage = function (pageObj, pageData,hash) {
 
 
     var page = this._initPage(pageObj);
@@ -342,7 +342,13 @@ IWebapp.prototype.openPage = function (pageObj, pageData) {
     this._pages[page.id] = page;
 
     page.onCreate(pageData);
-    this._addToHistory(page,pageData);
+    if(hash==null || hash.length==0){
+
+         this._addToHistory(page,pageData);
+    }else{
+
+        page.onHashChange(hash);
+    }
     page = null;
 
 
@@ -351,7 +357,7 @@ IWebapp.prototype.openPage = function (pageObj, pageData) {
 
 
 
-IWebapp.prototype.openChildPage = function (pageObj, pageData, parentObj) {
+IWebapp.prototype.openChildPage = function (pageObj, pageData, parentObj,hash) {
 
 
     var parentPage = null;
@@ -378,7 +384,18 @@ IWebapp.prototype.openChildPage = function (pageObj, pageData, parentObj) {
 
 
     page.onCreate(pageData);
-    this._addToHistory(page,pageData,parentPage);
+    if(hash==null || hash.length==0){
+
+        this._addToHistory(page,pageData,parentPage);
+    }else{
+        //open child page
+
+        //var childHash=hash.splice(0,1);
+        //var childPageName=this._hashList[childHash].name;
+        //this.openChildPage(childPageName,null,page)
+        page.onHashChange(hash);
+    }
+
 
 
 
@@ -388,7 +405,7 @@ IWebapp.prototype.openChildPage = function (pageObj, pageData, parentObj) {
 
 
 
-IWebapp.prototype.removePage = function (pageObj) {
+IWebapp.prototype.removePage = function (pageObj,changeLink) {
     var page = null;
     if (pageObj == null) {
         //have not set parentPage, use the latest page.
@@ -431,7 +448,7 @@ IWebapp.prototype.removePage = function (pageObj) {
         hash.splice(0,1);
 
         //if app remove this page, not by browser, updata hash.
-        if(window.location.hash== "#"+this._currentPageAlias){
+        if(window.location.hash== "#"+this._currentPageAlias && changeLink!=false){
 
             index=hash.indexOf(page.name);
             hash.splice(index);
@@ -441,7 +458,7 @@ IWebapp.prototype.removePage = function (pageObj) {
             //else only update current alias
 
             this._currentPageAlias="/"+hash.join("/");
-            trace("ONLY update _currentPageAlias:"+ this._currentPageAlias)
+          //  trace("ONLY update _currentPageAlias:"+ this._currentPageAlias)
         }
 
 
@@ -464,7 +481,7 @@ IWebapp.prototype.getCurrentHash=function(){
 //    }else{
 //        return this._history[this._historyIndex].hash;
 //    }
-    trace("this._currentPageAlias:"+this._currentPageAlias);
+    //trace("this._currentPageAlias:"+this._currentPageAlias);
     return this._currentPageAlias;
 
 }
@@ -472,10 +489,12 @@ IWebapp.prototype.getCurrentHash=function(){
 /**
  * @desc if the hash tag has changed by user or want back/forward, execute this method.
  * @param hash [string] current hash from browse
- * @param act [string] if only want back or forward, set the value to "back | forward".
  */
-IWebapp.prototype.onHashChange=function(hash,act){
+IWebapp.prototype.onHashChange=function(hash){
 
+    if(window.location.hash=="#"+this._currentPageAlias) return;
+
+   // trace("iweb app ===========hash change==========")
     //remove "#" from hash tag.
     if(hash.indexOf("#/")==0){
         hash=hash.substring(2);
@@ -532,13 +551,15 @@ IWebapp.prototype.onHashChange=function(hash,act){
         }
     }
 
-    trace("diffIndex:"+diffIndex+">>currentHashArray: "+currentHashArray+"=====hashArray: "+hashArray)
+    // trace("diffIndex:"+diffIndex+">>currentHashArray: "+currentHashArray+"=====hashArray: "+hashArray)
     if(diffIndex>0){
-        trace("find the parent page:"+diffIndex)
+       // trace("find the parent page:"+diffIndex)
         //find the parent page:
         var len=this._pages.length;
         var page=null;
         var parentAlias=hashArray[diffIndex-1];
+
+        //trace("parent alias:"+parentAlias)
         for(i=len-1;i>=0;i--){
             page=this._pages[this._pages[i]];
             if(page.alias==parentAlias){
@@ -546,6 +567,11 @@ IWebapp.prototype.onHashChange=function(hash,act){
             }
         }
 
+       // trace("current page:"+page.name)
+       // trace("hashArray:"+hashArray)
+
+        hashArray.splice(0,diffIndex)
+       // trace("hashArray2:"+hashArray)
         if(page!=null){
             page.onHashChange(hashArray)
         }
@@ -553,11 +579,17 @@ IWebapp.prototype.onHashChange=function(hash,act){
 
 
     }else{
+
         var rootPage=this._hashList[hashArray[0]];
+
+      //  trace("root page:"+rootPage+":"+hashArray[0])
         if(rootPage==null) rootPage=this._defualtPageId;
         else rootPage=rootPage.name;
 
-        this.openPage(rootPage);
+        hashArray.splice(0,1)
+
+       // trace(hashArray)
+        this.openPage(rootPage,null,hashArray);
     }
 
 
@@ -584,7 +616,7 @@ IWebapp.prototype.back = function () {
         }
     }
 
-    trace(this._history)
+    //trace(this._history)
 }
 
 
@@ -958,8 +990,8 @@ IWebapp.prototype._onReady=function(){
             }
         })
     }
-    trace("this._defualtPageId:"+this._defualtPageId)
-    trace(pagesMap)
+   // trace("this._defualtPageId:"+this._defualtPageId)
+    //trace(pagesMap)
     pages=null;
     pagesMap=null;
 
@@ -1032,19 +1064,24 @@ IWebapp.prototype._addPageToStage = function (page) {
 
 
         if (page.view.fillView == true) {
+            //find out the chain of parent page
+            var pageChain=this._getPageChain(page.id);
+          //  trace(pageChain)
+
+            //remove pages
             var $page = null;
             for (var i = 0; i < this._pages.length; i++) {
                 $page = this._pages[this._pages[i]];
 
 
                 //&& $page.type!=IWPPage.PAGE_TYPE_DIALOG
-                if ($page.view != null && $page.view.html != null && $page.id != page.id  ) {
+                if ($page.view != null && $page.view.html != null && $page.id != page.id && $page.type!=IWPPage.PAGE_TYPE_NOTIFY ) {
 
                     //If target page is  parent of current page,hidden target page.
                     if ($page.id == page._parentPageId) {
                         IWebapp.addClass($page.view.html, IWPPage.PAGE_CLASS_PAUSEPAGE);
-                    } else {
-                    //If not, remove it.
+                    } else if(pageChain.indexOf($page.id)<0) {
+                        //If not, remove it.
                         this.removePage($page);
                         i--;
                     }
@@ -1071,7 +1108,24 @@ IWebapp.prototype._addPageToStage = function (page) {
 
     this._$container.append(page.view.html);
 }
+IWebapp.prototype._getPageChain=function(pageId,chain){
+    if(chain==null) chain=[];
 
+    var page=this._pages[pageId];
+    if(page==null){
+        return chain;
+    }else{
+        chain.push(page.id);
+        var parentPage=this._pages[page._parentPageId];
+        if(parentPage!=null){
+
+            this._getPageChain(parentPage.id,chain)
+        }
+    }
+
+
+    return chain;
+}
 
 IWebapp.prototype._destroyPage = function (page) {
 
@@ -1173,7 +1227,7 @@ IWebapp.prototype._onTouching = function (target) {
             IWebapp.removeClass(target,context._touchTapAttr);
             clearInterval(target.timer);
             target.timer = null;
-             trace("===========dispatch long tap======target:"+target.nodeName+"===========");
+            // trace("===========dispatch long tap======target:"+target.nodeName+"===========");
             context._dispatchEvent(target, context._longTapEventTag)
         } else {
 
@@ -1446,7 +1500,7 @@ IWebapp.prototype._addToHistory=function(page,pageData,parentPage){
 IWebapp.prototype._setHash=function(hash){
     this._currentPageAlias=hash;
     window.location.hash=hash;
-    trace("set hash:"+hash)
+    //trace("set hash:"+hash)
 
 }
 
@@ -1512,11 +1566,17 @@ function IWPPage() {
     //trace(IWebapp.getInstance()._hashList)
     //this.alias=IWebapp.getInstance()._hashList[this.name].alias;
     this.alias=this.name;
+    this.childAliasList=[];
 
     for (var i in IWebapp.getInstance()._hashList){
         var item=IWebapp.getInstance()._hashList[i];
         if(item.name==this.name){
             this.alias=item.alias;
+            //this.childAliasList
+            for(var k=0;k<item.pages.length;k++){
+                this.childAliasList[k]=item.pages[k];
+
+            }
             break;
         }
 
@@ -1619,15 +1679,41 @@ IWPPage.prototype.onBack=function(){
 };
 
 IWPPage.prototype.onHashChange=function(hash){
-    trace("page hash changed:"+hash)
+  //  trace(this.name+ "   >>page hash changed:"+hash)
+
+   // hash.splice(0,1);
+    var childHash=hash[0];
+    hash.splice(0,1);
+//    trace("childHash:"+childHash +">>>>>>>>"+hash)
+//    trace("childAliasList:"+this.childAliasList)
+//    trace("find index:"+this.childAliasList.indexOf(childHash))
+    if(childHash==""|| childHash==null){
+       // trace("remove child page")
+        this.removeChildPage(false);//don't change hash when remove page.
+    }else if(this.childAliasList.indexOf(childHash)>=0){
+       // trace("open child page!!!!!!!"+hash)
+        var pageObj=IWebapp.getInstance()._hashList[childHash];
+        if(pageObj!=null){
+            core.openChildPage(pageObj.name, null, this,hash);
+        }
+
+    }else{
+        trace("can not find child page")
+    }
+//    if(childHash=="annouce"){
+//        core.openChildPage("AnnouncePage", null, this);
+//    }else if(childHash==""|| childHash==null){
+//        trace("no child hash");
+//        this.removeChildPage();
+//    }
 }
 
-IWPPage.prototype.removeChildPage=function(){
+IWPPage.prototype.removeChildPage=function(changeLink){
     var len=this._childPages.length;
 
     if(len>0){
         for(var i=0;i<len;i++){
-            IWebapp.getInstance().removePage(this._childPages[i]);
+            IWebapp.getInstance().removePage(this._childPages[i],changeLink);
 
         }
 

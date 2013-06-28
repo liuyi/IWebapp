@@ -14,25 +14,14 @@ DemoApp.getInstance = function () {
 DemoApp.prototype.init = function () {
 
 
-    core.openPage("LoginPage", {username: "liu yi"})
+    if(window.location.hash!=""){
+        core.onHashChange(window.location.hash);
+    }else{
+        core.openPage("LoginPage", {username: "liu yi"})
+    }
+
     window.onhashchange=function(){
-        var currentHash=core.getCurrentHash();
-        // trace("currentHASH:"+currentHash+"================="+window.location.hash);
-        if(window.location.hash!="#"+currentHash){
-            trace("HASH CHANGED!!!")
-            //check is forward or back
-            //or is a new link
-//            var currentHashArray=getCurrentHash.split("/");
-//            var updateHashArray=window.location.hash.split("/")
-//            updateHashArray.splice(1);
-
-
-            core.onHashChange(window.location.hash);
-
-
-           // trace(updateHashArray)
-
-        }
+        core.onHashChange(window.location.hash);
     }
 
 
@@ -184,18 +173,18 @@ HomePage.prototype.onBack=function(){
     return true;
 }
 
-HomePage.prototype.onHashChange=function(hash){
-
-    trace("homepage hash changed:"+hash)
-    hash.splice(0,1);
-    var childHash=hash[0];
-    if(childHash=="annouce"){
-        core.openChildPage("AnnouncePage", null, this);
-    }else if(childHash==""|| childHash==null){
-        trace("no child hash");
-        this.removeChildPage();
-    }
-}
+//HomePage.prototype.onHashChange=function(hash){
+//
+//    trace("homepage hash changed:"+hash)
+//    hash.splice(0,1);
+//    var childHash=hash[0];
+//    if(childHash=="annouce"){
+//        core.openChildPage("AnnouncePage", null, this);
+//    }else if(childHash==""|| childHash==null){
+//        trace("no child hash");
+//        this.removeChildPage();
+//    }
+//}
 
 
 IWebapp.extend(AnnouncePage, IWPPage);
@@ -208,21 +197,56 @@ function AnnouncePage() {
 AnnouncePage.prototype.onCreate = function (pageData) {
 
     this.setView("announceView");
-    this.backBtn = this.findViewItem("backBtn", true);
+    this.backBtn = this.findViewItem("backBtn");
+    this.detailBtn=this.findViewItem("detailBtn");
 
-    addEvent(this.backBtn, "click", this.onClicked, this);
+    addEvent(this.view.html, "click", this.onClicked, this);
+
 
 }
 
 AnnouncePage.prototype.onDestroy = function () {
-    removeEvent(this.backBtn, "click", this.onClicked);
+    removeEvent(this.view.html, "click", this.onClicked);
 }
 
 
 AnnouncePage.prototype.onClicked = function (e, context) {
-    context.close()
+    var target = (e.target) ? e.target : e.srcElement;//fot ie8
+    if(target==context.backBtn){
+        context.close()
+    }else if(target==context.detailBtn){
+        core.openChildPage("AnnounceChildPage",null,context);
+    }
+
 }
 
+
+
+
+IWebapp.extend(AnnounceChildPage, IWPPage);
+function AnnounceChildPage() {
+
+    AnnounceChildPage.$super(this);
+
+}
+
+AnnounceChildPage.prototype.onCreate=function(){
+    this.setView("annouceChildView");
+    this.backBtn=this.findViewItem("backBtn");
+    addEvent(this.view.html,"tap",this.onClicked,this);
+}
+
+
+AnnounceChildPage.prototype.onDestroy=function(){
+    removeEvent(this.view.html,"tap",this.onClicked)
+}
+
+AnnounceChildPage.prototype.onClicked=function(e,context){
+    var target = (e.target) ? e.target : e.srcElement;//fot ie8
+    if(target==context.backBtn){
+        context.close()
+    }
+}
 
 IWebapp.extend(ConfirmPage, IWPPage);
 function ConfirmPage(){
