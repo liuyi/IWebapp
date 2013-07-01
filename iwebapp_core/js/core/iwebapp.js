@@ -130,9 +130,8 @@ function IWebapp() {
     this._defaultLang = null;
     /*load views of app*/
     this._loader = new IWPLoader();
+    this._switchPlus=null;
 
-    IWebapp.checkTouchable();
-    this._ieFix();
 
     //touch handle stuff
     this._touchDisThreshold = 225;
@@ -164,7 +163,8 @@ function IWebapp() {
     this._touchTarget = null;
     this._touchTime = null;
 
-
+    IWebapp.checkTouchable();
+    this._ieFix();
 }
 
 iwp = window.iwp = IWebapp;
@@ -346,7 +346,6 @@ IWebapp.prototype.init = function (container, configPath, configData) {
  */
 IWebapp.prototype.openPage = function (pageObj, pageData,hash) {
 
-
     var page = this._initPage(pageObj);
 
     this._pages.push(page.id);//only push the id of page to array
@@ -354,20 +353,24 @@ IWebapp.prototype.openPage = function (pageObj, pageData,hash) {
 
     page.onCreate(pageData);
     if(hash==null || hash.length===0){
-        trace("ssdsd")
+
          this._addToHistory(page,pageData);
     }else{
-        trace("ccccc:"+typeof hash);
-        trace(hash);
+
         this._currentPageAlias="/"+page.alias;
 
-        trace("open  page:"+ this._currentPageAlias)
+
         page.onHashChange(hash);
     }
     page = null;
 
 
 
+
+}
+
+IWebapp.prototype.setSwitchPlus=function(iwpSwitch){
+    this._switchPlus=iwpSwitch;
 }
 
 
@@ -424,22 +427,27 @@ IWebapp.prototype.openChildPage = function (pageObj, pageData, parentObj,hash) {
 
 
 
-IWebapp.prototype.removePage = function (pageObj,changeLink) {
+IWebapp.prototype.removePage = function (pageObj,changeLink,resumeParent) {
+
+    var context=IWebapp.getInstance();
+    if(resumeParent==null) resumeParent=true;
     var page = null;
     if (pageObj == null) {
         //have not set parentPage, use the latest page.
     } else if (typeof pageObj == "string") {
-        page = this._pages[pageObj]
+        page = context._pages[pageObj]
     } else if (pageObj instanceof IWPPage) {
         page = pageObj;
     }
-    if (page == null) throw new Error(IWPError.PAGE_NOT_EXIST, "Can not find page when open child page");
+
+   // if (page == null) throw new Error(IWPError.PAGE_NOT_EXIST, "Can not find page when open child page:"+pageObj);
+    if (page == null) throw new Error("Can not find page when remove page:"+pageObj,IWPError.PAGE_NOT_EXIST);
 
     //remove child pages
     if (page._childPages.length > 0) {
 
         for (var i = 0; i < page._childPages.length; i++) {
-            this.removePage(page._childPages[i]);
+            context.removePage(page._childPages[i]);
             page._childPages.splice(i, 1);
             i--;
         }
@@ -448,14 +456,28 @@ IWebapp.prototype.removePage = function (pageObj,changeLink) {
     }
 
     //resume parent page
-    if (page._parentPageId != null) {
-        var parentPage = this._pages[page._parentPageId];
+    if (page._parentPageId != null && resumeParent==true) {
+        var parentPage = context._pages[page._parentPageId];
         if (parentPage != null && parentPage.view != null && parentPage.view.html != null) {
 
-            IWebapp.removeClass(parentPage.view.html, IWPPage.PAGE_CLASS_PAUSEPAGE);
-
+//            IWebapp.removeClass(parentPage.view.html, IWPPage.PAGE_CLASS_PAUSEPAGE);
+//
+//            var index = parentPage._childPages.indexOf(page.id);
+//            if (index >= 0)  parentPage._childPages.splice(index, 1);
+//            parentPage._status=IWPPage.STATUS_NORMAL;
+//            parentPage.onResume();
             var index = parentPage._childPages.indexOf(page.id);
             if (index >= 0)  parentPage._childPages.splice(index, 1);
+
+
+            if(this._switchPlus!=null){
+               // this._switchPlus.resumeParentPage(parentPage,this._container,function(){context._resumePage(parentPage)})
+                this._switchPlus.resumeParentPage(parentPage,this._container,context._resumePage,[parentPage.id])
+            }else{
+                this._resumePage(parentPage)
+            }
+
+
         }
     }
 
@@ -483,10 +505,40 @@ IWebapp.prototype.removePage = function (pageObj,changeLink) {
 
     }
 
-
     //destroy self
-    this._destroyPage(page);
+    var pageId=page.id;
+    /* if(resumeParent==true && page._parentPageId!=null){
+     if(context._switchPlus!=null && context._switchPlus.removeChildPage!=null  ){
 
+
+     context._switchPlus.removeChildPage(page,context._container,context._destroyPage,[pageId])
+     }
+     }else{
+     context._destroyPage(pageId);
+     }*/
+
+    if(context._switchPlus!=null ){
+        if(page.type==IWPPage.PAGE_TYPE_NORMAL){
+
+            // this._switchPlus.removePage($page,context._container,function(){context.removePage(p,null,false)});
+
+            if(resumeParent==true && page._parentPageId!=null){
+                context._switchPlus.removeChildPage(page,context._container,context._destroyPage,[pageId])
+            }else{
+                context._switchPlus.removePage(page,context._container,context._destroyPage,[pageId]);
+            }
+        }else if(page.type==IWPPage.PAGE_TYPE_NOTIFY){
+            context._switchPlus.removeNotify(page,context._container,context._destroyPage,[pageId]);
+        }else if(page.type==IWPPage.PAGE_TYPE_DIALOG){
+            context._switchPlus.removeDialog(page,context._container,context._destroyPage,[pageId]);
+        }
+    }else{
+        context._destroyPage(pageId);
+    }
+
+
+    parentPage=null;
+    context=null;
     page = null;
 }
 
@@ -703,8 +755,11 @@ IWebapp.prototype.removeNotify=function(target){
         this._notifications[target.id]=null;
         delete  this._notifications[target.id];
         this._notifications.splice(this._notifications.indexOf(target.id),1);
+        target.onDestroy();
 
     }
+
+    target=null;
 
 }
 
@@ -1086,7 +1141,7 @@ IWebapp.prototype._onReady=function(){
 IWebapp.prototype._addPageToStage = function (page) {
     if (page == null || page.view == null || page.view.html == null) throw new Error(IWPError.PAGE_NOT_EXIST_VIEW);
 
-
+    var context=this;
 
     if(page.type==IWPPage.PAGE_TYPE_NORMAL){
 
@@ -1108,14 +1163,43 @@ IWebapp.prototype._addPageToStage = function (page) {
 
                     //If target page is  parent of current page,hidden target page.
                     if ($page.id == page._parentPageId) {
-                        IWebapp.addClass($page.view.html, IWPPage.PAGE_CLASS_PAUSEPAGE);
+//                        IWebapp.addClass($page.view.html, IWPPage.PAGE_CLASS_PAUSEPAGE);
+//                        $page._status=IWPPage.STATUS_PAUSED;
+//                        $page.onPause();
+                        var p=this._pages[i];
+
+                        if(this._switchPlus!=null){
+                            if(this._switchPlus.hideParentPage!=null){
+                               // this._switchPlus.hideParentPage($page,context._container,function(){context._hidePage(p)})
+                                this._switchPlus.hideParentPage($page,context._container,context._hidePage,[p])
+                            }
+
+                        }
                     } else if(pageChain.indexOf($page.id)<0) {
                         //If not, remove it.
-                        this.removePage($page);
-                        i--;
+//                         trace("pageChain:"+pageChain.indexOf($page.id) +"  id:"+$page.id)
+//                         trace(pageChain)
+//                         p=this._pages[i];
+//                        if(this._switchPlus!=null){
+//                            if($page.type==IWPPage.PAGE_TYPE_NORMAL){
+//
+//                               // this._switchPlus.removePage($page,context._container,function(){context.removePage(p,null,false)});
+//                                this._switchPlus.removePage($page,context._container,context.removePage,[p,null,false]);
+//                            }else if($page.type==IWPPage.PAGE_TYPE_NOTIFY){
+//                                this._switchPlus.removeNotify($page,context._container,context.removePage,[p,null,false]);
+//                            }else if($page.type==IWPPage.PAGE_TYPE_DIALOG){
+//                                this._switchPlus.removeDialog($page,context._container,context.removePage,[p,null,false]);
+//                            }
+//                        }else{
+//                            this.removePage($page);
+//                        }
+
+                        this.removePage($page,null,false);
+
                     }
 
                 }
+
             }
         } else {
             trace("The page have not fill view ")
@@ -1136,7 +1220,62 @@ IWebapp.prototype._addPageToStage = function (page) {
 
 
     this._$container.append(page.view.html);
+
+    if(this._switchPlus!=null){
+        if(page.type==IWPPage.PAGE_TYPE_NORMAL){
+            this._switchPlus.showPage(page,context._container);
+        }else if(page.type==IWPPage.PAGE_TYPE_DIALOG){
+            this._switchPlus.showDialog(page,context._container);
+        }else if(page.type==IWPPage.PAGE_TYPE_NOTIFY){
+            this._switchPlus.showNotify(page,context._container);
+        }
+
+    }
+
+    context=null;
+    page=null;
 }
+
+IWebapp.prototype._hidePage=function(pageObj){
+    var context=IWebapp.getInstance()
+    var page=null;
+    if (typeof pageObj == "string") {
+        page = context._pages[pageObj]
+    } else if (pageObj instanceof IWPPage) {
+        page = pageObj;
+    }
+
+    IWebapp.addClass(page.view.html, IWPPage.PAGE_CLASS_PAUSEPAGE);
+    page._status=IWPPage.STATUS_PAUSED;
+    page.onPause();
+
+    context=null;
+    page=null;
+
+}
+
+IWebapp.prototype._resumePage=function(pageObj){
+    var context=IWebapp.getInstance()
+    var page=null;
+    if (typeof pageObj == "string") {
+        page = context._pages[pageObj]
+    } else if (pageObj instanceof IWPPage) {
+        page = pageObj;
+    }
+
+    IWebapp.removeClass(page.view.html, IWPPage.PAGE_CLASS_PAUSEPAGE);
+
+//    var index = page._childPages.indexOf(page.id);
+//    if (index >= 0)  page._childPages.splice(index, 1);
+    page._status=IWPPage.STATUS_NORMAL;
+    page.onResume();
+
+    context=null;
+    page=null;
+
+}
+
+
 IWebapp.prototype._getPageChain=function(pageId,chain){
     if(chain==null) chain=[];
 
@@ -1158,13 +1297,32 @@ IWebapp.prototype._getPageChain=function(pageId,chain){
 
 IWebapp.prototype._destroyPage = function (page) {
 
+    var context=IWebapp.getInstance();
+
+
+    if (typeof page == "string") {
+        page = context._pages[page]
+    }
+
+    if(page==null){
+        return;
+    }
+
+
+
     IWebapp.removeNode(page.view.html); //remove view from stage
-    delete this._pages[page.id]; //remove the object from page collection
-    var index = this._pages.indexOf(page.id);
+    delete context._pages[page.id]; //remove the object from page collection
+    var index = context._pages.indexOf(page.id);
+
+    //trace("remove page:"+page.id+" index:"+index)
+   // trace(this._pages)
     if (index >= 0) {
-        this._pages.splice(index, 1);//remove the id from page list.
+        context._pages.splice(index, 1);//remove the id from page list.
     }
     page.onDestroy();
+
+    context=null;
+    page=null;
 }
 
 IWebapp.prototype._initPage = function (pageObj) {
@@ -1675,7 +1833,7 @@ function IWPPage() {
 IWPPage.STATUS_UNREADY = 0;
 IWPPage.STATUS_NORMAL = 1;
 IWPPage.STATUS_PAUSED = 2;
-IWPPage.STATUS_STOPED = 3;
+
 
 IWPPage.PAGE_TYPE_NORMAL=0;
 IWPPage.PAGE_TYPE_DIALOG=1;
@@ -1709,14 +1867,6 @@ IWPPage.prototype.onPause = function () {
 }
 
 IWPPage.prototype.onResume = function () {
-
-}
-
-IWPPage.prototype.onStop = function () {
-
-}
-
-IWPPage.prototype.onRestart = function () {
 
 }
 
@@ -1872,9 +2022,10 @@ IWPPage.prototype.addViewToStage = function () {
 }
 
 IWPPage.prototype.close = function () {
-    if (this._parentPageId == null) return;
-
     IWebapp.getInstance().removePage(this);
+
+
+
 
 }
 
@@ -1893,6 +2044,7 @@ function IWPNotify(viewId){
     this.msgTxt=null;
     this.delay=1000;
     this.viewId=viewId;
+    this.timer=null;
 }
 
 IWPNotify.prototype.onCreate=function(pageData){
@@ -1906,8 +2058,13 @@ IWPNotify.prototype.onCreate=function(pageData){
 }
 
 
-IWPNotify.prototype.close=function(){
+IWPNotify.prototype.close=function(target){
 
+    target=(target!=null)?target:this;
+    var context=IWebapp.getInstance();
+    context.removeNotify(target);
+
+    target=null;
 }
 
 /**
@@ -1925,20 +2082,127 @@ IWPNotify.prototype.show=function(content,delay){
     if(delay!=null) this.delay=delay;
 
     var target=this;
-    setTimeout(function(){
-        IWebapp.getInstance().removeNotify(target)
-    },this.delay);
+    var context=IWebapp.getInstance();
+    if(context._switchPlus!=null){
+        context._switchPlus.showNotify(target,context._container,target.startTimer,[target]);
+    }else{
+        target.startTimer();
+    }
+
+    target=null;
+
 }
 
+IWPNotify.prototype.startTimer=function(target){
+      target=(target!=null)?target:this;
+    var context=IWebapp.getInstance();
+    if(context._switchPlus!=null){
+
+
+        target.timer=setTimeout(function(){
+
+
+            context._switchPlus.removeNotify(target,context._container,target.close,[target]);
+            target=null;
+        },target.delay);
+    }else{
+
+        target.timer=setTimeout(function(){target.close();target=null;},target.delay);
+    }
+
+
+}
+
+
+
+IWPNotify.prototype.onDestroy=function(){
+    clearTimeout(this.timer);
+    this.timer=null;
+}
 
 function IWPSwitch(){
 
 }
 
-IWPSwitch.prototype.start=function(prevItem,nextItem,container,onComplete){
-    prevItem.style.transition="left";
-    prevItem.style.transform("left","-1000px");
+IWPSwitch.prototype.showPage=function(page,container,onComplete,completeParams,isBack){
+
+    if(onComplete!=null) {
+        onComplete.apply(this,completeParams);
+
+    }
 }
+IWPSwitch.prototype.removePage=function(page,container,onComplete,completeParams,isBack){
+    if(onComplete!=null) {
+
+        onComplete.apply(this,completeParams);
+
+    }
+}
+
+
+IWPSwitch.prototype.resumeParentPage=function(page,container,onComplete,completeParams,isBack){
+    if(onComplete!=null) {
+        onComplete.apply(this,completeParams);
+
+    }
+}
+
+IWPSwitch.prototype.hideParentPage=function(page,container,onComplete,completeParams,isBack){
+    if(onComplete!=null) {
+        onComplete.apply(this,completeParams);
+
+    }
+}
+
+IWPSwitch.prototype.showChildPage=function(page,container,onComplete,completeParams,isBack){
+    if(onComplete!=null) {
+        onComplete.apply(this,completeParams);
+
+    }
+}
+
+IWPSwitch.prototype.removeChildPage=function(page,container,onComplete,completeParams,isBack){
+    if(onComplete!=null) {
+        onComplete.apply(this,completeParams);
+
+    }
+}
+
+
+
+
+IWPSwitch.prototype.showDialog=function(page,container,onComplete,completeParams,isBack){
+    if(onComplete!=null) {
+        onComplete.apply(this,completeParams);
+
+    }
+}
+
+IWPSwitch.prototype.removeDialog=function(page,container,onComplete,completeParams,isBack){
+    if(onComplete!=null) {
+        onComplete.apply(this,completeParams);
+
+    }
+}
+
+IWPSwitch.prototype.showNotify=function(page,container,onComplete,completeParams,isBack){
+    if(onComplete!=null) {
+        onComplete.apply(this,completeParams);
+
+    }
+}
+
+IWPSwitch.prototype.removeNotify=function(page,container,onComplete,completeParams,isBack){
+    if(onComplete!=null) {
+        onComplete.apply(this,completeParams);
+
+    }
+}
+
+
+
+
+
 
 /**
  * @desc the error code start from 100001

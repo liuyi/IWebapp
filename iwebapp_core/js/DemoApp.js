@@ -91,12 +91,12 @@ LoginPage.prototype.onCreate = function (pageData) {
     this.setView("loginView");
 
 
-    this.loginBtn = this.findViewItem("loginBtn", false)
-    this.regBtn = this.findViewItem("regBtn", true)
-    this.forget = this.findViewItem("forget", true)
-    this.usernameTxt = this.findViewItem("username", true)
-    this.passwordTxt = this.findViewItem("password", true)
-    this.learnLink = this.findViewItem("learnLink", true)
+    this.loginBtn = this.findViewItem("loginBtn")
+    this.regBtn = this.findViewItem("regBtn")
+    this.forget = this.findViewItem("forget")
+    this.usernameTxt = this.findViewItem("username")
+    this.passwordTxt = this.findViewItem("password")
+    this.learnLink = this.findViewItem("learnLink")
 
 
 
@@ -106,13 +106,6 @@ LoginPage.prototype.onCreate = function (pageData) {
     addEvent(this.view.html, "tap", this.onTap, this);
     addEvent(this.view.html, "longtap", this.onLongTap, this);
 
-
-    var context=this;
-    this.timer=setTimeout(function(){
-        context.view.html.style.transition="left 1s ";
-        context.view.html.style.left="-200px"
-
-    },10000000000000)
 
 
 
@@ -131,31 +124,35 @@ LoginPage.prototype.onDestroy = function () {
     removeEvent(this.view.html, "tap", this.onTap);
     removeEvent(this.view.html, "longtap", this.onLongTap);
 
-    clearTimeout(this.timer);
-    this.timer=null;
 
 }
+
+
+
 
 
 LoginPage.prototype.onTap = function (e, context) {
 
     var target = (e.target) ? e.target : e.srcElement;//fot ie8
 
+    trace(target)
+
+    trace(context)
 
     if (target == context.loginBtn) {
-
+        trace("dddd")
         app.login({username: context.usernameTxt.value, password: context.passwordTxt.value})
     } else if (target == context.regBtn) {
         trace("Do register");
         iwp.getInstance().openPage("ConfirmPage")
-//       iwp.getInstance().openDialog("ConfirmPage")
+
     }else if(target==context.forget){
-        trace("Forgot the password!!");
+        iwp.getInstance().notify("HI, check your email!")
     }else if(target==context.learnLink){
         trace("learnLink tap!!");
+        iwp.getInstance().notify("HI, easy work easy life!")
     }
 
-    //iwp.getInstance().notify("HI, welcome to here!")
     return false
 
 }
@@ -330,7 +327,7 @@ ConfirmPage.prototype.onTap=function(e,context){
         app.logout();
     } else if (target == context.cancelBtn) {
 
-        iwp.getInstance().removePage(context)
+        context.close();
     }else if(target==context.newDialogBtn){
         iwp.getInstance().openPage("ConfirmPage")
     }else if(target==context.newPageBtn){

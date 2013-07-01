@@ -13,7 +13,7 @@ function AppStart(){
 
 
     }})
-
+    core.setSwitchPlus(new SlideSwitch());
 
 
 
