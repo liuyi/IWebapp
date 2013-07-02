@@ -1,0 +1,22 @@
+.iwebui-switch-container{
+
+    display: block;
+    position: relative;
+
+}
+
+.iwebui-switch-drag-container{
+    position:absolute ;
+    left: 0;
+    height: 100%;
+    width: 100%;
+
+}
+
+.iwebui-switch-drag{
+    float: right;
+    height: 100%;
+
+}
+
+

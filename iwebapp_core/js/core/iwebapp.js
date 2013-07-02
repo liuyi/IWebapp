@@ -176,7 +176,7 @@ iwp = window.iwp = IWebapp;
 IWebapp.checkTouchable = function () {
     //trace("check touch")
     if (IWebapp.touchable == true) {
-        IWebapp.getInstance().handleTouch();
+        IWebapp.getInstance()._handleTouch();
     } else {
         var touchResult = function (e, context) {
             IWebapp.touchable = true;
@@ -185,7 +185,7 @@ IWebapp.checkTouchable = function () {
             removeEvent(window.document.body, "mousedown", mouseResult)
             removeEvent(window.document.body, "mousemove", mouseResult)
 
-            IWebapp.getInstance().handleTouch();
+            IWebapp.getInstance()._handleTouch();
            // trace(IWebapp.touchable)
         }
 
@@ -196,7 +196,7 @@ IWebapp.checkTouchable = function () {
             removeEvent(window.document.body, "mousedown", mouseResult)
             removeEvent(window.document.body, "mousemove", mouseResult)
 
-            IWebapp.getInstance().handleMouse();
+            IWebapp.getInstance()._handleMouse();
 
             //trace("mouse handle" + IWebapp.touchable)
         }
@@ -362,9 +362,11 @@ IWebapp.prototype.openPage = function (pageObj, pageData,hash) {
 
         page.onHashChange(hash);
     }
+
+    var pageId=page.id;
     page = null;
 
-
+    return pageId;
 
 
 }
@@ -420,9 +422,11 @@ IWebapp.prototype.openChildPage = function (pageObj, pageData, parentObj,hash) {
 
 
 
-
+    var pageId=page.id;
     parentPage = null;
     page = null;
+
+    return pageId;
 }
 
 
@@ -472,7 +476,9 @@ IWebapp.prototype.removePage = function (pageObj,changeLink,resumeParent) {
 
             if(this._switchPlus!=null){
                // this._switchPlus.resumeParentPage(parentPage,this._container,function(){context._resumePage(parentPage)})
+
                 this._switchPlus.resumeParentPage(parentPage,this._container,context._resumePage,[parentPage.id])
+
             }else{
                 this._resumePage(parentPage)
             }
@@ -568,7 +574,7 @@ IWebapp.prototype.onHashChange=function(hash){
         return;
     }
 
-   trace("****************change hash*******************_currentPageAlias:"+this._currentPageAlias)
+   //trace("****************change hash*******************_currentPageAlias:"+this._currentPageAlias)
    // trace("iweb app ===========hash change==========")
     //remove "#" from hash tag.
     if(hash.indexOf("#/")==0){
@@ -632,7 +638,7 @@ IWebapp.prototype.onHashChange=function(hash){
         }
     }
 
-      trace("diffIndex:"+diffIndex+">>currentHashArray: "+currentHashArray+"=====hashArray: "+hashArray)
+      //trace("diffIndex:"+diffIndex+">>currentHashArray: "+currentHashArray+"=====hashArray: "+hashArray)
     if(diffIndex>0){
        // trace("find the parent page:"+diffIndex)
         //find the parent page:
@@ -701,11 +707,19 @@ IWebapp.prototype.back = function () {
 }
 
 
-IWebapp.prototype.alert = function () {
-
+IWebapp.prototype.alert = function (content,confirmCallBack,cancelCallBack,alertName,pageData) {
+    if(alertName==null) alertName="IWPAlert";
+    var pageId=this.openPage(alertName,pageData);
+    var page=this._pages[pageId];
+    page.show(content,confirmCallBack,cancelCallBack);
 }
 
-IWebapp.prototype.confirm = function () {
+IWebapp.prototype.confirm = function (content,confirmCallBack,cancelCallBack,confirmName,pageData) {
+
+    if(confirmName==null) confirmName="IWPConfirm";
+    var pageId=this.openPage(confirmName,pageData);
+    var page=this._pages[pageId];
+    page.show(content,confirmCallBack,cancelCallBack);
 
 }
 
@@ -728,9 +742,10 @@ IWebapp.prototype.setSystemViews=function(obj){
         this._confirmViewId=obj.confirmViewId;
     }
 }
-IWebapp.prototype.notify = function (content,opts) {
+IWebapp.prototype.notify = function (content,delay,viewId) {
 
-    var notifyObj=new IWPNotify(this._notifyViewId);
+    if(viewId==null) viewId=this._notifyViewId;
+    var notifyObj=new IWPNotify(viewId);
     notifyObj.onCreate();
     this._notifications[notifyObj.id]=notifyObj;
     this._notifications.push(notifyObj.id);
@@ -738,7 +753,7 @@ IWebapp.prototype.notify = function (content,opts) {
     this._container.appendChild(notifyObj.view.html);
 
 
-    notifyObj.show(content,opts);
+    notifyObj.show(content,delay);
 }
 
 IWebapp.prototype.removeNotify=function(target){
@@ -762,6 +777,9 @@ IWebapp.prototype.removeNotify=function(target){
     target=null;
 
 }
+
+
+
 
 /**
  *  return the view which defined in assets xml.
@@ -1174,6 +1192,8 @@ IWebapp.prototype._addPageToStage = function (page) {
                                 this._switchPlus.hideParentPage($page,context._container,context._hidePage,[p])
                             }
 
+                        }else{
+                            context._hidePage(p);
                         }
                     } else if(pageChain.indexOf($page.id)<0) {
                         //If not, remove it.
@@ -1345,15 +1365,15 @@ IWebapp.prototype._initPage = function (pageObj) {
 }
 
 
-IWebapp.prototype.handleTouch = function () {
-    console.log("====handleTouch====")
+IWebapp.prototype._handleTouch = function () {
+    console.log("====_handleTouch====")
     addEvent(window.document.body, "touchstart", this._onTouchStart, this);
     //addEvent(window.document.body, "touchend", this._onTouchEnd, this);
 
 
 }
 
-IWebapp.prototype.handleMouse = function () {
+IWebapp.prototype._handleMouse = function () {
     console.log("====handle mouse====")
     addEvent(window.document.body, "mousedown", this._onMouseDown, this);
     // addEvent(window.document.body, "mouseup", this._onTouchEnd, this);
@@ -1363,9 +1383,31 @@ IWebapp.prototype.handleMouse = function () {
 IWebapp.prototype._onTouchStart = function (e, context) {
 
 
+
     if (context._touchTarget != null) {
         var preTarget = context._touchTarget;
         preTarget.removeAttribute(context._tapEventTag);
+        IWebapp.removeClass(preTarget,context._touchTapAttr);
+        IWebapp.removeClass(preTarget,context._touchLongTapAttr);
+
+
+        if (IWebapp.touchable == true) {
+            removeEvent(window.document.body, "touchmove", context._onTouchMove);
+            removeEvent(window.document.body, "touchend", context._onTouchEnd);
+        } else {
+            removeEvent(window.document.body, "mousemove", context._onMouseMove);
+            removeEvent(window.document.body, "mouseup", context._onTouchEnd);
+        }
+
+        preTarget.tap=null;
+        preTarget.touchX=0;
+        preTarget.touchY=0;
+        preTarget.touchTime=0;
+
+        clearInterval(preTarget.timer);
+        preTarget.timer = null;
+
+
     }
 
     context._touchTarget = context._getTouchTarget(e.target);
@@ -1381,17 +1423,26 @@ IWebapp.prototype._onTouchStart = function (e, context) {
         context._touchTarget.timer = setInterval(context._onTouching, 30);
         addEvent(window.document.body, "touchmove", context._onTouchMove, context);
         addEvent(window.document.body, "touchend", context._onTouchEnd, context);
+
+
     }
 
-    e.preventDefault();
-    return false;
+    //e.preventDefault();
+   // return false;
 
 }
+
 
 IWebapp.prototype._onTouching = function (target) {
 
     var context = IWebapp.getInstance();
     if (target == null) target = context._touchTarget;
+
+    if(target==null){
+
+
+        return;
+    }
 
     var delayTime = Date.now() - target.touchTime;
     if (delayTime >= context._touchStartTimeThreshold) {
@@ -1403,7 +1454,7 @@ IWebapp.prototype._onTouching = function (target) {
             IWebapp.addClass(target,context._touchTapAttr)
             target.tap = IWebapp.TAP_TYPE_SHORT;
 
-            //trace(target.tap)
+
 
         } else if ((target.tap == IWebapp.TAP_TYPE_SHORT) && (delayTime >= context._touchLongTapTimeThreshold) && (IWebapp.hasClass(context._touchLongTapAttr) ==false)) {
             target.tap = IWebapp.TAP_TYPE_LONG;
@@ -1414,7 +1465,7 @@ IWebapp.prototype._onTouching = function (target) {
             IWebapp.removeClass(target,context._touchTapAttr);
             clearInterval(target.timer);
             target.timer = null;
-            // trace("===========dispatch long tap======target:"+target.nodeName+"===========");
+
             context._dispatchEvent(target, context._longTapEventTag)
         } else {
 
@@ -1422,6 +1473,7 @@ IWebapp.prototype._onTouching = function (target) {
 
 
     }
+
 
    // trace("toccc:"+target.tap  +" delayTime:"+delayTime+"/"+context._touchStartTimeThreshold)
 
@@ -1432,6 +1484,7 @@ IWebapp.prototype._onTouchMove = function (e, context) {
     // e.preventDefault();
 
     var touch = e.touches[0];
+
     var target = context._touchTarget;
     target.touchXMov = touch.pageX;
     target.touchYMov = touch.pageY;
@@ -1440,6 +1493,7 @@ IWebapp.prototype._onTouchMove = function (e, context) {
 }
 
 IWebapp.prototype._onTouchEnd = function (e, context) {
+
 
     if (IWebapp.touchable == true) {
         removeEvent(window.document.body, "touchmove", context._onTouchMove);
@@ -1450,7 +1504,10 @@ IWebapp.prototype._onTouchEnd = function (e, context) {
     }
 
     var target = context._touchTarget;
+    if(target==null){
 
+        return;
+    }
 
     if (target.tap != null) {
 
@@ -1464,6 +1521,7 @@ IWebapp.prototype._onTouchEnd = function (e, context) {
 
 
     }
+
 
     clearInterval(target.timer);
     target.timer = null;
@@ -1493,6 +1551,8 @@ IWebapp.prototype._onTouchEnd = function (e, context) {
     target = null;
 
 
+
+
 }
 
 IWebapp.prototype._dispatchEvent = function (target, EventType) {
@@ -1501,7 +1561,7 @@ IWebapp.prototype._dispatchEvent = function (target, EventType) {
     var bindEvent = target.getAttribute("on" + EventType);
 
     if (bindEvent != null && bindEvent != "undefined" && bindEvent != "") {
-        eval(bindEvent.trim());
+        eval(bindEvent);
     }
 
 
@@ -1532,6 +1592,28 @@ IWebapp.prototype._onMouseDown = function (e, context) {
     if (context._touchTarget != null) {
         var preTarget = context._touchTarget;
         preTarget.removeAttribute(context._tapEventTag);
+        IWebapp.removeClass(preTarget,context._touchTapAttr);
+        IWebapp.removeClass(preTarget,context._touchLongTapAttr);
+
+
+        if (IWebapp.touchable == true) {
+            removeEvent(window.document.body, "touchmove", context._onTouchMove);
+            removeEvent(window.document.body, "touchend", context._onTouchEnd);
+        } else {
+            removeEvent(window.document.body, "mousemove", context._onMouseMove);
+            removeEvent(window.document.body, "mouseup", context._onTouchEnd);
+        }
+
+        preTarget.tap=null;
+        preTarget.touchX=0;
+        preTarget.touchY=0;
+        preTarget.touchTime=0;
+
+        clearInterval(preTarget.timer);
+        preTarget.timer = null;
+
+
+
     }
 
     var target = (e.target) ? e.target : e.srcElement;
@@ -1539,7 +1621,7 @@ IWebapp.prototype._onMouseDown = function (e, context) {
 
 
     if (context._touchTarget != null) {
-       //trace("got touch target:" + context._touchTarget.nodeName)
+
 
 
         context._touchTarget.touchTime = (e.timestamp || Date.now());
@@ -1550,63 +1632,30 @@ IWebapp.prototype._onMouseDown = function (e, context) {
         addEvent(window.document.body, "mouseup", context._onTouchEnd, context);
     }
 
-    e.preventDefault();
-    return false;
+   // e.preventDefault();
+   // return false;
 }
 
 IWebapp.prototype._onMouseMove = function (e, context) {
     //e.preventDefault();
 
 
+
     var target = context._touchTarget;
+    if(target==null) {
+
+        return;
+    } ;
     target.touchXMov = e.pageX || e.clientX ;
     target.touchYMov = e.pageY || e.clientY;
 
 
 }
 
-IWebapp.prototype._onMouseUp = function (e, context) {
 
-    //use _onTouchEnd to instead of this function.
-    /*
-     removeEvent(window.document.body, "mousemove", context._onMouseMove);
-
-     var target = context._touchTarget;
-
-
-     clearInterval(target.timer);
-     target.timer = null;
-     delete target.timer;
-     delete target.tap;
-     delete target.touchX;
-     delete target.touchY;
-     delete target.touchTime;
-     target.setAttribute(context._touchTapAttr, "");
-
-
-
-
-     if (target.tap != null) {
-
-     var distance = (target.touchXMov - target.touchX) * (target.touchXMov - target.touchX) + (target.touchYMov - target.touchY) * (target.touchYMov - target.touchY);
-
-     if (distance < context._touchDisThreshold) {
-     trace("dispatch event");
-     //context._dispatchEvent(target,context._tapEventTag);
-
-     }
-     }
-
-
-     context._touchTarget=null;
-     target=null;*/
-}
 
 
 IWebapp.prototype._getTouchTarget = function (target) {
-
-    // trace("_getTouchTarget:"+target+"  :"+target.parentNode.nodeName)
-
 
     while (target != null) {
 
@@ -1615,7 +1664,7 @@ IWebapp.prototype._getTouchTarget = function (target) {
 
 
 
-        if (target.getAttribute != null &&  (target.getAttribute(this._disableTag)===null ||target.getAttribute(this._disableTag)===false) && (target.getAttribute(this._ignoreTouchTag) == null) && (this._touchableNodes.indexOf(target.nodeName) >= 0 || target.getAttribute(this._touchableAttr) == this._touchableAttr)) {
+        if (target.getAttribute != null &&  (target.getAttribute(this._disableTag)===null ||target.getAttribute(this._disableTag)===false ||  target.getAttribute("disabled").value==undefined) && (target.getAttribute(this._ignoreTouchTag) == null) && (this._touchableNodes.indexOf(target.nodeName) >= 0 || target.getAttribute(this._touchableAttr) == this._touchableAttr)) {
 
             return target;
         } else {
@@ -1631,7 +1680,7 @@ IWebapp.prototype._getTouchTarget = function (target) {
 //            trace("touchable:"+this._touchableNodes.indexOf(target.nodeName)+">>"+target.nodeName+"?"+this._touchableNodes);
 //            trace("continure find:"+target.nodeName+ " parent:"+target.parentNode);
 
-          // trace("===>"+target.nodeName +">>"+">"+(target.getAttribute("disabled").value)+">"+ (target.getAttribute(this._ignoreTouchTag) == null)+">"+(this._touchableNodes.indexOf(target.nodeName) >= 0 || target.getAttribute(this._touchableAttr) == this._touchableAttr))
+           // trace("===>"+target.nodeName +">>"+">"+( (target.getAttribute("disabled").value)==undefined)+">"+ (target.getAttribute(this._ignoreTouchTag) == null)+">"+(this._touchableNodes.indexOf(target.nodeName) >= 0 || target.getAttribute(this._touchableAttr) == this._touchableAttr))
 
            // trace("<"+target.getAttribute("disabled")+">")
             target = target.parentNode;
@@ -2049,7 +2098,7 @@ function IWPNotify(viewId){
 
 IWPNotify.prototype.onCreate=function(pageData){
 
-    trace(this.viewId)
+
     this.setView(this.viewId);
     var txtId=this.view.html.childNodes[0].getAttribute("data-notify-target");
     if(txtId==null || txtId.trim().length==0) this.msgTxt= this.view.html.childNodes[0];
@@ -2118,7 +2167,162 @@ IWPNotify.prototype.startTimer=function(target){
 IWPNotify.prototype.onDestroy=function(){
     clearTimeout(this.timer);
     this.timer=null;
+    this.msgTxt=null;
+
 }
+
+
+
+IWebapp.extend(IWPConfirm, IWPPage);
+function IWPConfirm(){
+    IWPConfirm.$super(this);
+    this.viewId = null;
+    this.type=IWPPage.PAGE_TYPE_DIALOG;
+    this.onCancel=null;
+    this.onConfirm=null;
+    this.msgTxt=null;
+    this.cancelBtn=null;
+    this.confirmBtn=null;
+    this.closeBtn=null;
+}
+
+IWPConfirm.prototype.onCreate=function(pageData){
+    if(pageData!=null && pageData.viewId!=null){
+        this.viewId=pageData.viewId;
+    }else{
+        this.viewId=IWebapp.getInstance()._confirmViewId;
+    }
+    this.setView(this.viewId);
+    var dataNode=this.view.html.childNodes[0].childNodes[0];
+
+    this.msgTxt=this.findViewItem(dataNode.getAttribute("data-confirm-msg"));
+    this.cancelBtn=this.findViewItem(dataNode.getAttribute("data-confirm-cancel"));
+    this.confirmBtn=this.findViewItem(dataNode.getAttribute("data-confirm-submit"));
+    this.closeBtn=this.findViewItem(dataNode.getAttribute("data-confirm-close"));
+
+
+
+    addEvent(this.view.html,IWebapp.getInstance()._tapEventTag,this.onClicked,this);
+}
+
+IWPConfirm.prototype.onDestroy=function(){
+    removeEvent(this.view.html,IWebapp.getInstance()._tapEventTag,this.onClicked);
+    this.onCancel=null;
+    this.onConfirm=null;
+    this.msgTxt=null;
+    this.cancelBtn=null;
+    this.confirmBtn=null;
+    this.closeBtn=null;
+}
+
+IWPConfirm.prototype.onClicked=function(e,context){
+    var target = (e.target) ? e.target : e.srcElement;//fot ie8
+    if(target==context.confirmBtn){
+        if(context.onConfirm!=null){
+            context.onConfirm();
+        }
+    }else if(target==context.cancelBtn || target==context.closeBtn){
+        if(context.onCancel!=null){
+            context.onCancel();
+        }
+    }
+
+    context.close();
+    context=null;
+    target=null;
+}
+
+
+IWPConfirm.prototype.show=function(content,confirmCallBack,cancelCallBack){
+    this.onCancel=cancelCallBack;
+    this.onConfirm=confirmCallBack;
+
+
+    if(typeof content =="string"){
+        this.msgTxt.innerHTML=content
+    }else {
+        this.msgTxt.appendChild(content);
+    }
+
+}
+
+
+
+IWebapp.extend(IWPAlert, IWPPage);
+function IWPAlert(){
+    IWPAlert.$super(this);
+    this.viewId = null;
+    this.type=IWPPage.PAGE_TYPE_DIALOG;
+    this.onCancel=null;
+    this.onConfirm=null;
+    this.msgTxt=null;
+
+    this.confirmBtn=null;
+    this.closeBtn=null;
+}
+
+IWPAlert.prototype.onCreate=function(pageData){
+    if(pageData!=null && pageData.viewId!=null){
+        this.viewId=pageData.viewId;
+    }else{
+        this.viewId=IWebapp.getInstance()._alertViewId;
+    }
+    this.setView(this.viewId);
+    var dataNode=this.view.html.childNodes[0].childNodes[0];
+
+    trace(dataNode)
+
+    this.msgTxt=this.findViewItem(dataNode.getAttribute("data-alert-msg"));
+
+    this.confirmBtn=this.findViewItem(dataNode.getAttribute("data-alert-submit"));
+    this.closeBtn=this.findViewItem(dataNode.getAttribute("data-alert-close"));
+
+
+
+    addEvent(this.view.html,IWebapp.getInstance()._tapEventTag,this.onClicked,this);
+}
+
+IWPAlert.prototype.onDestroy=function(){
+    removeEvent(this.view.html,IWebapp.getInstance()._tapEventTag,this.onClicked);
+    this.onCancel=null;
+    this.onConfirm=null;
+    this.msgTxt=null;
+
+    this.confirmBtn=null;
+    this.closeBtn=null;
+}
+
+IWPAlert.prototype.onClicked=function(e,context){
+    var target = (e.target) ? e.target : e.srcElement;//fot ie8
+    if(target==context.confirmBtn){
+        if(context.onConfirm!=null){
+            context.onConfirm();
+        }
+    }else if(target==context.closeBtn){
+        if(context.onCancel!=null){
+            context.onCancel();
+        }
+    }
+
+    context.close();
+    context=null;
+    target=null;
+}
+
+
+IWPAlert.prototype.show=function(content,confirmCallBack,cancelCallBack){
+    this.onCancel=cancelCallBack;
+    this.onConfirm=confirmCallBack;
+
+
+    if(typeof content =="string"){
+        this.msgTxt.innerHTML=content
+    }else {
+        this.msgTxt.appendChild(content);
+    }
+
+}
+
 
 function IWPSwitch(){
 

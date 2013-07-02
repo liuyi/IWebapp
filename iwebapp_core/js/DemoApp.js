@@ -98,6 +98,8 @@ LoginPage.prototype.onCreate = function (pageData) {
     this.passwordTxt = this.findViewItem("password")
     this.learnLink = this.findViewItem("learnLink")
 
+    this.switchBtn=new IWebUISwitch();
+    this.switchBtn.create(this.findViewItem("switchBtn"));
 
 
 
@@ -121,6 +123,7 @@ LoginPage.prototype.onDestroy = function () {
     this.usernameTxt = null;
     this.passwordTxt = null;
     this.learnLink = null;
+    this.switchBtn=null;
     removeEvent(this.view.html, "tap", this.onTap);
     removeEvent(this.view.html, "longtap", this.onLongTap);
 
@@ -135,22 +138,20 @@ LoginPage.prototype.onTap = function (e, context) {
 
     var target = (e.target) ? e.target : e.srcElement;//fot ie8
 
-    trace(target)
-
-    trace(context)
 
     if (target == context.loginBtn) {
-        trace("dddd")
+
         app.login({username: context.usernameTxt.value, password: context.passwordTxt.value})
     } else if (target == context.regBtn) {
         trace("Do register");
-        iwp.getInstance().openPage("ConfirmPage")
+        iwp.getInstance().confirm("Do you want open a new page?",function(){trace("ok")},function(){trace("cancel")})
 
     }else if(target==context.forget){
         iwp.getInstance().notify("HI, check your email!")
     }else if(target==context.learnLink){
         trace("learnLink tap!!");
-        iwp.getInstance().notify("HI, easy work easy life!")
+       // iwp.getInstance().notify("HI, easy work easy life!")
+        iwp.getInstance().alert("WOWOWOWOWOW",function(){trace("ok")},function(){trace("cancel")})
     }
 
     return false

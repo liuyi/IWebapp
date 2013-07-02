@@ -73,7 +73,7 @@ SlideSwitch.prototype.removeDialog=function(page,container,onComplete,completePa
 SlideSwitch.prototype.showNotify=function(page,container,onComplete,completeParams){
     page.view.html.style.opacity="0";
     page.view.html.style.top="55%";
-    TweenLite.to(page.view.html,0.3,{opacity:1,top:(Math.random()*5+40-Math.random()*5)+"%",onComplete:onComplete,onCompleteParams:completeParams});
+    TweenLite.to(page.view.html,0.3,{opacity:1,top:(Math.random()*5+45-Math.random()*5)+"%",onComplete:onComplete,onCompleteParams:completeParams});
 
 }
 

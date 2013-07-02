@@ -4,11 +4,11 @@
         <en>lang/en.js</en>
         <zh>lang/zh.js</zh>
     </lang>
-    <textFile>css/core.css;css/theme.css</textFile>
+    <textFile>css/core.css;css/iwebapp-ui.css;css/theme.css</textFile>
     <images>
         <img src="images/loading.gif" />
     </images>
-    <views confirmViewId="confirmView" notifyViewId="notificationView">
+    <views confirmViewId="confirmView" notifyViewId="notificationView" alertViewId="alertView">
         <view id="loadingView">html/loadingView.html</view>
         <view id="loginView">html/loginView.html</view>
         <view id="homeView">html/homeView.html</view>
@@ -16,8 +16,9 @@
         <view id="annouceChildView">html/annouce_child.html</view>
         <view id="confirmView">html/confirmView.html</view>
         <view id="notificationView">html/notificationView.html</view>
+        <view id="alertView">html/alertView.html</view>
     </views>
-    <pages mode="web" defualtPageAlias="login">
+    <pages  defualtPageAlias="login">
         <page alias="login" name="LoginPage" />
         <page alias="home" name="HomePage" >
             <page alias="annouce" name="AnnouncePage" >
