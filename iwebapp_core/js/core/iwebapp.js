@@ -276,6 +276,38 @@ IWebapp.resumeNode=function(htmlElement){
     htmlElement.removeAttribute(IWebapp.getInstance()._disableTag)
 }
 
+IWebapp.getElementsByClassName=function(target,classname){
+    if(target.getElementsByClassName!=null){
+
+        return target.getElementsByClassName(classname);
+    }else{
+        var regx = new RegExp("\\b" + classname + "\\b", "gi");
+        var has = null;
+        var elements=[];
+        getList(target);
+        return elements;
+    }
+
+    function getList(target){
+        if(target.childNodes==null || target.childNodes.length==0)  return;
+
+
+        var len=target.childNodes.length;
+
+        for( var i=0;i<len;i++){
+            var  item=target.childNodes[i];
+            if(item.className!=null){
+                has = item.className.match(regx);
+                if(has != null && has.length > 0){
+
+                    elements.push(item);
+                }
+            }
+            getList(item);
+        }
+
+    }
+}
 
 //public function at below=================
 
@@ -410,13 +442,8 @@ IWebapp.prototype.openChildPage = function (pageObj, pageData, parentObj,hash) {
     }else{
         //open child page
 
-        //var childHash=hash.splice(0,1);
-        //var childPageName=this._hashList[childHash].name;
-        //this.openChildPage(childPageName,null,page)
-
          this._currentPageAlias+="/"+page.alias;
-        trace("====page.alias>"+page.alias)
-        trace("open child page hash:"+ this._currentPageAlias)
+
         page.onHashChange(hash);
     }
 
@@ -464,18 +491,11 @@ IWebapp.prototype.removePage = function (pageObj,changeLink,resumeParent) {
         var parentPage = context._pages[page._parentPageId];
         if (parentPage != null && parentPage.view != null && parentPage.view.html != null) {
 
-//            IWebapp.removeClass(parentPage.view.html, IWPPage.PAGE_CLASS_PAUSEPAGE);
-//
-//            var index = parentPage._childPages.indexOf(page.id);
-//            if (index >= 0)  parentPage._childPages.splice(index, 1);
-//            parentPage._status=IWPPage.STATUS_NORMAL;
-//            parentPage.onResume();
             var index = parentPage._childPages.indexOf(page.id);
             if (index >= 0)  parentPage._childPages.splice(index, 1);
 
 
             if(this._switchPlus!=null){
-               // this._switchPlus.resumeParentPage(parentPage,this._container,function(){context._resumePage(parentPage)})
 
                 this._switchPlus.resumeParentPage(parentPage,this._container,context._resumePage,[parentPage.id])
 
@@ -490,7 +510,6 @@ IWebapp.prototype.removePage = function (pageObj,changeLink,resumeParent) {
     //remove hash tag
     if(page.type==IWPPage.PAGE_TYPE_NORMAL && page._parentPageId!=null){
 
-       // trace(window.location.hash +"==="+this._currentPageAlias)
         var hash= window.location.hash.split("/");
         hash.splice(0,1);
 
@@ -505,7 +524,7 @@ IWebapp.prototype.removePage = function (pageObj,changeLink,resumeParent) {
             //else only update current alias
 
             this._currentPageAlias="/"+hash.join("/");
-          //  trace("ONLY update _currentPageAlias:"+ this._currentPageAlias)
+
         }
 
 
@@ -513,15 +532,7 @@ IWebapp.prototype.removePage = function (pageObj,changeLink,resumeParent) {
 
     //destroy self
     var pageId=page.id;
-    /* if(resumeParent==true && page._parentPageId!=null){
-     if(context._switchPlus!=null && context._switchPlus.removeChildPage!=null  ){
 
-
-     context._switchPlus.removeChildPage(page,context._container,context._destroyPage,[pageId])
-     }
-     }else{
-     context._destroyPage(pageId);
-     }*/
 
     if(context._switchPlus!=null ){
         if(page.type==IWPPage.PAGE_TYPE_NORMAL){
@@ -553,12 +564,7 @@ IWebapp.prototype.removePage = function (pageObj,changeLink,resumeParent) {
  * @returns {boolean}
  */
 IWebapp.prototype.getCurrentHash=function(){
-//    if(this._history.length==0) {
-//        return "";
-//    }else{
-//        return this._history[this._historyIndex].hash;
-//    }
-    //trace("this._currentPageAlias:"+this._currentPageAlias);
+
     return this._currentPageAlias;
 
 }
@@ -574,43 +580,12 @@ IWebapp.prototype.onHashChange=function(hash){
         return;
     }
 
-   //trace("****************change hash*******************_currentPageAlias:"+this._currentPageAlias)
-   // trace("iweb app ===========hash change==========")
+
     //remove "#" from hash tag.
     if(hash.indexOf("#/")==0){
         hash=hash.substring(2);
     }
 
-
-//
-//    if(this._historyIndex-1 >=0 && hash==this._history[this._historyIndex-1].hash){
-//        //back
-//        trace("BACK TO:"+hash);
-//        var pageItem=this._history[this._historyIndex-1];
-//        if(pageItem.parentPageId==null){
-//            this.openPage(pageItem.constructorName,pageItem.params)
-//        }else{
-//            this.openChildPage(pageItem.constructorName,pageItem.params,pageItem.parentPageId)
-//        }
-//
-//
-//    }else if(this._historyIndex+1< this._history.length && hash==this._history[this._historyIndex+1].hash){
-//        //forward
-//        trace("FORWARD TO:"+hash)
-//
-//          pageItem=this._history[this._historyIndex+1];
-//        if(pageItem.parentPageId==null){
-//            this.openPage(pageItem.constructorName,pageItem.params)
-//        }else{
-//            this.openChildPage(pageItem.constructorName,pageItem.params,pageItem.parentPageId)
-//        }
-//    }else{
-//        //change to a new page.
-//        trace("SWITCH TO NEW PAGE:" +hash);
-//        var hashArray=hash.split("/");
-//        //need change hash to page constructor name
-//       // this.openPage(hashArray[],pageItem.params)
-//    }
 
     var hashArray=hash.split("/");
 
@@ -619,7 +594,7 @@ IWebapp.prototype.onHashChange=function(hash){
     if(this._currentPageAlias==null) this._currentPageAlias="";
     var currentHash=this._currentPageAlias.toString();
     if(currentHash.indexOf("/")==0) currentHash=currentHash.substring(1);
-   // trace("currentHash:"+currentHash+">"+(typeof currentHash))
+
     if(currentHash.length>0){
         var currentHashArray=currentHash.split("/");
     }
@@ -638,15 +613,14 @@ IWebapp.prototype.onHashChange=function(hash){
         }
     }
 
-      //trace("diffIndex:"+diffIndex+">>currentHashArray: "+currentHashArray+"=====hashArray: "+hashArray)
+
     if(diffIndex>0){
-       // trace("find the parent page:"+diffIndex)
+
         //find the parent page:
         var len=this._pages.length;
         var page=null;
         var parentAlias=hashArray[diffIndex-1];
 
-        //trace("parent alias:"+parentAlias)
         for(i=len-1;i>=0;i--){
             page=this._pages[this._pages[i]];
             if(page.alias==parentAlias){
@@ -654,11 +628,9 @@ IWebapp.prototype.onHashChange=function(hash){
             }
         }
 
-       // trace("current page:"+page.name)
-       // trace("hashArray:"+hashArray)
 
-        hashArray.splice(0,diffIndex)
-       // trace("hashArray2:"+hashArray)
+        hashArray.splice(0,diffIndex);
+
         if(page!=null){
             page.onHashChange(hashArray)
         }
@@ -669,13 +641,12 @@ IWebapp.prototype.onHashChange=function(hash){
 
         var rootPage=this._hashList[hashArray[0]];
 
-        trace("root page:"+rootPage+":"+hashArray)
+
         if(rootPage==null) rootPage=this._defualtPageId;
         else rootPage=rootPage.name;
 
         hashArray.splice(0,1)
-        trace("hash array====>>>>")
-         trace(hashArray)
+
         this.openPage(rootPage,null,hashArray);
     }
 
@@ -945,6 +916,8 @@ IWebapp.prototype.addJsCss = function (file, assetsRoot, onAllLoad) {
 //protected function at below==============================
 
 IWebapp.prototype._ieFix=function(){
+
+    //add indexOf to Array
     if (!Array.prototype.indexOf)
     {
         Array.prototype.indexOf = function(elt , from)
@@ -967,6 +940,18 @@ IWebapp.prototype._ieFix=function(){
             return -1;
         };
     }
+
+
+    //add getElementsByClassName to htmlElement
+
+//    if(Element.prototype.getElementsByClassName==null){
+//        trace("old brwoser")
+//
+//        Element.prototype.getElementsByClassName=function(className){
+//            var array=[];
+//            return ["sdssd"]
+//        }
+//    }
 }
 IWebapp.prototype._onConfigLoaded = function (data) {
 
@@ -1425,6 +1410,10 @@ IWebapp.prototype._onTouchStart = function (e, context) {
         addEvent(window.document.body, "touchend", context._onTouchEnd, context);
 
 
+        if(context._touchTarget.onFingerStart){
+            context._touchTarget.onFingerStart(touch.pageX,touch.pageY);
+        }
+
     }
 
     //e.preventDefault();
@@ -1486,10 +1475,17 @@ IWebapp.prototype._onTouchMove = function (e, context) {
     var touch = e.touches[0];
 
     var target = context._touchTarget;
+    if(target==null) {
+
+        return;
+    } ;
     target.touchXMov = touch.pageX;
     target.touchYMov = touch.pageY;
 
 
+    if(target.onFingerMove){
+        target.onFingerMove(target.touchXMov,target.touchYMov );
+    }
 }
 
 IWebapp.prototype._onTouchEnd = function (e, context) {
@@ -1547,9 +1543,15 @@ IWebapp.prototype._onTouchEnd = function (e, context) {
     IWebapp.removeClass(target,context._touchTapAttr);
     IWebapp.removeClass(target,context._touchLongTapAttr);
 
+
+    if(context._touchTarget.onFingereUp){
+        context._touchTarget.onFingereUp();
+    }
+
+
+
     context._touchTarget = null;
     target = null;
-
 
 
 
@@ -1630,6 +1632,10 @@ IWebapp.prototype._onMouseDown = function (e, context) {
         context._touchTarget.timer = setInterval(context._onTouching, 30);
         addEvent(window.document.body, "mousemove", context._onMouseMove, context);
         addEvent(window.document.body, "mouseup", context._onTouchEnd, context);
+
+        if(context._touchTarget.onFingerStart){
+            context._touchTarget.onFingerStart(context._touchTarget.touchX,context._touchTarget.touchY);
+        }
     }
 
    // e.preventDefault();
@@ -1645,10 +1651,13 @@ IWebapp.prototype._onMouseMove = function (e, context) {
     if(target==null) {
 
         return;
-    } ;
+    }
     target.touchXMov = e.pageX || e.clientX ;
     target.touchYMov = e.pageY || e.clientY;
 
+    if(target.onFingerMove){
+        target.onFingerMove(target.touchXMov ,target.touchYMov );
+    }
 
 }
 

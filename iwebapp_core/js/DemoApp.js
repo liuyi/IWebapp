@@ -100,6 +100,8 @@ LoginPage.prototype.onCreate = function (pageData) {
 
     this.switchBtn=new IWebUISwitch();
     this.switchBtn.create(this.findViewItem("switchBtn"));
+    this.slider=new IWebUISlider();
+    this.slider.create(this.findViewItem("slider"))
 
 
 

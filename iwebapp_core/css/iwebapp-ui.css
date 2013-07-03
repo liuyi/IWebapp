@@ -20,3 +20,51 @@
 }
 
 
+.iwp-ui-slider{
+    display: block;
+    position: relative;
+}
+
+.iwp-ui-slider-active{
+    display: block;
+    height: 100%;
+    position: absolute;
+    top:0;
+    left:0;
+    width: 100%;
+}
+
+.iwp-ui-slider-down{
+    display: block;
+    height: 100%;
+    position: absolute;
+    top:0;
+    right: 0;
+    width: 100%;
+}
+
+.iwp-ui-slider-slug{
+   height: 100%;
+}
+
+
+
+/*themes*/
+.iwp-ui-slider{
+    width: 50%;
+    padding: 20px;
+    height: 25px;
+}
+.iwp-ui-slider-active{
+    display: block;
+    background: #0B1E13;
+}
+
+.iwp-ui-slider-down{
+
+    background: #B0FD21;
+}
+
+.iwp-ui-slider-slug{
+
+}
