@@ -81,16 +81,22 @@ IWebUISwitch.prototype.setVal=function(val){
     }
 }
 
-/************************************/
 
+IWebUISlider.DIRECTION_HORIZON=1;
+IWebUISlider.DIRECTION_VERTICAL=2;
+/**
+ *
+ * @constructor
+ */
 function IWebUISlider(){
-    this.root=null;
+    this.container=null;
     this.activeNode=null;
     this.downNode=null;
     this.dragNode=null;
     this.snap=false;
     this.percent=0;
-    this.direction="horizon";
+    this.direction=1;
+    this.supportTransform=getsupportedprop(['transform', 'MozTransform', 'WebkitTransform', 'OTransform']);
 
 }
 
@@ -103,19 +109,78 @@ IWebUISlider.prototype.create=function(target){
     this.dragNode=IWebapp.getElementsByClassName(target,"iwp-ui-slider-slug")[0];
 
 
-    this.container.context=this;
-    this.container.onFingerStart=this.onTouchStart;
-    this.container.onFingerMove=this.onTouchMove;
-}
+    this.dragNode.context=this;
+    this.dragNode.onFingerMove=this._onTouchMove;
+    this.dragNode.onFingerStart=this._onTouchStart;
 
-IWebUISlider.prototype.onTouchStart=function(x,y){
-     trace(this.touchX+"/"+this.touchY);
-     trace(this.offsetTop)
-     trace(this.offsetLeft)
-    trace(this.offsetWidth)
-}
 
-IWebUISlider.prototype.onTouchMove=function(x,y){
-   // trace(this.touchX+"/"+this.touchY +">>"+this.touchXMov+"/"+this.touchYMov);
 
 }
+
+IWebUISlider.prototype.onDestroy=function(){
+    this.dragNode.context=null;
+    this.dragNode.onFingerMove=null;
+    this.container=null;
+    this.activeNode=null;
+    this.downNode=null;
+    this.dragNode=null;
+    this.snap=false;
+
+}
+
+
+IWebUISlider.prototype._onTouchStart=function(x,y){
+    this.prevPos=x;
+}
+IWebUISlider.prototype._onTouchMove=function(x,y){
+    // trace(this.touchX+"/"+this.touchY +">>"+this.touchXMov+"/"+this.touchYMov);
+
+
+    var p=0;
+    if(this.context.direction==IWebUISlider.DIRECTION_HORIZON){
+
+
+
+        // p=(this.touchXMov-this.context.container.offsetLeft)/(this.context.container.offsetWidth);
+
+
+        this.pos=this.offsetLeft+this.touchXMov-this.prevPos;
+        if(this.pos<0) this.pos=0;
+        else if(this.pos>(this.context.container.offsetWidth-this.offsetWidth)){
+            this.pos=this.context.container.offsetWidth-this.offsetWidth
+        }
+        this.prevPos=this.touchXMov;
+        if(this.supportTransform!=null){
+
+            this.style[this.supportTransform]="translate3d("+this.pos+"px,0px,0px)";
+        }else{
+            this.style.left=this.pos+"px";
+
+        }
+
+    }else{
+
+       // p=(this.touchYMov-this.context.container.offsetTop)/this.context.container.offsetHeight;
+        this.pos=this.offsetTop+this.touchYMov-this.prevPos;
+        if(this.pos<0) this.pos=0;
+        else if(this.pos>this.context.container.offsetHeight-this.offsetHeight){
+            this.pos=this.context.container.offsetHeight-this.offsetHeight
+        }
+        if(this.supportTransform!=null){
+            this.style[this.supportTransform]="translate3d(0px,"+this.pos+"px,0px)";
+        }else{
+            this.style.top=this.pos+"px";
+        }
+    }
+
+
+}
+
+IWebUISlider.prototype._setPercent=function(p){
+
+    this.percent=p;
+
+
+
+}
+

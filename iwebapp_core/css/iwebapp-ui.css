@@ -45,18 +45,21 @@
 
 .iwp-ui-slider-slug{
    height: 100%;
+   position: absolute;
+
 }
 
 
 
 /*themes*/
 .iwp-ui-slider{
-    width: 50%;
-    padding: 20px;
-    height: 25px;
+    width: 80%;
+    display: block;
+    height: 50px;
 }
 .iwp-ui-slider-active{
     display: block;
+
     background: #0B1E13;
 }
 
@@ -66,5 +69,6 @@
 }
 
 .iwp-ui-slider-slug{
-
+    width: 25%;
+    background:#ffffff;
 }

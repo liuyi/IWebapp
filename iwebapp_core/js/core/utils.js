@@ -442,6 +442,30 @@ fixEvent.stopPropagation = function() {
     this.cancelBubble = true;
 };
 
+function checkIEVersion(requireVersion){
+    var userAgent = navigator.userAgent.toLowerCase();
+    // Test if the browser is IE and check the version number is lower than 9
+    if (/msie/.test(userAgent) &&
+        parseFloat((userAgent.match(/.*(?:rv|ie)[\/: ](.+?)([ \);]|$)/) || [])[1]) < requireVersion) {
+        // Navigate to error page
+        return false
+    }
+
+    return true
+}
+
+
+function getsupportedprop(proparray){
+    var root=document.documentElement; //reference root element of document
+    for (var i=0; i<proparray.length; i++){ //loop through possible properties
+        if (proparray[i] in root.style){ //if property exists on element (value will be string, empty string if not set)
+            return proparray[i] //return that string
+        }
+    }
+
+    root=null;
+    return null;
+}
 
 //addEvent and removeEvent end=========================
 

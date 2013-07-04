@@ -153,11 +153,14 @@ function IWebapp() {
     this._touchLongTapAttr = "longtap";
 
     this._touchableNodes = ["A", "INPUT", "TEXTAREA", "BUTTON"];
+    this._touchBubblesNodes=["INPUT", "TEXTAREA"];
     this._touchableAttr = "touchable";
     this._tapEventTag = "tap";
     this._longTapEventTag = "longtap";
     this._ignoreTouchTag = "ignore";
     this._disableTag = "disabled";
+
+    this._isMouseDown=false;
 
 
     this._touchTarget = null;
@@ -308,6 +311,11 @@ IWebapp.getElementsByClassName=function(target,classname){
 
     }
 }
+
+
+
+
+
 
 //public function at below=================
 
@@ -1418,7 +1426,10 @@ IWebapp.prototype._onTouchStart = function (e, context) {
 
     //e.preventDefault();
    // return false;
-
+    if(context._touchTarget!=null && context._touchBubblesNodes.indexOf(context._touchTarget.nodeName)<0){
+        e.preventDefault();
+        return false;
+    }
 }
 
 
@@ -1490,6 +1501,7 @@ IWebapp.prototype._onTouchMove = function (e, context) {
 
 IWebapp.prototype._onTouchEnd = function (e, context) {
 
+    context._isMouseDown=false;
 
     if (IWebapp.touchable == true) {
         removeEvent(window.document.body, "touchmove", context._onTouchMove);
@@ -1590,6 +1602,8 @@ IWebapp.prototype._dispatchEvent = function (target, EventType) {
 IWebapp.prototype._onMouseDown = function (e, context) {
 
 
+
+    context._isMouseDown=true;
     //
     if (context._touchTarget != null) {
         var preTarget = context._touchTarget;
@@ -1638,20 +1652,27 @@ IWebapp.prototype._onMouseDown = function (e, context) {
         }
     }
 
-   // e.preventDefault();
-   // return false;
+    if(context._touchTarget!=null && context._touchBubblesNodes.indexOf(context._touchTarget.nodeName)<0){
+        e.preventDefault();
+        return false;
+    }
+
 }
 
 IWebapp.prototype._onMouseMove = function (e, context) {
     //e.preventDefault();
 
 
-
+    if(context._isMouseDown!=true){
+        IWebapp.prototype._onTouchEnd(e,context);
+        return;
+    }
     var target = context._touchTarget;
     if(target==null) {
 
         return;
     }
+
     target.touchXMov = e.pageX || e.clientX ;
     target.touchYMov = e.pageY || e.clientY;
 
@@ -1673,7 +1694,7 @@ IWebapp.prototype._getTouchTarget = function (target) {
 
 
 
-        if (target.getAttribute != null &&  (target.getAttribute(this._disableTag)===null ||target.getAttribute(this._disableTag)===false ||  target.getAttribute("disabled").value==undefined) && (target.getAttribute(this._ignoreTouchTag) == null) && (this._touchableNodes.indexOf(target.nodeName) >= 0 || target.getAttribute(this._touchableAttr) == this._touchableAttr)) {
+        if (target.getAttribute != null &&  (target.getAttribute(this._disableTag)===null ||target.getAttribute(this._disableTag)===false ||  target.getAttribute("disabled").value==undefined) && (target.getAttribute(this._ignoreTouchTag) == null) && (this._touchableNodes.indexOf(target.nodeName) >= 0 || target.getAttribute(this._touchableAttr) == "true")) {
 
             return target;
         } else {

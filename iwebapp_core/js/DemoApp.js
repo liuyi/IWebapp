@@ -47,7 +47,7 @@ DemoApp.prototype.init = function () {
 
     function checkIEVersion(requireVersion){
         var userAgent = navigator.userAgent.toLowerCase();
-// Test if the browser is IE and check the version number is lower than 9
+        // Test if the browser is IE and check the version number is lower than 9
         if (/msie/.test(userAgent) &&
             parseFloat((userAgent.match(/.*(?:rv|ie)[\/: ](.+?)([ \);]|$)/) || [])[1]) < requireVersion) {
             // Navigate to error page
