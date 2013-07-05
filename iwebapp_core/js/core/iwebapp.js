@@ -1530,7 +1530,9 @@ IWebapp.prototype._onTouchEnd = function (e, context) {
 
     }
 
-
+    if(context._touchTarget.onFingerUp){
+        context._touchTarget.onFingerUp();
+    }
     clearInterval(target.timer);
     target.timer = null;
     //IE 8 don't have delete.
@@ -1556,9 +1558,7 @@ IWebapp.prototype._onTouchEnd = function (e, context) {
     IWebapp.removeClass(target,context._touchLongTapAttr);
 
 
-    if(context._touchTarget.onFingereUp){
-        context._touchTarget.onFingereUp();
-    }
+
 
 
 
@@ -1643,6 +1643,8 @@ IWebapp.prototype._onMouseDown = function (e, context) {
         context._touchTarget.touchTime = (e.timestamp || Date.now());
         context._touchTarget.touchXMov = context._touchTarget.touchX = e.pageX || e.clientX ;
         context._touchTarget.touchYMov = context._touchTarget.touchY = e.pageY || e.clientY ;
+
+
         context._touchTarget.timer = setInterval(context._onTouching, 30);
         addEvent(window.document.body, "mousemove", context._onMouseMove, context);
         addEvent(window.document.body, "mouseup", context._onTouchEnd, context);

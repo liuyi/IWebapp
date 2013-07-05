@@ -100,10 +100,28 @@ LoginPage.prototype.onCreate = function (pageData) {
 
     this.switchBtn=new IWebUISwitch();
     this.switchBtn.create(this.findViewItem("switchBtn"));
-    this.slider=new IWebUISlider();
-    this.slider.create(this.findViewItem("slider"))
+    this.slider=new IWebUISlider(this.findViewItem("slider"),{min:200,max:1000,snap:true,increment:800,animate:true});
 
 
+
+    this.setValBtn=this.findViewItem("setValBtn");
+    this.setPerBtn=this.findViewItem("setPerBtn");
+
+    addEvent(this.setValBtn,"change",function(e,context){
+        context.slider.setVal(Number(this.value))
+    },this)
+
+    addEvent(this.setPerBtn,"change",function(e,context){
+        context.slider.setPercent(Number(this.value))
+    },this)
+
+
+    var sliderVal= this.sliderVal=this.findViewItem("sliderVal");
+
+
+    this.slider.onChange=function(p,val){
+        sliderVal.innerText="percent:"+Math.round(p*100)+"  value:"+val;
+    }
 
 
     // addEvent(this.view.html, "click", this.onClicked, this);
