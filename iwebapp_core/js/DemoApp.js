@@ -108,7 +108,12 @@ LoginPage.prototype.onCreate = function (pageData) {
     this.setPerBtn=this.findViewItem("setPerBtn");
     this.ball=this.findViewItem("ball");
 
-      IWPTween.to(this.ball,1,{x:300,y:100,onComplete:function(p){trace("commmm:"+p)},completeParams:["hahahah"]});
+
+      IWPTween.to(this.ball,1,{css:{x:300,y:100},
+          onComplete:function(p){
+          trace("commmm:"+p);
+          IWPTween.to(this,1,{css:{x:800,y:300}})
+      },completeParams:["hahahah"]});
 
 
 //    var ox=10;

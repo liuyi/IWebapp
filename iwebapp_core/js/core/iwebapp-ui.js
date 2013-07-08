@@ -579,10 +579,15 @@ function IWPTween() {
 IWPTween._targets = [];
 IWPTween._count = 0;
 IWPTween._tweenId = 0;
+IWPTween._targetId = 0;
 IWPTween._transform = getsupportedprop(['transform', 'MozTransform', 'WebkitTransform', 'OTransform']);
 IWPTween._transition = getsupportedprop([ 'transition', 'MozTransition', 'WebkitTransition', 'OTransition']);
 IWPTween.isBadBrwoser = (IWPTween._transform == null || IWPTween._transition == null);
 IWPTween._timer = null;
+
+IWPTween.killOf = function () {
+
+}
 
 IWPTween.to = function (target, time, obj) {
     if (obj == null) {
@@ -590,62 +595,65 @@ IWPTween.to = function (target, time, obj) {
     }
 
     var css = null;
-    var x = (obj.x != null) ? obj.x : 0;
-    var y = (obj.y != null) ? obj.y : 0;
+    var x = (obj.css.x != null) ? obj.css.x : 0;
+    var y = (obj.css.y != null) ? obj.css.y : 0;
     var ease = (obj.ease == null) ? "easeInOutQuad" : obj.ease;
+    var origin = {css: {}}
 
     if (IWPTween.isBadBrwoser) {
 
 
-        if (obj.x != null) {
-            obj.ox = target.style.left.replace("px", "").replace("%", "");
-            obj.ox = Number(obj.ox);
-            obj.x -= obj.ox;
+        if (obj.css.x != null) {
+            origin.css.x = Number(target.style.left.replace("px", "").replace("%", ""));
+            obj.css.x -= origin.css.x;
+
         }
 
-        if (obj.y != null) {
-            obj.oy = target.style.top.replace("px", "").replace("%", "");
-            obj.oy = Number(obj.oy);
-            obj.y -= obj.oy;
+        if (obj.css.y != null) {
+            origin.css.y = Number(target.style.top.replace("px", "").replace("%", ""));
+
+            obj.css.y -= origin.css.y;
         }
-        css = {left: obj.x, top: obj.y, ox: obj.ox, oy: obj.oy};
+        css = {left: obj.css.x, top: obj.css.y};
     } else {
-        var z = (obj.z != null) ? obj.css.z : 0;
+        var z = (obj.css.z != null) ? obj.css.z : 0;
         css = {x: x, y: y, z: z};
     }
+    var tweenObj = {time: time * 1000, ease: ease, css: css, spentTime: 0, onComplete: obj.onComplete, completeParams: obj.completeParams, _origin: origin}
+    if(time<0.01) time=0;
 
 
     if (time == 0) {
 
         if (IWPTween.isBadBrwoser) {
-            for (var i in obj.css) {
-                target.style[i] = obj.css[i];
+
+            for (var i in tweenObj.css) {
+                target.style[i] = tweenObj.css[i] + "px";
             }
         } else {
             target.style[IWPTween._transition] = "0s";
             target.style[IWPTween._transform] = "translate3d(" + x + "px," + y + "px," + z + "px)";
         }
 
+        if (tweenObj.onComplete != null) {
+            if (tweenObj.completeParams == null) tweenObj.completeParams = [];
+            tweenObj.onComplete.apply(target, tweenObj.completeParams)
+            tweenObj.onComplete = null;
+            tweenObj.completeParams = null;
+        }
+
 
     } else {
-
-        var tweenObj = {time: time * 1000, ease: ease, css: css, spentTime: 0, onComplete: obj.onComplete, completeParams: obj.completeParams}
-
-        if (IWPTween.isBadBrwoser) {
-
-
-            IWPTween._addTweenItem(target, tweenObj);
-
-        } else {
+        if (IWPTween.isBadBrwoser != true) {
             target.style[IWPTween._transition] = time + "s";
             var timer = setTimeout(function () {
                 target.style[IWPTween._transform] = "translate3d(" + x + "px," + y + "px," + z + "px)";
-                target.addEventListener( 'webkitTransitionEnd',
-                    function( event ) { alert( "Finished transition!" ); }, false );
-                clearTimeout(timer)
             }, 0);
 
         }
+
+        IWPTween._addTweenItem(target, tweenObj);
+
     }
 
     return IWPTween._tweenId;
@@ -654,26 +662,23 @@ IWPTween.to = function (target, time, obj) {
 
 IWPTween._addTweenItem = function (target, tweenObj) {
     if (IWPTween._targets == null) {
-        IWPTween._targets[target] = [];
+        IWPTween._targets = {};
     }
 
-    IWPTween._targets.push(target)
-
-    trace("target:" + target)
+    if (target._tweenTargetId == null && IWPTween._targets[target._tweenTargetId] == null) {
+        IWPTween._targets[++IWPTween._targetId] = target;
+        target._tweenTargetId = IWPTween._targetId;
+    }
 
     if (target._tweens == null) {
         target._tweens = {};
-
-        trace("target._tweens:" + target._tweens)
     }
 
     target._tweens[ ++IWPTween._tweenId] = tweenObj;
-
+    tweenObj._tweenId = IWPTween._tweenId;
 
     IWPTween._count++;
     IWPTween._initTimer();
-
-
 
 
 }
@@ -700,7 +705,7 @@ IWPTween._tween = function () {
 
     var tweens = null;
     var item = null;
-    for (var i = 0; i < IWPTween._targets.length; i++) {
+    for (var i  in  IWPTween._targets) {
         item = IWPTween._targets[i];
         tweens = item._tweens;
 
@@ -710,21 +715,24 @@ IWPTween._tween = function () {
         for (var k in tweens) {
             tweenObj = tweens[k];
 
+            //tween the css style of bad brwosers such as :ie6,7,8,9, else tween them by  css
+            if (IWPTween.isBadBrwoser) {
+                if (tweenObj.css.left != null) {
+                    var val = item.style.left.replace("px", "").replace("%", "");
+                    if (val == "") val = 0;
 
-            if (tweenObj.css.left != null) {
-                var val = item.style.left.replace("px", "").replace("%", "");
-                if (val == "") val = 0;
+                    var result = Math[tweenObj.ease](tweenObj.spentTime, tweenObj._origin.css.x, tweenObj.css.left, tweenObj.time);
+                   // trace("result:"+result)
 
-                var result = Math[tweenObj.ease](tweenObj.spentTime, tweenObj.css.ox, tweenObj.css.left, tweenObj.time);
+                    item.style.left = result + "px";
+                }
 
+                if (tweenObj.css.top != null) {
+                    val = item.style.top.replace("px", "").replace("%", "");
+                    if (val == "") val = 0;
+                    item.style.top = Math[tweenObj.ease](tweenObj.spentTime, tweenObj._origin.css.y, tweenObj.css.top, tweenObj.time) + "px"
+                }
 
-                item.style.left = result + "px";
-            }
-
-            if (tweenObj.css.top != null) {
-                val = item.style.top.replace("px", "").replace("%", "");
-                if (val == "") val = 0;
-                item.style.top = Math[tweenObj.ease](tweenObj.spentTime, tweenObj.css.oy, tweenObj.css.top, tweenObj.time) + "px"
             }
 
 
