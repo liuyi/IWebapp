@@ -106,6 +106,21 @@ LoginPage.prototype.onCreate = function (pageData) {
 
     this.setValBtn=this.findViewItem("setValBtn");
     this.setPerBtn=this.findViewItem("setPerBtn");
+    this.ball=this.findViewItem("ball");
+
+      IWPTween.to(this.ball,1,{x:300,y:100,onComplete:function(p){trace("commmm:"+p)},completeParams:["hahahah"]});
+
+
+//    var ox=10;
+//    var tx=100;
+//    var t=1000;
+//    var spentTime=0
+//    var c=setInterval(function(){
+//        var x=Math.easeOutQuad(spentTime,ox,tx,t);
+//        spentTime+=30;
+//        trace("x:"+x+", spent time="+spentTime);
+//        if(spentTime>=t) clearInterval(c)
+//    },30)
 
     addEvent(this.setValBtn,"change",function(e,context){
         context.slider.setVal(Number(this.value))
@@ -128,8 +143,16 @@ LoginPage.prototype.onCreate = function (pageData) {
     addEvent(this.view.html, "tap", this.onTap, this);
     addEvent(this.view.html, "longtap", this.onLongTap, this);
 
-
-
+//    var target= $(this.setValBtn)
+//    target.fadeTo(500,0,function(){this.style.visibility="hidden";this.style.display="";})
+//
+//
+//    setTimeout(function(){
+//        //target[0].style.visibility="visible";
+//        //我擦， 这才是JQ吗
+//        target.css("visibility","visible")
+//        target.fadeTo(500,1)
+//    },2000)
 
 
 
@@ -208,7 +231,7 @@ HomePage.prototype.onCreate = function (pageData) {
 
     addEvent(this.view.html, "tap", this.onClicked, this);
 
-    var btn=this.announceBtn
+    var btn=this.announceBtn;
     this.timer=setTimeout(function(){
 
         iwp.resumeNode(btn)

@@ -1,56 +1,55 @@
-function IWebUI(){
+function IWebUI() {
 
 }
-function IWebUISwitch(){
-    this.container=null;
-    this.dragNode=null;
-    this.dragContainer=null;
-    this.dragWidth="25%";
+function IWebUISwitch() {
+    this.container = null;
+    this.dragNode = null;
+    this.dragContainer = null;
+    this.dragWidth = "25%";
 }
 
 
-IWebUISwitch.prototype.create=function(target,autoCreate){
-    this.container=target;
-    if(autoCreate==null) autoCreate=true;
+IWebUISwitch.prototype.create = function (target, autoCreate) {
+    this.container = target;
+    if (autoCreate == null) autoCreate = true;
 
-    if(autoCreate==true){
-        this.dragNode=window.document.createElement("div");
-        this.dragContainer=window.document.createElement("div");
+    if (autoCreate == true) {
+        this.dragNode = window.document.createElement("div");
+        this.dragContainer = window.document.createElement("div");
         this.dragContainer.appendChild(this.dragNode);
         this.container.appendChild(this.dragContainer);
 
 
-
-        iwp.addClass(this.dragNode,"iwebui-switch-drag");
-        iwp.addClass(this.dragContainer,"iwebui-switch-drag-container");
-        iwp.addClass(this.container,"iwebui-switch-container");
+        iwp.addClass(this.dragNode, "iwebui-switch-drag");
+        iwp.addClass(this.dragContainer, "iwebui-switch-drag-container");
+        iwp.addClass(this.container, "iwebui-switch-container");
     }
 
     this.setVal(false);
 
-    this.container.context=this;
-    this.container.onFingerStart=this.onTouch;
-    this.container.onFingerMove=this.onMove;
+    this.container.context = this;
+    this.container.onFingerStart = this.onTouch;
+    this.container.onFingerMove = this.onMove;
 }
 
-IWebUISwitch.prototype.onDrag=function(e,context){
-   if(context.value==true){
+IWebUISwitch.prototype.onDrag = function (e, context) {
+    if (context.value == true) {
 
-       context.setVal(false)
-   }else{
-       context.setVal(true)
+        context.setVal(false)
+    } else {
+        context.setVal(true)
 
-   }
+    }
     return false;
 
 }
 
-IWebUISwitch.prototype.onTouch=function(x,y){
+IWebUISwitch.prototype.onTouch = function (x, y) {
 
-    if(this.context.value==true){
+    if (this.context.value == true) {
 
         this.context.setVal(false)
-    }else{
+    } else {
         this.context.setVal(true)
 
     }
@@ -58,145 +57,141 @@ IWebUISwitch.prototype.onTouch=function(x,y){
 
 }
 
-IWebUISwitch.prototype.onMove=function(x,y){
-
-
+IWebUISwitch.prototype.onMove = function (x, y) {
 
 
 }
 
 
-IWebUISwitch.prototype.setVal=function(val){
+IWebUISwitch.prototype.setVal = function (val) {
     TweenLite.killTweensOf(this.dragContainer)
-    if(val==true){
-        this.value=true;
+    if (val == true) {
+        this.value = true;
 
-        TweenLite.to(this.dragContainer,0.6,{left:"0%"})
+        TweenLite.to(this.dragContainer, 0.6, {left: "0%"})
 
 
-    }else {
-        this.value=false;
-        TweenLite.to(this.dragContainer,0.6,{left:"-75%"})
+    } else {
+        this.value = false;
+        TweenLite.to(this.dragContainer, 0.6, {left: "-75%"})
 
     }
 }
 
 
-IWebUISlider.DIRECTION_HORIZON=1;
-IWebUISlider.DIRECTION_VERTICAL=2;
+IWebUISlider.DIRECTION_HORIZON = 1;
+IWebUISlider.DIRECTION_VERTICAL = 2;
 /**
  *
  * @constructor
  */
-function IWebUISlider(target,opts){
-    this.container=null;
-    this.activeNode=null;
-    this.downNode=null;
-    this.dragNode=null;
-    this.snap=false;
-    this.percent=0;
-    this.direction=1;
-    this.supportTransform=getsupportedprop(['transform','MozTransform', 'WebkitTransform', 'OTransform']);
-    this.supportTransition=getsupportedprop([ 'transition','MozTransition', 'WebkitTransition', 'OTransition']);
-    this.onChange=null;
-    this.min=0;
-    this.max=1;
-    this.value=0;
-    this.increment=1;
-    this.animate=false;
+function IWebUISlider(target, opts) {
+    this.container = null;
+    this.activeNode = null;
+    this.downNode = null;
+    this.dragNode = null;
+    this.snap = false;
+    this.percent = 0;
+    this.direction = 1;
+    this.supportTransform = getsupportedprop(['transform', 'MozTransform', 'WebkitTransform', 'OTransform']);
+    this.supportTransition = getsupportedprop([ 'transition', 'MozTransition', 'WebkitTransition', 'OTransition']);
+    this.onChange = null;
+    this.min = 0;
+    this.max = 1;
+    this.value = 0;
+    this.increment = 1;
+    this.animate = false;
 
-    this._timer=null;
+    this._timer = null;
 
-    if(target!=null){
-        this.create(target,opts);
+    if (target != null) {
+        this.create(target, opts);
     }
 
 
 }
 
-IWebUISlider.prototype.create=function(target,opts){
-    this.container=target;
+IWebUISlider.prototype.create = function (target, opts) {
+    this.container = target;
 
 
-    this.activeNode=IWebapp.getElementsByClassName(target,"iwp-ui-slider-active")[0];
-    this.downNode=IWebapp.getElementsByClassName(target,"iwp-ui-slider-down")[0];
-    this.dragNode=IWebapp.getElementsByClassName(target,"iwp-ui-slider-slug")[0];
+    this.activeNode = IWebapp.getElementsByClassName(target, "iwp-ui-slider-active")[0];
+    this.downNode = IWebapp.getElementsByClassName(target, "iwp-ui-slider-down")[0];
+    this.dragNode = IWebapp.getElementsByClassName(target, "iwp-ui-slider-slug")[0];
 
 
-    this.container.context=this;
-    this.dragNode.context=this;
-    this.dragNode.onFingerMove=this._onTouchMove;
-    this.dragNode.onFingerStart=this._onTouchStart;
-    this.dragNode.onFingerUp=this._onTouchEnd;
+    this.container.context = this;
+    this.dragNode.context = this;
+    this.dragNode.onFingerMove = this._onTouchMove;
+    this.dragNode.onFingerStart = this._onTouchStart;
+    this.dragNode.onFingerUp = this._onTouchEnd;
 
-    this.container.onFingerStart=this._onBarClick;
-    this.container.onFingerUp=this._onBarUp;
-
-
-    if(opts!=null){
-
-        this.min=(opts.min!=null)?opts.min:this.min;
-        this.max=(opts.max!=null)?opts.max:this.max;
-        this.direction=(opts.direction!=null)?opts.direction:this.direction;
-        this.onChange=(opts.onChange!=null)?opts.onChange:this.onChange;
-        this.animate=(opts.animate!=null)?opts.animate:this.animate;
-        this.snap=(opts.snap!=null)?opts.snap:this.snap;
-        this.increment=(opts.increment!=null)?opts.increment:this.increment;
+    this.container.onFingerStart = this._onBarClick;
+    this.container.onFingerUp = this._onBarUp;
 
 
-        if(opts.value!=null){
+    if (opts != null) {
+
+        this.min = (opts.min != null) ? opts.min : this.min;
+        this.max = (opts.max != null) ? opts.max : this.max;
+        this.direction = (opts.direction != null) ? opts.direction : this.direction;
+        this.onChange = (opts.onChange != null) ? opts.onChange : this.onChange;
+        this.animate = (opts.animate != null) ? opts.animate : this.animate;
+        this.snap = (opts.snap != null) ? opts.snap : this.snap;
+        this.increment = (opts.increment != null) ? opts.increment : this.increment;
+
+
+        if (opts.value != null) {
             this.setVal(opts.value);
-        }else if(opts.percent!=null){
+        } else if (opts.percent != null) {
             this.setPercent(opts.percent);
         }
     }
 
 
-
 }
 
-IWebUISlider.prototype.destroy=function(){
+IWebUISlider.prototype.destroy = function () {
     clearInterval(this._timer);
-    this._timer=null;
-    this.container.onFingerStart=null;
-    this.container.onFingerUp=null;
-    this.container.context=null;
-    this.dragNode.context=null;
-    this.dragNode.onFingerMove=null;
-    this.container=null;
-    this.activeNode=null;
-    this.downNode=null;
-    this.dragNode=null;
-    this.snap=false;
-    this.onChange=null;
-    this.dataList=null;
+    this._timer = null;
+    this.container.onFingerStart = null;
+    this.container.onFingerUp = null;
+    this.container.context = null;
+    this.dragNode.context = null;
+    this.dragNode.onFingerMove = null;
+    this.container = null;
+    this.activeNode = null;
+    this.downNode = null;
+    this.dragNode = null;
+    this.snap = false;
+    this.onChange = null;
+    this.dataList = null;
 
 }
 
-IWebUISlider.prototype.setRange=function(min,max){
-    this.min=min;
-    this.max=max;
-    this.value=this.percent*(this.max-this.min)+this.min;
+IWebUISlider.prototype.setRange = function (min, max) {
+    this.min = min;
+    this.max = max;
+    this.value = this.percent * (this.max - this.min) + this.min;
 }
 
-IWebUISlider.prototype.setPercent=function(p){
-    if(p>1) p=1;
-    if(p<0) p=0;
+IWebUISlider.prototype.setPercent = function (p) {
+    if (p > 1) p = 1;
+    if (p < 0) p = 0;
 
 
+    if (this.snap != true) {
+        this.percent = p;
+        this.value = this.percent * (this.max - this.min) + this.min;
+    } else {
 
-    if(this.snap!=true){
-        this.percent=p;
-        this.value=this.percent*(this.max-this.min)+this.min;
-    }else{
+        var val = p * (this.max - this.min) + this.min;
+        var n = (val - this.min) / this.increment;
 
-        var val=p*(this.max-this.min)+this.min;
-        var n=(val-this.min)/this.increment;
-
-        this.value=Math.round(n)*this.increment+this.min;
-        this.percent=(this.value-this.min)/(this.max-this.min);
-        if(this.percent>1) this.percent=1;
-        else if(this.percent<0) this.percent=0;
+        this.value = Math.round(n) * this.increment + this.min;
+        this.percent = (this.value - this.min) / (this.max - this.min);
+        if (this.percent > 1) this.percent = 1;
+        else if (this.percent < 0) this.percent = 0;
     }
 
 
@@ -205,26 +200,24 @@ IWebUISlider.prototype.setPercent=function(p){
 
 }
 
-IWebUISlider.prototype.setVal=function(val){
-    if(val>this.max) val=this.max;
-    else if(val<this.min) val=this.min;
+IWebUISlider.prototype.setVal = function (val) {
+    if (val > this.max) val = this.max;
+    else if (val < this.min) val = this.min;
 
 
-    if(this.snap!=true){
-        this.value=val;
-    }else{
+    if (this.snap != true) {
+        this.value = val;
+    } else {
 
-        var n=(val-this.min)/this.increment;
+        var n = (val - this.min) / this.increment;
 
-        this.value=Math.round(n)*this.increment+this.min;
+        this.value = Math.round(n) * this.increment + this.min;
     }
 
 
-
-    this.percent=(this.value-this.min)/(this.max-this.min);
-    if(this.percent>1) this.percent=1;
-    else if(this.percent<0) this.percent=0;
-
+    this.percent = (this.value - this.min) / (this.max - this.min);
+    if (this.percent > 1) this.percent = 1;
+    else if (this.percent < 0) this.percent = 0;
 
 
     this._updateDrag(this.percent);
@@ -235,20 +228,20 @@ IWebUISlider.prototype.setVal=function(val){
 
 /**********private function list********/
 
-IWebUISlider.prototype._onBarClick=function(){
-    var p=0;
-    if(this.context.direction==IWebUISlider.DIRECTION_HORIZON){
-        p=(this.touchX-this.offsetLeft-this.context.dragNode.offsetWidth)/(this.offsetWidth-this.context.dragNode.offsetWidth);
+IWebUISlider.prototype._onBarClick = function () {
+    var p = 0;
+    if (this.context.direction == IWebUISlider.DIRECTION_HORIZON) {
+        p = (this.touchX - this.offsetLeft - this.context.dragNode.offsetWidth) / (this.offsetWidth - this.context.dragNode.offsetWidth);
 
-    }else{
+    } else {
 
-        p=(this.touchY-this.offsetTop-this.context.dragNode.offsetHeight)/(this.offsetHeight-this.context.dragNode.offsetHeight);
+        p = (this.touchY - this.offsetTop - this.context.dragNode.offsetHeight) / (this.offsetHeight - this.context.dragNode.offsetHeight);
     }
 
-    if(p<0) p=0;
-    else if(p>1) p=1;
+    if (p < 0) p = 0;
+    else if (p > 1) p = 1;
 
-    if(this.context.snap!=true){
+    if (this.context.snap != true) {
         this.context._updateData(p);
     }
 
@@ -256,97 +249,99 @@ IWebUISlider.prototype._onBarClick=function(){
 }
 
 
-IWebUISlider.prototype._onBarUp=function(){
+IWebUISlider.prototype._onBarUp = function () {
 
-    if(this.context.snap!=true) return;
+    if (this.context.snap != true) return;
 
-    var p=0;
-    if(this.context.direction==IWebUISlider.DIRECTION_HORIZON){
-        p=(this.touchX-this.offsetLeft-this.context.dragNode.offsetWidth)/(this.offsetWidth-this.context.dragNode.offsetWidth);
+    var p = 0;
+    if (this.context.direction == IWebUISlider.DIRECTION_HORIZON) {
+        p = (this.touchX - this.offsetLeft - this.context.dragNode.offsetWidth) / (this.offsetWidth - this.context.dragNode.offsetWidth);
 
-    }else{
+    } else {
 
-        p=(this.touchY-this.offsetTop-this.context.dragNode.offsetHeight)/(this.offsetHeight-this.context.dragNode.offsetHeight);
+        p = (this.touchY - this.offsetTop - this.context.dragNode.offsetHeight) / (this.offsetHeight - this.context.dragNode.offsetHeight);
     }
 
 
+    if (p < 0) p = 0;
+    else if (p > 1) p = 1;
+    var val = this.context.min + p * (this.context.max - this.context.min);
+    var n = (val - this.context.min) / this.context.increment;
 
-    if(p<0) p=0;
-    else if(p>1) p=1;
-    var val=this.context.min+p*(this.context.max-this.context.min);
-    var n=(val-this.context.min)/this.context.increment;
-
-    var val2=Math.round(n)*this.context.increment+this.context.min;
-
+    var val2 = Math.round(n) * this.context.increment + this.context.min;
 
 
     this.context.setVal(val2);
-    if(this.onChange!=null) this.onChange(this.context.percent,this.context.value);
+    if (this.onChange != null) this.onChange(this.context.percent, this.context.value);
 
 }
 
 
-IWebUISlider.prototype._updateDrag=function(p){
+IWebUISlider.prototype._updateDrag = function (p) {
 
-    trace("_updateDrag")
-    if(this.direction==IWebUISlider.DIRECTION_HORIZON){
+    if (this.direction == IWebUISlider.DIRECTION_HORIZON) {
 
-        this.dragNode.pos=p*(this.container.offsetWidth-this.dragNode.offsetWidth);
+        this.dragNode.pos = p * (this.container.offsetWidth - this.dragNode.offsetWidth);
 
-        if(this.animate!=true){
+        if (this.animate != true) {
 
 
-            if(this.supportTransform!=null){
+            if (this.supportTransform != null) {
 
-                this.dragNode.style[this.supportTransform]="translate3d("+ this.dragNode.pos+"px,0px,0px)";
-            }else{
-                this.dragNode.style.left= this.dragNode.pos+"px";
+                this.dragNode.style[this.supportTransform] = "translate3d(" + this.dragNode.pos + "px,0px,0px)";
+            } else {
+                this.dragNode.style.left = this.dragNode.pos + "px";
 
             }
-        }else{
+        } else {
 
-            if(this.supportTransform!=null){
-               trace(this.supportTransition)
-               this.dragNode.style[this.supportTransition]=" 0.2s";
+            if (this.supportTransform != null) {
 
-                this.dragNode.style[this.supportTransform]="translate3d("+ this.dragNode.pos+"px,0px,0px)";
+                this.dragNode.style[this.supportTransition] = " 0.2s";
 
-            }else{
+                this.dragNode.style[this.supportTransform] = "translate3d(" + this.dragNode.pos + "px,10px,20px)";
 
-              //  this.dragNode.style.left= this.dragNode.pos+"px";
-                if(this._timer!=null){
+
+            } else {
+
+                //  this.dragNode.style.left= this.dragNode.pos+"px";
+                if (this._timer != null) {
                     clearInterval(this._timer);
 
 
                 }
-                var context=this;
-                this._timer=setInterval(function(){context._tween(context);},30);
+                var context = this;
+                this._timer = setInterval(function () {
+                    context._tween(context);
+                }, 30);
 
             }
         }
 
-    }else{
-        this.dragNode.pos=p*(this.container.offsetHeight-this.dragNode.offsetHeight);
+    } else {
+        this.dragNode.pos = p * (this.container.offsetHeight - this.dragNode.offsetHeight);
 
-        if(this.animate!=true){
-            if(this.supportTransform!=null){
-                this.dragNode.style[this.supportTransform]="translate3d(0px,"+ this.dragNode.pos+"px,0px)";
-            }else{
-                this.dragNode.style.top= this.dragNode.pos+"px";
+        if (this.animate != true) {
+            if (this.supportTransform != null) {
+                this.dragNode.style[this.supportTransform] = "translate3d(0px," + this.dragNode.pos + "px,0px)";
+            } else {
+                this.dragNode.style.top = this.dragNode.pos + "px";
             }
-        }else{
-            if(this.supportTransform!=null){
-                this.dragNode.style[this.supportTransition]=" 0.2s";
-                this.dragNode.style[this.supportTransform]="translate3d(0px,"+ this.dragNode.pos+"px,0px)";
-            }else{
-               // this.dragNode.style.top= this.dragNode.pos+"px";
-                if(this._timer!=null){
+        } else {
+            if (this.supportTransform != null) {
+                this.dragNode.style[this.supportTransition] = " 0.2s";
+                this.dragNode.style[this.supportTransform] = "translate3d(0px," + this.dragNode.pos + "px,0px)";
+            } else {
+                // this.dragNode.style.top= this.dragNode.pos+"px";
+                if (this._timer != null) {
                     clearInterval(this._timer);
 
 
                 }
-                var context=this;
-                this._timer=setInterval(function(){context._tween(context);},30);
+                var context = this;
+                this._timer = setInterval(function () {
+                    context._tween(context);
+                }, 30);
 
             }
         }
@@ -354,122 +349,407 @@ IWebUISlider.prototype._updateDrag=function(p){
     }
 }
 
-IWebUISlider.prototype._tween=function(context){
-    var left=Number(context.dragNode.style.left.replace("px",""));
-    var pos=left+(context.dragNode.pos-left)*0.6;
+IWebUISlider.prototype._tween = function (context) {
+    var left = Number(context.dragNode.style.left.replace("px", ""));
+    var pos = left + (context.dragNode.pos - left) * 0.6;
 
 
-    var len=(context.container.offsetWidth-context.dragNode.offsetWidth)
-    if(pos<=0) {
-        pos=0;
+    var len = (context.container.offsetWidth - context.dragNode.offsetWidth)
+    if (pos <= 0) {
+        pos = 0;
         clearInterval(context._timer);
 
     }
-    else if(pos>=(len-1) && pos <=(len+1) ){
-        pos=context.container.offsetWidth-context.dragNode.offsetWidth;
+    else if (pos >= (len - 1) && pos <= (len + 1)) {
+        pos = context.container.offsetWidth - context.dragNode.offsetWidth;
         clearInterval(context._timer)
 
     }
-   // trace(pos+"/"+context.dragNode.pos)
-    context.dragNode.style.left=pos+"px";
-    context=null;
+    // trace(pos+"/"+context.dragNode.pos)
+    context.dragNode.style.left = pos + "px";
+    context = null;
 
 }
 
-IWebUISlider.prototype._onTouchStart=function(x,y){
+IWebUISlider.prototype._onTouchStart = function (x, y) {
 
-    this.style[this.context.supportTransition]="0s";
-    if(this.context.direction==IWebUISlider.DIRECTION_HORIZON){
-        this.prevPos=this.touchX;
-    }else{
-        this.prevPos=this.touchY;
+    this.style[this.context.supportTransition] = "0s";
+    if (this.context.direction == IWebUISlider.DIRECTION_HORIZON) {
+        this.prevPos = this.touchX;
+    } else {
+        this.prevPos = this.touchY;
     }
 
 }
-IWebUISlider.prototype._onTouchMove=function(x,y){
+IWebUISlider.prototype._onTouchMove = function (x, y) {
 
-    if(this.pos==null) {
+    if (this.pos == null) {
 
-        this.pos=0;
+        this.pos = 0;
     }
 
-    if(this.context.direction==IWebUISlider.DIRECTION_HORIZON){
+    if (this.context.direction == IWebUISlider.DIRECTION_HORIZON) {
 
-        this.pos=this.pos+this.touchXMov-this.prevPos;
+        this.pos = this.pos + this.touchXMov - this.prevPos;
 
-        if(this.pos<0) this.pos=0;
-        else if(this.pos>=(this.context.container.offsetWidth-this.offsetWidth)){
-            this.pos=this.context.container.offsetWidth-this.offsetWidth
-
-        }
-
-        if(this.context.supportTransform!=null){
-
-            this.style[this.context.supportTransform]="translate3d("+this.pos+"px,0px,0px)";
-        }else{
-            this.style.left=this.pos+"px";
-
+        if (this.pos < 0) this.pos = 0;
+        else if (this.pos >= (this.context.container.offsetWidth - this.offsetWidth)) {
+            this.pos = this.context.container.offsetWidth - this.offsetWidth
 
         }
-        this.prevPos=this.touchXMov;
 
-        if(this.context.snap!=true)
-        this.context._updateData(this.pos/(this.context.container.offsetWidth-this.offsetWidth));
+        if (this.context.supportTransform != null) {
 
-    }else{
+            this.style[this.context.supportTransform] = "translate3d(" + this.pos + "px,10px,20px)";
+        } else {
+            this.style.left = this.pos + "px";
 
-       // p=(this.touchYMov-this.context.container.offsetTop)/this.context.container.offsetHeight;
-        this.pos=this.pos+this.touchYMov-this.prevPos;
 
-        if(this.pos<0) this.pos=0;
-        else if(this.pos>=(this.context.container.offsetHeight-this.offsetHeight)){
-            this.pos=this.context.container.offsetHeight-this.offsetHeight
         }
-        if(this.context.supportTransform!=null){
-            this.style[this.context.supportTransform]="translate3d(0px,"+this.pos+"px,0px)";
-        }else{
-            this.style.top=this.pos+"px";
+        this.prevPos = this.touchXMov;
+
+        if (this.context.snap != true)
+            this.context._updateData(this.pos / (this.context.container.offsetWidth - this.offsetWidth));
+
+    } else {
+
+        // p=(this.touchYMov-this.context.container.offsetTop)/this.context.container.offsetHeight;
+        this.pos = this.pos + this.touchYMov - this.prevPos;
+
+        if (this.pos < 0) this.pos = 0;
+        else if (this.pos >= (this.context.container.offsetHeight - this.offsetHeight)) {
+            this.pos = this.context.container.offsetHeight - this.offsetHeight
+        }
+        if (this.context.supportTransform != null) {
+            this.style[this.context.supportTransform] = "translate3d(0px," + this.pos + "px,0px)";
+        } else {
+            this.style.top = this.pos + "px";
         }
 
-        this.prevPos=this.touchYMov;
+        this.prevPos = this.touchYMov;
 
-        if(this.context.snap!=true)
-        this.context._updateData(this.pos/(this.context.container.offsetHeight-this.offsetHeight));
+        if (this.context.snap != true)
+            this.context._updateData(this.pos / (this.context.container.offsetHeight - this.offsetHeight));
     }
 
 
 }
 
-IWebUISlider.prototype._onTouchEnd=function(){
+IWebUISlider.prototype._onTouchEnd = function () {
 
-    if(this.context.snap==true){
+    if (this.context.snap == true) {
         //snap drag node to the best position
-        if(this.context.direction==IWebUISlider.DIRECTION_HORIZON){
-            var p=this.pos/(this.context.container.offsetWidth-this.offsetWidth);
+        if (this.context.direction == IWebUISlider.DIRECTION_HORIZON) {
+            var p = this.pos / (this.context.container.offsetWidth - this.offsetWidth);
 
 
-        }else{
-              p=this.pos/(this.context.container.offsetHeight-this.offsetHeight);
+        } else {
+            p = this.pos / (this.context.container.offsetHeight - this.offsetHeight);
         }
 
-        if(p<0) p=0;
-        else if(p>1) p=1;
-        var val=this.context.min+p*(this.context.max-this.context.min);
-        var n=(val-this.context.min)/this.context.increment;
+        if (p < 0) p = 0;
+        else if (p > 1) p = 1;
+        var val = this.context.min + p * (this.context.max - this.context.min);
+        var n = (val - this.context.min) / this.context.increment;
 
-        var val2=Math.round(n)*this.context.increment+this.context.min;
+        var val2 = Math.round(n) * this.context.increment + this.context.min;
 
         this.context.setVal(val2);
-        if(this.onChange!=null) this.onChange(this.percent,this.value);
+        if (this.onChange != null) this.onChange(this.percent, this.value);
     }
 }
-IWebUISlider.prototype._updateData=function(p){
-    if(p<0) p=0;
-    else if(p>1) p=1;
+IWebUISlider.prototype._updateData = function (p) {
+    if (p < 0) p = 0;
+    else if (p > 1) p = 1;
 
-    this.percent=p;
-    this.value=this.percent*(this.max-this.min)+this.min;
-    if(this.onChange!=null) this.onChange(this.percent,this.value);
+    this.percent = p;
+    this.value = this.percent * (this.max - this.min) + this.min;
+    if (this.onChange != null) this.onChange(this.percent, this.value);
 
 }
+
+
+Math.linearTween = function (t, b, c, d) {
+    return c * t / d + b;
+};
+Math.easeInQuad = function (t, b, c, d) {
+    t /= d;
+    return c * t * t + b;
+};
+Math.easeOutQuad = function (t, b, c, d) {
+    t /= d;
+    return -c * t * (t - 2) + b;
+};
+Math.easeInOutQuad = function (t, b, c, d) {
+    t /= d / 2;
+    if (t < 1) return c / 2 * t * t + b;
+    t--;
+    return -c / 2 * (t * (t - 2) - 1) + b;
+};
+
+Math.easeInCubic = function (t, b, c, d) {
+    t /= d;
+    return c * t * t * t + b;
+};
+Math.easeOutCubic = function (t, b, c, d) {
+    t /= d;
+    t--;
+    return c * (t * t * t + 1) + b;
+};
+Math.easeInOutCubic = function (t, b, c, d) {
+    t /= d / 2;
+    if (t < 1) return c / 2 * t * t * t + b;
+    t -= 2;
+    return c / 2 * (t * t * t + 2) + b;
+};
+Math.easeInQuart = function (t, b, c, d) {
+    t /= d;
+    return c * t * t * t * t + b;
+};
+Math.easeOutQuart = function (t, b, c, d) {
+    t /= d;
+    t--;
+    return -c * (t * t * t * t - 1) + b;
+};
+Math.easeInOutQuart = function (t, b, c, d) {
+    t /= d / 2;
+    if (t < 1) return c / 2 * t * t * t * t + b;
+    t -= 2;
+    return -c / 2 * (t * t * t * t - 2) + b;
+};
+Math.easeInQuint = function (t, b, c, d) {
+    t /= d;
+    return c * t * t * t * t * t + b;
+};
+Math.easeOutQuint = function (t, b, c, d) {
+    t /= d;
+    t--;
+    return c * (t * t * t * t * t + 1) + b;
+};
+Math.easeInOutQuint = function (t, b, c, d) {
+    t /= d / 2;
+    if (t < 1) return c / 2 * t * t * t * t * t + b;
+    t -= 2;
+    return c / 2 * (t * t * t * t * t + 2) + b;
+};
+Math.easeInSine = function (t, b, c, d) {
+    return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
+};
+Math.easeOutSine = function (t, b, c, d) {
+    return c * Math.sin(t / d * (Math.PI / 2)) + b;
+};
+Math.easeInOutSine = function (t, b, c, d) {
+    return -c / 2 * (Math.cos(Math.PI * t / d) - 1) + b;
+};
+Math.easeInExpo = function (t, b, c, d) {
+    return c * Math.pow(2, 10 * (t / d - 1)) + b;
+};
+Math.easeOutExpo = function (t, b, c, d) {
+    return c * ( -Math.pow(2, -10 * t / d) + 1 ) + b;
+};
+
+Math.easeInOutExpo = function (t, b, c, d) {
+    t /= d / 2;
+    if (t < 1) return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
+    t--;
+    return c / 2 * ( -Math.pow(2, -10 * t) + 2 ) + b;
+};
+
+Math.easeInCirc = function (t, b, c, d) {
+    t /= d;
+    return -c * (Math.sqrt(1 - t * t) - 1) + b;
+};
+Math.easeOutCirc = function (t, b, c, d) {
+    t /= d;
+    t--;
+    return c * Math.sqrt(1 - t * t) + b;
+};
+Math.easeInOutCirc = function (t, b, c, d) {
+    t /= d / 2;
+    if (t < 1) return -c / 2 * (Math.sqrt(1 - t * t) - 1) + b;
+    t -= 2;
+    return c / 2 * (Math.sqrt(1 - t * t) + 1) + b;
+};
+
+
+function IWPTween() {
+
+}
+
+IWPTween._targets = [];
+IWPTween._count = 0;
+IWPTween._tweenId = 0;
+IWPTween._transform = getsupportedprop(['transform', 'MozTransform', 'WebkitTransform', 'OTransform']);
+IWPTween._transition = getsupportedprop([ 'transition', 'MozTransition', 'WebkitTransition', 'OTransition']);
+IWPTween.isBadBrwoser = (IWPTween._transform == null || IWPTween._transition == null);
+IWPTween._timer = null;
+
+IWPTween.to = function (target, time, obj) {
+    if (obj == null) {
+        return;
+    }
+
+    var css = null;
+    var x = (obj.x != null) ? obj.x : 0;
+    var y = (obj.y != null) ? obj.y : 0;
+    var ease = (obj.ease == null) ? "easeInOutQuad" : obj.ease;
+
+    if (IWPTween.isBadBrwoser) {
+
+
+        if (obj.x != null) {
+            obj.ox = target.style.left.replace("px", "").replace("%", "");
+            obj.ox = Number(obj.ox);
+            obj.x -= obj.ox;
+        }
+
+        if (obj.y != null) {
+            obj.oy = target.style.top.replace("px", "").replace("%", "");
+            obj.oy = Number(obj.oy);
+            obj.y -= obj.oy;
+        }
+        css = {left: obj.x, top: obj.y, ox: obj.ox, oy: obj.oy};
+    } else {
+        var z = (obj.z != null) ? obj.css.z : 0;
+        css = {x: x, y: y, z: z};
+    }
+
+
+    if (time == 0) {
+
+        if (IWPTween.isBadBrwoser) {
+            for (var i in obj.css) {
+                target.style[i] = obj.css[i];
+            }
+        } else {
+            target.style[IWPTween._transition] = "0s";
+            target.style[IWPTween._transform] = "translate3d(" + x + "px," + y + "px," + z + "px)";
+        }
+
+
+    } else {
+
+        var tweenObj = {time: time * 1000, ease: ease, css: css, spentTime: 0, onComplete: obj.onComplete, completeParams: obj.completeParams}
+
+        if (IWPTween.isBadBrwoser) {
+
+
+            IWPTween._addTweenItem(target, tweenObj);
+
+        } else {
+            target.style[IWPTween._transition] = time + "s";
+            var timer = setTimeout(function () {
+                target.style[IWPTween._transform] = "translate3d(" + x + "px," + y + "px," + z + "px)";
+                target.addEventListener( 'webkitTransitionEnd',
+                    function( event ) { alert( "Finished transition!" ); }, false );
+                clearTimeout(timer)
+            }, 0);
+
+        }
+    }
+
+    return IWPTween._tweenId;
+
+}
+
+IWPTween._addTweenItem = function (target, tweenObj) {
+    if (IWPTween._targets == null) {
+        IWPTween._targets[target] = [];
+    }
+
+    IWPTween._targets.push(target)
+
+    trace("target:" + target)
+
+    if (target._tweens == null) {
+        target._tweens = {};
+
+        trace("target._tweens:" + target._tweens)
+    }
+
+    target._tweens[ ++IWPTween._tweenId] = tweenObj;
+
+
+    IWPTween._count++;
+    IWPTween._initTimer();
+
+
+
+
+}
+IWPTween._initTimer = function () {
+    if (IWPTween._timer == null) {
+        IWPTween._timer = setInterval(IWPTween._tween, 30);
+    }
+
+}
+
+IWPTween._checkTweens = function () {
+
+
+    if (IWPTween._count <= 0) {
+        clearInterval(IWPTween._timer);
+        IWPTween._timer = null;
+        IWPTween._count = 0;
+        trace("Clear timer")
+    }
+}
+
+IWPTween._tween = function () {
+    IWPTween._checkTweens();
+
+    var tweens = null;
+    var item = null;
+    for (var i = 0; i < IWPTween._targets.length; i++) {
+        item = IWPTween._targets[i];
+        tweens = item._tweens;
+
+
+        var tweenObj = null;
+
+        for (var k in tweens) {
+            tweenObj = tweens[k];
+
+
+            if (tweenObj.css.left != null) {
+                var val = item.style.left.replace("px", "").replace("%", "");
+                if (val == "") val = 0;
+
+                var result = Math[tweenObj.ease](tweenObj.spentTime, tweenObj.css.ox, tweenObj.css.left, tweenObj.time);
+
+
+                item.style.left = result + "px";
+            }
+
+            if (tweenObj.css.top != null) {
+                val = item.style.top.replace("px", "").replace("%", "");
+                if (val == "") val = 0;
+                item.style.top = Math[tweenObj.ease](tweenObj.spentTime, tweenObj.css.oy, tweenObj.css.top, tweenObj.time) + "px"
+            }
+
+
+            tweenObj.spentTime += 30;
+
+            if (tweenObj.spentTime >= tweenObj.time) {
+
+                if (tweenObj.onComplete != null) {
+                    if (tweenObj.completeParams == null) tweenObj.completeParams = [];
+                    tweenObj.onComplete.apply(item, tweenObj.completeParams)
+                    tweenObj.onComplete = null;
+                    tweenObj.completeParams = null;
+                }
+                tweens[k] = null;
+                delete tweens[k];
+                IWPTween._count--;
+
+
+            }
+        }
+
+
+    }//end loop
+
+
+}
+
 

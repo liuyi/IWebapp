@@ -187,3 +187,6 @@
       position:relative;
       top:1px;
   }
+
+
+ .ball{ width: 100px; height: 100px; background: #378de5; position: absolute;top: 0;left: 0}

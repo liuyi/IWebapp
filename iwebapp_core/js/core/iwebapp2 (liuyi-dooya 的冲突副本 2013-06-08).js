@@ -1,0 +1,1160 @@
+//some hacks for ie7,ie8
+
+/**
+ * @desc inheritance,idea come from: Kevin Lindsey
+ * @param subClass
+ * @param baseClass
+ */
+IWebapp.extend = function (subClass, baseClass) {
+
+
+    function Empty() {
+    }
+
+    Empty.prototype = baseClass.prototype;
+
+    subClass.prototype = new Empty();
+    subClass.prototype.constructor = subClass;
+
+    subClass.superConstructor = baseClass;
+    subClass.superClass = baseClass.prototype;
+
+    subClass.$super = function (context, params) {
+
+        var p = [];
+        for (var i = 0; i < arguments.length; i++) {
+            if (i != 0) {
+                p.push(arguments[i]);
+            }
+        }
+        subClass.superConstructor.apply(context, p);
+        p = null;
+
+    }
+
+    subClass.method = function (context, fun, params) {
+        var p = [];
+        for (var i = 0; i < arguments.length; i++) {
+            if (i > 1) {
+                p.push(arguments[i]);
+            }
+        }
+        subClass.superClass[fun].apply(context, p)
+        p = null;
+
+    }
+
+
+}
+
+
+/**
+ * @constant
+ * @type {number}
+ * @desc If this device is a pc or mac
+ *
+ * */
+IWebapp.APP_ENV_NORMAL = 1;
+/**
+ * @constant
+ * @type {number}
+ * @desc If this device can be touch
+ * */
+IWebapp.APP_ENV_TOUCH = 2;
+
+IWebapp._instance = null;
+
+/**
+ *
+ * @returns {IWebapp} the instance of IWebapp Class
+ */
+IWebapp.getInstance = function () {
+    if (IWebapp._instance == null) IWebapp._instance = new IWebapp();
+    return IWebapp._instance;
+}
+
+/** @constructor
+ *  @desc IWebapp version 2.0<br/>
+ Rewrite from previous version,some api changed.<br/>
+ The target is make it more fast, smoothing and less memory.
+ * */
+function IWebapp() {
+
+    if (IWebapp._instance != null) {
+        throw  new Error("IWebapp is singleton class.")
+    }
+    IWebapp._instance = this;
+    this.id = simpleUID();
+    /*the assets configuration file*/
+    this._assetsXML = null;
+    /*the config data of the  app, defined how to use assets and the special behaviour of the app*/
+    this._configData = null;
+    /*store all views assets to this list*/
+    this._viewSources = [];
+    /*store all pages to this list*/
+    this._pages = [];
+
+
+    /*attach pages to this HTMLElement*/
+    this._container = null;
+    /*sometimes we want use jquery object of this HTMLElement*/
+    this._$container = null;
+    /*root path of meida assets*/
+    this._mediaServer = "";
+    /*root path of api address*/
+    this._apiServer = "";
+    this._defaultLang = null;
+    /*load views of app*/
+    this._loader = new IWPLoader();
+
+
+    this.touchSupport=!!('ontouchstart' in window) || !!('onmsgesturechange' in window);
+
+   // alert(this.touchSupport);
+    //alert(('ontouchstart' in window)+">>>"+(!!('onmsgesturechange' in window)));
+}
+
+iwp = window.iwp = IWebapp;
+//static function at here=================
+IWebapp.removeNode = function (htmlElement) {
+    if (htmlElement.parentNode != null) htmlElement.parentNode.removeChild(htmlElement);
+}
+
+IWebapp.hasClass = function (target, className) {
+
+    if (target.className == null) return false;
+    var regx = new RegExp("\\b" + className + "\\b", "gi");
+    var has = target.className.match(regx);
+    return (has != null && has.length > 0);
+
+}
+
+IWebapp.removeClass = function (target, className) {
+    if (target.className == null) {
+        target.className = "";
+    } else {
+        var regx = new RegExp("\\b" + className + "\\b", "gi");
+        var has = target.className.match(regx);
+
+        if (has != null && has.length >= 0) {
+            target.className = target.className.replace(className, "");
+
+        }
+    }
+
+}
+IWebapp.addClass = function (target, className) {
+    if (target.className == null) {
+        target.className = className;
+    } else {
+        var regx = new RegExp("\\b" + className + "\\b", "gi");
+        var has = target.className.match(regx);
+        if (has == null || has.length < 0) {
+            target.className += (" " + className);
+        }
+    }
+
+}
+
+
+//public function at below=================
+
+
+/**
+ * @desc initialize the app with a config xml and config data.
+ * @param container  {HTMLElement }dom element, attach whole pages to it.
+ * @param configPath {string} the path of assets xml. (not include root path)
+ * @param configData {object} {
+ *  mediaServer:string,
+ *  apiServer:string,
+ *  _lang:default language name
+ *  onReady:call back function when whole required assets loaded.
+ * }
+ */
+IWebapp.prototype.init = function (container, configPath, configData) {
+    this._configData = (null == configData) ? {} : configData;
+
+    this._mediaServer = (this._configData.mediaServer == null) ? "" : this._configData.mediaServer;
+    this._apiServer = (this._configData.apiServer == null) ? "" : this._configData.apiServer;
+
+    //set language
+    if (this._configData._lang != null) {
+
+        L10n.setLang(this._configData._lang);
+    } else if (navigator.globalization != null) {
+        navigator.globalization.getLocaleName(
+            function (language) {
+                L10n.setLang(language.value.substring(0, language.value.indexOf("_")));
+
+            },
+            function (e) {
+                console.log("get language error:" + e);
+
+            }
+        );
+    }
+
+
+    //set container
+    if (container == null) this._container = window.document.body;
+    else this._container = container;
+
+    this._container = $(this._container)
+
+    this._container = $(this._container)
+
+    if (this._container.nodeType) {
+        this._$container = $(this._container)
+    } else if (this._container[0] != null && this._container[0].nodeType != null) {
+        this._$container = this._container;
+        this._container = this._container[0];
+    } else {
+        throw new Error("IWebapp.prototype.init:" + container + " is not a HTML Element");
+    }
+
+
+    //load config xml:
+    this.loadStrFile(this._mediaServer + "" + configPath, this._onConfigLoaded, this._loadConfigError, {dataType: "xml", context: this})
+
+}
+
+
+/**
+ * @desc navigate to a page
+ * @param pageName
+ * @param pageData
+ */
+IWebapp.prototype.openPage = function (pageObj, pageData) {
+
+
+    var page = this._initPage(pageObj);
+
+    this._pages.push(page.id);//only push the id of page to array
+    this._pages[page.id] = page;
+
+    page.onCreate(pageData);
+
+    page = null;
+
+}
+
+IWebapp.prototype.openChildPage = function (pageObj, pageData, parentObj) {
+
+
+    var parentPage = null;
+    if (parentObj == null) {
+        //have not set parentPage, use the latest page.
+    } else if (typeof parentObj == "string") {
+        parentPage = this._pages[parentObj]
+    } else if (parentObj instanceof IWPPage) {
+        parentPage = parentObj;
+    }
+
+
+    if (parentPage == null) throw new Error(IWPError.PAGE_NOT_EXIST, "Can not find page when open child page");
+
+
+    var page = this._initPage(pageObj);
+    page._parentPageId = parentPage.id;
+
+
+
+    this._pages.push(page.id);//only push the id of page to array
+    this._pages[page.id] = page;
+
+    parentPage._childPages.push(page.id);
+
+
+
+
+    page.onCreate(pageData);
+
+    parentPage = null;
+    page = null;
+}
+
+
+IWebapp.prototype.removePage = function (pageObj) {
+    var page = null;
+    if (pageObj == null) {
+        //have not set parentPage, use the latest page.
+    } else if (typeof pageObj == "string") {
+        page = this._pages[pageObj]
+    } else if (pageObj instanceof IWPPage) {
+        page = pageObj;
+    }
+    if (page == null) throw new Error(IWPError.PAGE_NOT_EXIST, "Can not find page when open child page");
+
+    //remove child pages
+    if (page._childPages.length > 0) {
+
+        for (var i = 0; i < page._childPages.length; i++) {
+            this.removePage(page._childPages[i]);
+            page._childPages.splice(i, 1);
+            i--;
+        }
+
+
+    }
+
+    //resume parent page
+    if (page._parentPageId != null) {
+        var parentPage = this._pages[page._parentPageId];
+        if (parentPage != null && parentPage.view != null && parentPage.view.html != null) {
+
+            IWebapp.removeClass(parentPage.view.html, "pausePage");
+
+            var index = parentPage._childPages.indexOf(page.id);
+            if (index >= 0)  parentPage._childPages.splice(index, 1);
+        }
+    }
+
+    //destroy self
+    this._destroyPage(page);
+
+    page = null;
+}
+
+//Maby this method need be remove. don't reveal page to app.
+IWebapp.prototype.findPage = function (pageId) {
+    return this._pages[pageId];
+}
+
+
+IWebapp.prototype.navBack = function () {
+
+}
+
+
+IWebapp.prototype.alert = function () {
+
+}
+
+IWebapp.prototype.confirm = function () {
+
+}
+
+IWebapp.prototype.notice = function () {
+
+}
+
+
+/**
+ *  return the view which defined in assets xml.
+ * @param viewId {string} the id of view
+ * @param viewData {object} the object of view
+ */
+IWebapp.prototype.getView = function (viewId, viewData) {
+    var view = this._viewSources[viewId];
+    var copy = null;
+    if (view != null) {
+        copy = view.clone();
+
+        this._createViewElement(copy, viewData);
+    }
+
+    return copy;
+}
+
+
+/**
+ * @desc :load text format file
+ * @param url {string}
+ * @param callback {function}
+ * @param onError {function}
+ * @param opts {object} {dataType:xml|html|text, context:object}
+ */
+IWebapp.prototype.loadStrFile = function (url, callback, onError, opts) {
+    dataType = (opts == null || opts.dataType == null) ? "xml" : opts.dataType;
+    context = (opts == null || opts.context == null) ? null : opts.context;
+    $.ajax({
+        type: "get",
+        url: url,
+        cache: true,
+        dataType: dataType,
+        context: context,
+        success: callback,
+        error: onError
+    });
+
+
+}
+
+/**
+ * @desc preload whole images source of app
+ * @param file {string | array} the collection of images, it can be single file path or a list of file path
+ * @param assetsRoot {string} If there is special root paht of current file.
+ * @param placeId   {string} put the file or files to a HTMLElement
+ * @param callback  {function} When all the images are done (ignore incorrectly file)
+ */
+IWebapp.prototype.prepareImages = function (file, assetsRoot, placeId, callback) {
+    var files = typeof file == "string" ? [file] : file;
+    var loaded = 0;
+    var div = document.createElement("div");
+    div.setAttribute("id", placeId);
+    // div.style.width = "1px";
+    // div.style.height = "1px";
+
+    for (var i = 0; i < files.length; i++) {
+        var imgNode = document.createElement("img");
+        imgNode.onload = imgLoaded;
+        imgNode.onerror = imgNode.onabort = imgLoaded;
+        imgNode.src = addSlash(assetsRoot) + file[i];
+        // imgNode.width = 1;
+        // imgNode.height = 1;
+        div.appendChild(imgNode)
+
+    }
+
+
+    function imgLoaded(error) {
+
+        if (error != null && error.type == "error") {
+            console.log("load image error: " + error.target.src);
+            //console.log(error);
+        }
+
+
+        loaded++;
+        if (loaded == files.length) {
+            window.document.body.appendChild(div);
+            if (callback != null) callback();
+        }
+    }
+}
+
+
+/**
+ * @desc insert one or more js/css file to current html
+ * @param file {string | array} the collection of text files, it can be single file path or a list of file path
+ * @param assetsRoot {string} If there is special root paht of current file.
+ * @param onAllLoad {function}  When all the images are done.
+ */
+IWebapp.prototype.addJsCss = function (file, assetsRoot, onAllLoad) {
+
+    var files = typeof file == "string" ? [file] : file;
+    var headID = document.getElementsByTagName("head")[0];
+
+
+    var cssLen = window.document.styleSheets.length;
+
+    var jsList = [];
+
+    for (var i = 0; i < files.length; i++) {
+
+        if (files[i].indexOf(".css") > 0) {
+            var cssNode = document.createElement('link');
+            cssNode.type = 'text/css';
+            cssNode.rel = 'stylesheet';
+            cssNode.href = addSlash(assetsRoot) + files[i] + "?" + Math.random();
+            cssNode.media = 'screen';
+            cssLen++;
+
+            headID.appendChild(cssNode);
+        } else if (files[i].indexOf(".js") > 0) {
+            jsList.push(files[i]);
+        }
+
+
+    }//end for
+
+    var check = setInterval(checkCss, 50);
+
+    function checkCss() {
+
+        //UC has a strange problem, the length of css files more than loaded.
+        //so have to use >= instead of ==
+        if (window.document.styleSheets.length >= cssLen) {
+
+            clearInterval(check);
+            if (jsList.length > 0) {
+                loadJs(0);
+            } else {
+                onFload();
+            }
+        }
+
+    }
+
+    function loadJs(id) {
+        $.getScript(addSlash(assetsRoot) + jsList[id], onJsLoad);
+    }
+
+    function onJsLoad(id) {
+        if (id < jsList.length - 1) {
+            id++;
+            loadJs(id);
+        } else {
+            onFload();
+        }
+    }
+
+    function onFload() {
+
+
+        if (onAllLoad) onAllLoad();
+
+    }
+
+
+}
+
+
+//protected function at below==============================
+
+
+IWebapp.prototype._onConfigLoaded = function (data) {
+
+    this._assetsXML = $(data);
+    //this._loadViews();
+    this._loadRequires();
+
+
+}
+
+IWebapp.prototype._loadConfigError = function (e) {
+    trace("load config xml error:" + e);
+}
+
+/*load files which are required by app*/
+IWebapp.prototype._loadRequires = function () {
+
+
+    var list = this._assetsXML.find("data > textFile").text().split(";");
+    //load language package
+    var lanPath = this._assetsXML.find("data > _lang > " + L10n.getLang()).text();
+    list.push(lanPath);
+
+    //load all required files.
+    this.addJsCss(list, this._mediaServer, this._loadViews);
+
+
+}
+
+IWebapp.prototype._preLoadImages = function () {
+    var _iwebapp = IWebapp.getInstance();
+
+    var imgs = [];
+    _iwebapp._assetsXML.find("data > images >img").each(function (index, element) {
+
+        imgs.push($(element).attr("src"));
+    });
+    _iwebapp.prepareImages(imgs, _iwebapp._mediaServer, "preload", _iwebapp._preImagesLoaded());
+
+    _iwebapp = null;
+    imgs = null;
+}
+
+
+IWebapp.prototype._preImagesLoaded = function () {
+
+    this._loader.clear();
+    if (this._configData.onReady != null) this._configData.onReady();
+}
+
+IWebapp.prototype._loadViews = function () {
+
+
+    var _iwebapp = IWebapp.getInstance();
+    if (_iwebapp._viewSources != null) _iwebapp._viewSources = [];
+    var loadItem;
+    var view;
+    _iwebapp._assetsXML.find('data > views >view').each(function (index, element) {
+        element = $(element)
+        view = new IWPView();
+        view.id = element.attr('id');
+        view.url = element.text();
+        _iwebapp._viewSources.push(view);
+        _iwebapp._viewSources[view.id] = view;
+        loadItem = new IWPLoadItem();
+        loadItem.url = _iwebapp._mediaServer + view.url;
+        loadItem.alias = view.id;
+        loadItem.dataType = "text";
+
+        _iwebapp._loader.addFile(loadItem);
+        element = null;
+
+    })//end find
+
+
+    view = null;
+    loadItem = null;
+
+
+    _iwebapp._loader.onAllLoaded = _iwebapp._preLoadImages;
+    _iwebapp._loader.onItemLoaded = _iwebapp._viewItemLoaded;
+    _iwebapp._loader.start();
+
+}
+
+IWebapp.prototype._viewItemLoaded = function (index, content) {
+    var _iwebapp = IWebapp.getInstance();
+
+    var view = _iwebapp._viewSources[index];
+    if (null == view) {
+        console.log("can not find view data index:" + index)
+        return;
+    }
+    view.text = content;
+
+    _iwebapp = null;
+    view = null;
+
+}
+
+IWebapp.prototype._getPage = function (pageName) {
+
+    return this._pages[pageName];
+
+
+}
+
+IWebapp.prototype._createViewElement = function (view, viewData) {
+    if (view.html == null) {
+        var viewContainer = window.document.createElement("div");
+        viewContainer.className = "page";
+        view.html = viewContainer;
+    }
+    view.html.innerHTML = view.text;
+    return view;
+}
+
+
+/**
+ * @desc append  view of  the page to stage
+ * @param page
+ */
+IWebapp.prototype._addPageToStage = function (page) {
+    if (page == null || page.view == null || page.view.html == null) throw new Error(IWPError.PAGE_NOT_EXIST_VIEW);
+
+
+    if (page.view.fillView == true) {
+        var $page = null;
+        for (var i = 0; i < this._pages.length; i++) {
+            $page = this._pages[this._pages[i]];
+
+            if ($page.view != null && $page.view.html != null && $page.id != page.id) {
+
+                //If target page is  parent of current page,hidden target page.
+                if ($page.id == page._parentPageId) {
+                    IWebapp.addClass($page.view.html, "pausePage");
+                } else {
+
+                    this.removePage($page);
+                    i--;
+                }
+
+            }
+        }
+    } else {
+        trace("The page have not fill view ")
+    }
+
+
+    this._$container.append(page.view.html);
+}
+
+
+IWebapp.prototype._destroyPage = function (page) {
+
+    IWebapp.removeNode(page.view.html); //remove view from stage
+    delete this._pages[page.id]; //remove the object from page collection
+    var index = this._pages.indexOf(page.id);
+    if (index >= 0) {
+        this._pages.splice(index, 1);//remove the id from page list.
+    }
+    page.onDestroy();
+}
+
+IWebapp.prototype._initPage = function (pageObj) {
+    var page = null;
+    if (typeof pageObj == "string") {
+
+        page = eval("new " + pageObj + "()");//need test, if it's too slowly, should change other way.
+    } else if (pageObj instanceof IWPPage) {
+
+        page = pageObj;
+    } else {
+        throw new Error(IWPError.PAGE_INCORRECT_OBJECT, "This is not a instance of IWPPage");
+    }
+
+    if (page.id == null) {
+        throw new Error(IWPError.PAGE_NOT_INITIALIZED, "The IWPPage need execute super constructor function,example: ClassName.$super(this)");
+    }
+
+    return page;
+}
+
+
+//==============OTHER CLASS=================================
+
+
+/**
+ *
+ * @constructor
+ * @desc Page's view
+ */
+function IWPView() {
+    /**
+     *
+     * @type {string}
+     */
+    this.id = null;
+    /**
+     * @desc usually make it to null, we use text to hold content
+     * @type {HTMLElement}
+     */
+    this.html = null;
+    /**
+     *
+     * @type {string}
+     */
+    this.text = null;
+
+    /**
+     * @desc If this is true,will hidden whole views behind this view.
+     * @type {boolean}
+     */
+    this.fillView = true;
+
+}
+IWPView.prototype.clone = function () {
+    return $.extend(true,{}, this);
+}
+/**
+ * @desc the app have lots of page, the same like Activity in android.
+ * @constructor
+ */
+function IWPPage() {
+    /**
+     * Unique id
+     * @type {string}
+     */
+    this.id = "IWPPage" + simpleUID();
+
+    /**
+     * @desc the IWPPage object used by the page
+     * @type {IWPView}
+     */
+    this.view = null;
+    /**
+     * @desc If singlePage is true, when open a new page, this page would be destroy.
+     * @type {boolean}
+     */
+    this.singlePage = true;
+
+    /**
+     * @desc store id of child pages. if the parent page removed, all child pages would be remove.
+     * @type {Array}
+     */
+    this._childPages = [];
+
+    /**
+     * If this page is a child page of others
+     * @type {string}
+     */
+    this._parentPageId = null;
+
+    this._status = IWPPage.STATUS_UNREADY;
+    this._viewItemId = 1;
+
+
+}
+
+IWPPage.STATUS_UNREADY = 0;
+IWPPage.STATUS_NORMAL = 1;
+IWPPage.STATUS_PAUSED = 2;
+IWPPage.STATUS_STOPED = 3;
+
+
+/**
+ * check the page's status, don't set it.
+ * @type {number}
+ */
+IWPPage.prototype.getStatus = function () {
+    return this._status
+}
+
+/**
+ * @desc When the page will be add to container, this function would be execute.<br/>Don't execute this function manually.
+ * @param pageData {object} Data from other pages or classes
+ */
+IWPPage.prototype.onCreate = function (pageData) {
+
+
+}
+
+IWPPage.prototype.onPause = function () {
+
+}
+
+IWPPage.prototype.onResume = function () {
+
+}
+
+IWPPage.prototype.onStop = function () {
+
+}
+
+IWPPage.prototype.onRestart = function () {
+
+}
+
+IWPPage.prototype.onDestroy = function () {
+
+}
+
+
+/**
+ * @desc get HTMLElement in the view of the page.
+ * @param id {string}
+ * @param needUpdateId {boolean} If the element need update to a new unique id, set it to true; default is false.
+ * @param newId {string} If this needUpdatedId to true,and you want define the special id. but the real id is page's id+"+"+newId
+ * @returns {HTMLElement}
+ */
+IWPPage.prototype.findViewItem = function (id, needUpdateId, newId) {
+    var item = window.document.getElementById(id);
+    if (item == null) {
+        return null;
+    }
+
+    if (needUpdateId == true) {
+        if (newId != null) {
+            item.id = this.id + "_" + newId;
+        } else {
+            item.id = this.id + "_" + this._viewItemId++;
+        }
+    }
+
+    return item;
+}
+
+/**
+ * @desc set view of page and add it to stage.
+ * @param viewId
+ * @param autoAddedToStage
+ */
+IWPPage.prototype.setView = function (viewId, viewData, autoAddedToStage) {
+    this.view = IWebapp.getInstance().getView(viewId, viewData);
+    if (this.view == null) {
+        //throw  new Error("Can not find the view:"+viewId,IWPError.PAGE_NOT_EXIST_VIEW);
+        throw  new Error(IWPError.PAGE_NOT_EXIST_VIEW, "Can not find the view:" + viewId);
+    }
+
+
+    if (autoAddedToStage != false) {
+
+        IWebapp.getInstance()._addPageToStage(this);
+
+    }
+}
+
+/**
+ * @desc If set autoAddedToStage to false when setView, can add view to stage manually.
+ */
+IWPPage.prototype.addViewToStage = function () {
+    if (this.view == null) throw  new Error(IWPError.PAGE_NOT_EXIST_VIEW, "Can not find view of the page");
+
+    IWebapp.getInstance()._addPageToStage(this);
+}
+
+IWPPage.prototype.close = function () {
+    if (this._parentPageId == null) return;
+
+    IWebapp.getInstance().removePage(this)
+
+}
+
+function IWPPageData() {
+
+}
+
+/**
+ * @desc the error code start from 100001
+ * @constructor
+ */
+function IWPError() {
+
+}
+
+IWPError.PAGE_NOT_EXIST = 100001;
+IWPError.PAGE_INCORRECT_OBJECT = 100002;
+IWPError.PAGE_NOT_INITIALIZED = 100003;
+IWPError.PAGE_NOT_EXIST_VIEW = 100004;
+
+
+/**
+ * IWPLoader:Load html,text content.
+ *
+ * */
+
+/**
+ *
+ * @constructor
+ * @desc Load text files by queue
+ */
+function IWPLoader() {
+    this.index = 0;
+    this.list = [];
+    this.state = IWPLoader.STATUS_FREE;
+    /**
+     *
+     * @type {function}
+     */
+    this.onAllLoaded = null;
+    /**
+     *
+     * @type {function}
+     */
+    this.onItemLoaded = null;
+
+    /**
+     *
+     * @type {function}
+     */
+    this.onLoadError = null;
+
+}
+/**
+ * @constant
+ * @type {number}
+ */
+IWPLoader.STATUS_FREE = 1;
+/**
+ * @constant
+ * @type {number}
+ */
+IWPLoader.STATUS_BUSY = 2;
+
+/**
+ * @desc add a load object to queue
+ * @param loadItem
+ */
+IWPLoader.prototype.addFile = function (loadItem) {
+    this.list.push(loadItem);
+}
+
+/**
+ * @desc start to load
+ */
+IWPLoader.prototype.start = function () {
+
+    if (IWPLoader.STATUS_FREE == this.state) {
+        this.state = IWPLoader.STATUS_BUSY;
+        this._loadItem(this.index);
+    }
+}
+
+IWPLoader.prototype._allLoaded = function () {
+    this.state = IWPLoader.STATUS_FREE;
+    if (this.onAllLoaded != null) this.onAllLoaded();
+}
+
+
+/**
+ * @desc Clear all the data in this object
+ */
+IWPLoader.prototype.clear = function () {
+    var item = null;
+
+    while (this.list.length > 0) {
+        item = this.list[0];
+        item.content = null;
+
+        delete item;
+        this.list.splice(0, 1);
+    }
+    item = null;
+    this.index = 0;
+    this.state = IWPLoader.STATUS_FREE;
+    this.onAllLoaded = null;
+    this.onItemLoaded = null;
+    this.onLoadError = null;
+
+
+}
+
+/**
+ * @desc get loadItem by index
+ * @param id {number}
+ * @returns {IWPLoadItem}
+ */
+IWPLoader.prototype.getItemByIndex = function (id) {
+    if (this.list == null || id >= this.list.length) return null;
+    return  this.list[id];
+}
+
+/**
+ * @desc get loadItem by name
+ * @param alias {string}
+ * @returns {IWPLoadItem}
+ */
+IWPLoader.prototype.getItemByName = function (alias) {
+    var len = this.list.length;
+    var loadItem;
+    for (var i = 0; i < len; i++) {
+        loadItem = this.list[i];
+        if (loadItem.alias == alias) return loadItem;
+    }
+    return null;
+}
+
+
+IWPLoader.prototype._loadItem = function (id) {
+    var loadItem = this.list[id];
+    $.ajax({
+        type: "get",
+        url: loadItem.url,
+        cache: loadItem.cache,
+        dataType: loadItem.dataType,
+        context: this,
+        success: this._itemLoaded,
+        error: this._loadError
+    });
+}
+
+IWPLoader.prototype._itemLoaded = function (content) {
+
+    var $loadItem = this.list[this.index];
+    $loadItem.content = content;
+
+    if (this.onItemLoaded != null) {
+
+        this.onItemLoaded(this.index, content);
+    }
+    if (this.index == this.list.length - 1) this._allLoaded();
+    else {
+
+        this.index++;
+        this._loadItem(this.index);
+
+    }
+}
+
+IWPLoader.prototype._loadError = function (XMLHttpRequest, textStatus, errorThrown) {
+    trace("load item: failed!");
+    if (this.onLoadError != null) this.onLoadError(XMLHttpRequest, textStatus, errorThrown)
+}
+
+
+/**
+ * @desc the item of IWPLoader
+ * @constructor
+ */
+function IWPLoadItem() {
+    /**
+     * @desc the url of file
+     * @type {string}
+     */
+    this.url = null;
+    /**
+     * @desc the loaded content
+     * @type {object}
+     */
+    this.content = null;
+    this.dataType = "html";
+    this.cache = "false";
+    /**
+     * the name of file
+     * @type {string}
+     */
+    this.alias = null;
+
+}
+
+
+/**
+ * @desc Localization of languages
+ * @constructor
+ */
+function L10n() {
+
+
+}
+
+/**
+ * @desc set the default language
+ * @type {string}
+ */
+L10n.defaultLang = "en";
+L10n._lang = "en";
+/**
+ * @desc set support languages,  example: L10n.support="en,zh"
+ * @type {string}
+ */
+L10n.support = "en,zh";
+L10n._langData = null;
+
+L10n.setLang = function (lang) {
+    lang = lang.toLowerCase();
+
+    if (L10n.support.indexOf(lang) < 0) {
+
+        L10n._lang = L10n.defaultLang;
+    }
+    L10n._lang = lang;
+
+}
+/**
+ * @desc get the name of language
+ * @returns {string}
+ */
+L10n.getLang = function () {
+    return L10n._lang;
+}
+
+/**
+ * set the data of current language
+ * @param obj
+ */
+L10n.setData = function (obj) {
+    if (obj == null)  L10n._langData = eval(L10n._lang);
+    else L10n._langData = obj;
+}
+
+/**
+ * @desc translate the tag to localize words.
+ * @param label {string}
+ * @returns {string}
+ */
+L10n.trans = function (label) {
+    return L10n._langData[label];
+
+}
+
+
+/**
+ * @desc Convert all the tag:${tag name} to localized words.
+ * @param content {string}
+ * @returns {string}
+ */
+L10n.apply = function (content) {
+
+    var regx = /\$\{\w+\}/g;
+    var labels = content.match(regx);
+    if (labels == null || labels.length == 0) {
+        return content;
+    }
+    var len = labels.length;
+
+    var langStr = "";
+
+    var transtr = content;
+    for (var i = 0; i < len; i++) {
+        label = labels[i].replace("${","").replace("}", "");
+
+        langStr = L10n._langData[label];
+
+        transtr = transtr.replace(new RegExp("\\${"+label+"}", "g"), langStr);
+
+
+    }
+
+
+    return transtr
+}
+
+L = L10n;
+
+
+
