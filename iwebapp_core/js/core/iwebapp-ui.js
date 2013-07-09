@@ -318,6 +318,10 @@ IWebUISlider.prototype._updateDrag = function (p) {
             }
         }
 
+        var martix = window.getComputedStyle(this.dragNode)[this.supportTransform]
+        trace("martix>>" + this.supportTransform)
+        trace(martix)
+
     } else {
         this.dragNode.pos = p * (this.container.offsetHeight - this.dragNode.offsetHeight);
 
@@ -582,9 +586,9 @@ IWPTween._tweenId = 0;
 IWPTween._targetId = 0;
 IWPTween._transform = getsupportedprop(['transform', 'MozTransform', 'WebkitTransform', 'OTransform']);
 IWPTween._transition = getsupportedprop([ 'transition', 'MozTransition', 'WebkitTransition', 'OTransition']);
-IWPTween.isBadBrwoser = (IWPTween._transform == null || IWPTween._transition == null);
+IWPTween.isBadBrowser = (IWPTween._transform == null || IWPTween._transition == null);
 IWPTween._timer = null;
-
+IWPTween.isBadBrowser=true
 IWPTween.killOf = function () {
 
 }
@@ -594,46 +598,125 @@ IWPTween.to = function (target, time, obj) {
         return;
     }
 
-    var css = null;
-    var x = (obj.css.x != null) ? obj.css.x : 0;
-    var y = (obj.css.y != null) ? obj.css.y : 0;
-    var ease = (obj.ease == null) ? "easeInOutQuad" : obj.ease;
+//    var css = null;
+//    var x = (obj.css.x != null) ? obj.css.x : 0;
+//    var y = (obj.css.y != null) ? obj.css.y : 0;
+//    var ease = (obj.ease == null) ? "easeInOutQuad" : obj.ease;
+//    var origin = {css: {}}
+//
+//
+//
+//    if (IWPTween.isBadBrowser) {
+//
+//
+//        if (obj.css.x != null) {
+//            origin.css.x = Number(target.style.left.replace("px", "").replace("%", ""));
+//            obj.css.x -= origin.css.x;
+//
+//        }
+//
+//        if (obj.css.y != null) {
+//            origin.css.y = Number(target.style.top.replace("px", "").replace("%", ""));
+//
+//            obj.css.y -= origin.css.y;
+//        }
+//
+//
+//        css = {left: obj.css.x, top: obj.css.y};
+//    } else {
+//        var z = (obj.css.z != null) ? obj.css.z : 0;
+//        css = {x: x, y: y, z: z};
+//    }
+
+
+    var css = {};
+    var cssUnit = {};
+    var ease = (obj.ease == null) ? "easeInOutQuart" : obj.ease;
     var origin = {css: {}}
+    if (obj.css != null) {
+        for (var style in obj.css) {
+            if( typeof obj.css[style] =="string"){
+                cssUnit[style] = obj.css[style].replace(/[\d+\.]/g,"")
+                css[style] = Number(obj.css[style].replace(/[^\d+\.]/g,""));
 
-    if (IWPTween.isBadBrwoser) {
 
+            }else{
+                cssUnit[style] = "";
+                css[style] = obj.css[style];
+            }
 
-        if (obj.css.x != null) {
-            origin.css.x = Number(target.style.left.replace("px", "").replace("%", ""));
-            obj.css.x -= origin.css.x;
 
         }
-
-        if (obj.css.y != null) {
-            origin.css.y = Number(target.style.top.replace("px", "").replace("%", ""));
-
-            obj.css.y -= origin.css.y;
-        }
-        css = {left: obj.css.x, top: obj.css.y};
-    } else {
-        var z = (obj.css.z != null) ? obj.css.z : 0;
-        css = {x: x, y: y, z: z};
     }
-    var tweenObj = {time: time * 1000, ease: ease, css: css, spentTime: 0, onComplete: obj.onComplete, completeParams: obj.completeParams, _origin: origin}
-    if(time<0.01) time=0;
+    var tweenObj = {time: time * 1000, ease: ease, css: css, cssUnit: cssUnit, spentTime: 0, onComplete: obj.onComplete, completeParams: obj.completeParams, _origin: origin}
+    if (time < 0.01) time = 0;
 
 
     if (time == 0) {
 
-        if (IWPTween.isBadBrwoser) {
+        if (IWPTween.isBadBrowser) {
 
-            for (var i in tweenObj.css) {
-                target.style[i] = tweenObj.css[i] + "px";
-            }
+                if ( tweenObj.css["x"]!=null) {
+                    target.style["left"] = tweenObj.css["x"] + tweenObj.cssUnit["x"];
+                }
+                 if ( tweenObj.css["y"]!=null) {
+                    target.style["top"] = tweenObj.css["y"] + tweenObj.cssUnit['y'];
+                }
+
         } else {
-            target.style[IWPTween._transition] = "0s";
-            target.style[IWPTween._transform] = "translate3d(" + x + "px," + y + "px," + z + "px)";
+            if (tweenObj.css.x != null || tweenObj.css.y != null || tweenObj.css.z != null) {
+                var martix = window.getComputedStyle(target)[IWPTween._transform];
+
+                if (martix != "none") {
+                    if (martix.indexOf("3d") > 0) {
+                        martix = martix.split(",");
+                        var ox = martix[12];
+                        var oy = martix[13];
+                        var oz = martix[14];
+                    } else {
+                        martix = martix.split(",");
+                        ox = martix[4];
+                        oy = martix[5];
+                        oz = 0;
+                    }
+                } else {
+                    ox = 0;
+                    oy = 0;
+                    oz = 0;
+                }
+                if (tweenObj.css.x == null) {
+                    tweenObj.css.x = ox;
+                }
+
+                if (tweenObj.css.y == null) {
+                    tweenObj.css.y = oy;
+                }
+
+                if (tweenObj.css.z == null) {
+                    tweenObj.css.z = oz;
+                }
+
+
+
+                 target.style[IWPTween._transform] = "translate3d(" + tweenObj.css.x + (tweenObj.cssUnit["x"] || "px") + "," + tweenObj.css.y + (tweenObj.cssUnit["y"] || "px") + "," + tweenObj.css.z + (tweenObj.cssUnit["z"] || "px") + ")";
+
+            }
+
+
         }
+
+        for (var i in tweenObj.css) {
+
+
+            if (i != "x" && i!="y" && i!="z") {
+
+                target.style[i] = tweenObj.css[i] + tweenObj.cssUnit[i];
+
+            }
+
+
+        }
+
 
         if (tweenObj.onComplete != null) {
             if (tweenObj.completeParams == null) tweenObj.completeParams = [];
@@ -644,13 +727,109 @@ IWPTween.to = function (target, time, obj) {
 
 
     } else {
-        if (IWPTween.isBadBrwoser != true) {
+
+        //update css in modern browsers
+        if (IWPTween.isBadBrowser != true) {
             target.style[IWPTween._transition] = time + "s";
-            var timer = setTimeout(function () {
-                target.style[IWPTween._transform] = "translate3d(" + x + "px," + y + "px," + z + "px)";
-            }, 0);
+
+
+            if (tweenObj.css.x != null || tweenObj.css.y != null || tweenObj.css.z != null) {
+                  martix = window.getComputedStyle(target)[IWPTween._transform];
+
+                if (martix != "none") {
+                    if (martix.indexOf("3d") > 0) {
+                        martix = martix.split(",");
+                          ox = martix[12];
+                          oy = martix[13];
+                          oz = martix[14];
+                    } else {
+                        martix = martix.split(",");
+                        ox = martix[4];
+                        oy = martix[5];
+                        oz = 0;
+                    }
+                } else {
+                    ox = 0;
+                    oy = 0;
+                    oz = 0;
+                }
+                if (tweenObj.css.x == null) {
+                    tweenObj.css.x = ox;
+                }
+
+                if (tweenObj.css.y == null) {
+                    tweenObj.css.y = oy;
+                }
+
+                if (tweenObj.css.z == null) {
+                    tweenObj.css.z = oz;
+                }
+
+
+                var timer = setTimeout(function () {
+                    target.style[IWPTween._transform] = "translate3d(" + tweenObj.css.x + (tweenObj.cssUnit["x"] || "px") + "," + tweenObj.css.y + (tweenObj.cssUnit["y"] || "px") + "," + tweenObj.css.z + (tweenObj.cssUnit["z"] || "px") + ")";
+
+                    //update common style
+                    for (var i in tweenObj.css) {
+
+
+                        if (i != "x" && i!="y" && i!="z") {
+
+                            target.style[i] = tweenObj.css[i] + tweenObj.cssUnit[i];
+                        }
+
+
+                    }
+
+                }, 0);
+            }
+
 
         }
+
+        //ge origin sytle
+
+        for ( style in tweenObj.css) {
+
+
+            if ( style!="z") {
+                var val =null;
+                if(style=="x"){
+                     val =target["offsetLeft"];
+                }else if(style=="y"){
+                    val =target["offsetTop"];
+                }else{
+                    val=target.style[style];
+                }
+
+
+                if(val=="undefined" || val=="none" || val=="" || val==undefined || val=="null") {
+
+                    if(style=="opacity"){
+
+                        val=1;
+                    }else{
+                        val=0;
+                    }
+                }
+
+
+
+                if(typeof val == "string") {
+                    val=val.replace(/[^\d+\.]/g,"")
+
+                }
+
+
+                tweenObj._origin.css[style]=Number(val);
+                tweenObj.css[style]-=tweenObj._origin.css[style];
+
+               // trace(target.style.left)
+
+            }
+
+        }
+
 
         IWPTween._addTweenItem(target, tweenObj);
 
@@ -716,22 +895,38 @@ IWPTween._tween = function () {
             tweenObj = tweens[k];
 
             //tween the css style of bad brwosers such as :ie6,7,8,9, else tween them by  css
-            if (IWPTween.isBadBrwoser) {
-                if (tweenObj.css.left != null) {
-                    var val = item.style.left.replace("px", "").replace("%", "");
-                    if (val == "") val = 0;
+            if (IWPTween.isBadBrowser) {
+                if (tweenObj.css.x != null) {
 
-                    var result = Math[tweenObj.ease](tweenObj.spentTime, tweenObj._origin.css.x, tweenObj.css.left, tweenObj.time);
-                   // trace("result:"+result)
+                    var result = Math[tweenObj.ease](tweenObj.spentTime, tweenObj._origin.css.x, tweenObj.css.x, tweenObj.time);
 
-                    item.style.left = result + "px";
+                    //trace("result:"+result)
+
+                    item.style.left =result +  tweenObj.cssUnit["x"];
                 }
 
-                if (tweenObj.css.top != null) {
-                    val = item.style.top.replace("px", "").replace("%", "");
-                    if (val == "") val = 0;
-                    item.style.top = Math[tweenObj.ease](tweenObj.spentTime, tweenObj._origin.css.y, tweenObj.css.top, tweenObj.time) + "px"
+                if (tweenObj.css.y != null) {
+
+                   item.style.top = Math[tweenObj.ease](tweenObj.spentTime, tweenObj._origin.css.y, tweenObj.css.y, tweenObj.time)+ tweenObj.cssUnit["y"]
                 }
+
+ 
+                // trace("style:top "+item.style.top+",left "+item.style.left+">>> oy "+tweenObj._origin.css.y+",ox "+tweenObj._origin.css.x+"  time:"+tweenObj.time+",spentTime:"+tweenObj.spentTime+", target pos:"+tweenObj.css.y+", "+tweenObj.css.x+" ease:"+tweenObj.ease)
+
+            }
+
+            //update common style
+            for (var style in tweenObj.css) {
+
+
+                if (style != "x" && style!="y" && style!="z") {
+
+                  // item.style[style] = tweenObj.css[style] + tweenObj.cssUnit[style];
+                   item.style[style] = Math[tweenObj.ease](tweenObj.spentTime, tweenObj._origin.css[style], tweenObj.css[style], tweenObj.time) + tweenObj.cssUnit[style];
+
+
+                }
+
 
             }
 

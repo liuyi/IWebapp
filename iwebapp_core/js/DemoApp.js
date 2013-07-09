@@ -21,7 +21,11 @@ DemoApp.prototype.init = function () {
     }
 
 
-
+    var str="1000.0223222px";
+    var val=str.replace(/[^\d+\.]/g,"")
+    var val2=str.replace(/[\d+\.]/g,"")
+    trace("vvv:"+val)
+    trace("uuuuu:"+val2)
     //handle deeplink, if this app is a web.
 
 
@@ -109,23 +113,17 @@ LoginPage.prototype.onCreate = function (pageData) {
     this.ball=this.findViewItem("ball");
 
 
-      IWPTween.to(this.ball,1,{css:{x:300,y:100},
+      IWPTween.to(this.ball,1,{css:{x:"400px",y:"200px",opacity:0.5},
           onComplete:function(p){
           trace("commmm:"+p);
-          IWPTween.to(this,1,{css:{x:800,y:300}})
+         IWPTween.to(this,1,{css:{x:"200px",y:"200px",opacity:1}})
       },completeParams:["hahahah"]});
 
-
-//    var ox=10;
-//    var tx=100;
-//    var t=1000;
-//    var spentTime=0
-//    var c=setInterval(function(){
-//        var x=Math.easeOutQuad(spentTime,ox,tx,t);
-//        spentTime+=30;
-//        trace("x:"+x+", spent time="+spentTime);
-//        if(spentTime>=t) clearInterval(c)
-//    },30)
+    var css="100%";
+  //var unit= css.replace(/\d/g,"")
+  var val= css.replace(/\D/g,"")
+   // trace("unit:"+unit)
+    trace("val:"+val)
 
     addEvent(this.setValBtn,"change",function(e,context){
         context.slider.setVal(Number(this.value))
