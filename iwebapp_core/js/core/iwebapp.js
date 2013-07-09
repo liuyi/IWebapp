@@ -27,6 +27,7 @@ IWebapp.extend = function (subClass, baseClass) {
                 p.push(arguments[i]);
             }
         }
+
         subClass.superConstructor.apply(context, p);
         p = null;
 
@@ -102,22 +103,22 @@ function IWebapp() {
      * Store all the notifications object to the list.
      * @type {Array}
      */
-    this._notifications=[];
-    this._notifyViewId=null;
-    this._confirmViewId=null;
-    this._alertViewId=null;
+    this._notifications = [];
+    this._notifyViewId = null;
+    this._confirmViewId = null;
+    this._alertViewId = null;
 
     /**
      * Store all the history data to this list.
      * @type {Array}
      * @private
      */
-    this._history=[];
-    this._historyIndex=-1;
-    this._hashList=[];
-    this._currentPageAlias="";
-    this._defualtPageId="";
-   // this._userChangeHash=false;//If is user press back button or forward button, set it to true;
+    this._history = [];
+    this._historyIndex = -1;
+    this._hashList = [];
+    this._currentPageAlias = "";
+    this._defualtPageId = "";
+    // this._userChangeHash=false;//If is user press back button or forward button, set it to true;
 
     /*attach pages to this HTMLElement*/
     this._container = null;
@@ -130,7 +131,7 @@ function IWebapp() {
     this._defaultLang = null;
     /*load views of app*/
     this._loader = new IWPLoader();
-    this._switchPlus=null;
+    this._switchPlus = null;
 
 
     //touch handle stuff
@@ -153,14 +154,14 @@ function IWebapp() {
     this._touchLongTapAttr = "longtap";
 
     this._touchableNodes = ["A", "INPUT", "TEXTAREA", "BUTTON"];
-    this._touchBubblesNodes=["INPUT", "TEXTAREA"];
+    this._touchBubblesNodes = ["INPUT", "TEXTAREA"];
     this._touchableAttr = "touchable";
     this._tapEventTag = "tap";
     this._longTapEventTag = "longtap";
     this._ignoreTouchTag = "ignore";
     this._disableTag = "disabled";
 
-    this._isMouseDown=false;
+    this._isMouseDown = false;
 
 
     this._touchTarget = null;
@@ -189,7 +190,7 @@ IWebapp.checkTouchable = function () {
             removeEvent(window.document.body, "mousemove", mouseResult)
 
             IWebapp.getInstance()._handleTouch();
-           // trace(IWebapp.touchable)
+            // trace(IWebapp.touchable)
         }
 
         var mouseResult = function (e, context) {
@@ -259,49 +260,49 @@ IWebapp.addClass = function (target, className) {
         var regx = new RegExp("\\b" + className + "\\b", "gi");
         var has = target.className.match(regx);
         if (has == null || has.length < 0) {
-            target.className =target.className.trim()+" " + className;
+            target.className = target.className.trim() + " " + className;
 
-          //  trace("className:"+className)
+            //  trace("className:"+className)
         }
     }
 
 
 }
-IWebapp.disableNode=function(htmlElement){
-    IWebapp.addClass(htmlElement,IWebapp.getInstance()._disableTag);
+IWebapp.disableNode = function (htmlElement) {
+    IWebapp.addClass(htmlElement, IWebapp.getInstance()._disableTag);
     htmlElement.setAttribute(IWebapp.getInstance()._disableTag)
 }
 
-IWebapp.resumeNode=function(htmlElement){
+IWebapp.resumeNode = function (htmlElement) {
 
 
-    IWebapp.removeClass(htmlElement,IWebapp.getInstance()._disableTag);
+    IWebapp.removeClass(htmlElement, IWebapp.getInstance()._disableTag);
     htmlElement.removeAttribute(IWebapp.getInstance()._disableTag)
 }
 
-IWebapp.getElementsByClassName=function(target,classname){
-    if(target.getElementsByClassName!=null){
+IWebapp.getElementsByClassName = function (target, classname) {
+    if (target.getElementsByClassName != null) {
 
         return target.getElementsByClassName(classname);
-    }else{
+    } else {
         var regx = new RegExp("\\b" + classname + "\\b", "gi");
         var has = null;
-        var elements=[];
+        var elements = [];
         getList(target);
         return elements;
     }
 
-    function getList(target){
-        if(target.childNodes==null || target.childNodes.length==0)  return;
+    function getList(target) {
+        if (target.childNodes == null || target.childNodes.length == 0)  return;
 
 
-        var len=target.childNodes.length;
+        var len = target.childNodes.length;
 
-        for( var i=0;i<len;i++){
-            var  item=target.childNodes[i];
-            if(item.className!=null){
+        for (var i = 0; i < len; i++) {
+            var item = target.childNodes[i];
+            if (item.className != null) {
                 has = item.className.match(regx);
-                if(has != null && has.length > 0){
+                if (has != null && has.length > 0) {
 
                     elements.push(item);
                 }
@@ -311,10 +312,6 @@ IWebapp.getElementsByClassName=function(target,classname){
 
     }
 }
-
-
-
-
 
 
 //public function at below=================
@@ -384,7 +381,7 @@ IWebapp.prototype.init = function (container, configPath, configData) {
  * @param pageName
  * @param pageData
  */
-IWebapp.prototype.openPage = function (pageObj, pageData,hash) {
+IWebapp.prototype.openPage = function (pageObj, pageData, hash) {
 
     var page = this._initPage(pageObj);
 
@@ -392,18 +389,18 @@ IWebapp.prototype.openPage = function (pageObj, pageData,hash) {
     this._pages[page.id] = page;
 
     page.onCreate(pageData);
-    if(hash==null || hash.length===0){
+    if (hash == null || hash.length === 0) {
 
-         this._addToHistory(page,pageData);
-    }else{
+        this._addToHistory(page, pageData);
+    } else {
 
-        this._currentPageAlias="/"+page.alias;
+        this._currentPageAlias = "/" + page.alias;
 
 
         page.onHashChange(hash);
     }
 
-    var pageId=page.id;
+    var pageId = page.id;
     page = null;
 
     return pageId;
@@ -411,13 +408,12 @@ IWebapp.prototype.openPage = function (pageObj, pageData,hash) {
 
 }
 
-IWebapp.prototype.setSwitchPlus=function(iwpSwitch){
-    this._switchPlus=iwpSwitch;
+IWebapp.prototype.setSwitchPlus = function (iwpSwitch) {
+    this._switchPlus = iwpSwitch;
 }
 
 
-
-IWebapp.prototype.openChildPage = function (pageObj, pageData, parentObj,hash) {
+IWebapp.prototype.openChildPage = function (pageObj, pageData, parentObj, hash) {
 
 
     var parentPage = null;
@@ -444,20 +440,19 @@ IWebapp.prototype.openChildPage = function (pageObj, pageData, parentObj,hash) {
 
 
     page.onCreate(pageData);
-    if(hash==null || hash.length===0){
+    if (hash == null || hash.length === 0) {
 
-        this._addToHistory(page,pageData,parentPage);
-    }else{
+        this._addToHistory(page, pageData, parentPage);
+    } else {
         //open child page
 
-         this._currentPageAlias+="/"+page.alias;
+        this._currentPageAlias += "/" + page.alias;
 
         page.onHashChange(hash);
     }
 
 
-
-    var pageId=page.id;
+    var pageId = page.id;
     parentPage = null;
     page = null;
 
@@ -465,11 +460,10 @@ IWebapp.prototype.openChildPage = function (pageObj, pageData, parentObj,hash) {
 }
 
 
+IWebapp.prototype.removePage = function (pageObj, changeLink, resumeParent) {
 
-IWebapp.prototype.removePage = function (pageObj,changeLink,resumeParent) {
-
-    var context=IWebapp.getInstance();
-    if(resumeParent==null) resumeParent=true;
+    var context = IWebapp.getInstance();
+    if (resumeParent == null) resumeParent = true;
     var page = null;
     if (pageObj == null) {
         //have not set parentPage, use the latest page.
@@ -479,8 +473,8 @@ IWebapp.prototype.removePage = function (pageObj,changeLink,resumeParent) {
         page = pageObj;
     }
 
-   // if (page == null) throw new Error(IWPError.PAGE_NOT_EXIST, "Can not find page when open child page:"+pageObj);
-    if (page == null) throw new Error("Can not find page when remove page:"+pageObj,IWPError.PAGE_NOT_EXIST);
+    // if (page == null) throw new Error(IWPError.PAGE_NOT_EXIST, "Can not find page when open child page:"+pageObj);
+    if (page == null) throw new Error("Can not find page when remove page:" + pageObj, IWPError.PAGE_NOT_EXIST);
 
     //remove child pages
     if (page._childPages.length > 0) {
@@ -495,7 +489,7 @@ IWebapp.prototype.removePage = function (pageObj,changeLink,resumeParent) {
     }
 
     //resume parent page
-    if (page._parentPageId != null && resumeParent==true) {
+    if (page._parentPageId != null && resumeParent == true) {
         var parentPage = context._pages[page._parentPageId];
         if (parentPage != null && parentPage.view != null && parentPage.view.html != null) {
 
@@ -503,11 +497,11 @@ IWebapp.prototype.removePage = function (pageObj,changeLink,resumeParent) {
             if (index >= 0)  parentPage._childPages.splice(index, 1);
 
 
-            if(this._switchPlus!=null){
+            if (this._switchPlus != null) {
 
-                this._switchPlus.resumeParentPage(parentPage,this._container,context._resumePage,[parentPage.id])
+                this._switchPlus.resumeParentPage(parentPage, this._container, context._resumePage, [parentPage.id])
 
-            }else{
+            } else {
                 this._resumePage(parentPage)
             }
 
@@ -516,22 +510,22 @@ IWebapp.prototype.removePage = function (pageObj,changeLink,resumeParent) {
     }
 
     //remove hash tag
-    if(page.type==IWPPage.PAGE_TYPE_NORMAL && page._parentPageId!=null){
+    if (page.type == IWPPage.PAGE_TYPE_NORMAL && page._parentPageId != null) {
 
-        var hash= window.location.hash.split("/");
-        hash.splice(0,1);
+        var hash = window.location.hash.split("/");
+        hash.splice(0, 1);
 
         //if app remove this page, not by browser, updata hash.
-        if(window.location.hash== "#"+this._currentPageAlias && changeLink!=false){
+        if (window.location.hash == "#" + this._currentPageAlias && changeLink != false) {
 
-            index=hash.indexOf(page.name);
+            index = hash.indexOf(page.name);
             hash.splice(index);
 
-            this._setHash("/"+hash.join("/"));
-        }else {
+            this._setHash("/" + hash.join("/"));
+        } else {
             //else only update current alias
 
-            this._currentPageAlias="/"+hash.join("/");
+            this._currentPageAlias = "/" + hash.join("/");
 
         }
 
@@ -539,31 +533,31 @@ IWebapp.prototype.removePage = function (pageObj,changeLink,resumeParent) {
     }
 
     //destroy self
-    var pageId=page.id;
+    var pageId = page.id;
 
 
-    if(context._switchPlus!=null ){
-        if(page.type==IWPPage.PAGE_TYPE_NORMAL){
+    if (context._switchPlus != null) {
+        if (page.type == IWPPage.PAGE_TYPE_NORMAL) {
 
             // this._switchPlus.removePage($page,context._container,function(){context.removePage(p,null,false)});
 
-            if(resumeParent==true && page._parentPageId!=null){
-                context._switchPlus.removeChildPage(page,context._container,context._destroyPage,[pageId])
-            }else{
-                context._switchPlus.removePage(page,context._container,context._destroyPage,[pageId]);
+            if (resumeParent == true && page._parentPageId != null) {
+                context._switchPlus.removeChildPage(page, context._container, context._destroyPage, [pageId])
+            } else {
+                context._switchPlus.removePage(page, context._container, context._destroyPage, [pageId]);
             }
-        }else if(page.type==IWPPage.PAGE_TYPE_NOTIFY){
-            context._switchPlus.removeNotify(page,context._container,context._destroyPage,[pageId]);
-        }else if(page.type==IWPPage.PAGE_TYPE_DIALOG){
-            context._switchPlus.removeDialog(page,context._container,context._destroyPage,[pageId]);
+        } else if (page.type == IWPPage.PAGE_TYPE_NOTIFY) {
+            context._switchPlus.removeNotify(page, context._container, context._destroyPage, [pageId]);
+        } else if (page.type == IWPPage.PAGE_TYPE_DIALOG) {
+            context._switchPlus.removeDialog(page, context._container, context._destroyPage, [pageId]);
         }
-    }else{
+    } else {
         context._destroyPage(pageId);
     }
 
 
-    parentPage=null;
-    context=null;
+    parentPage = null;
+    context = null;
     page = null;
 }
 
@@ -571,7 +565,7 @@ IWebapp.prototype.removePage = function (pageObj,changeLink,resumeParent) {
  * @desc if user pressed back button or forward button, it should return true else return false.
  * @returns {boolean}
  */
-IWebapp.prototype.getCurrentHash=function(){
+IWebapp.prototype.getCurrentHash = function () {
 
     return this._currentPageAlias;
 
@@ -581,87 +575,80 @@ IWebapp.prototype.getCurrentHash=function(){
  * @desc if the hash tag has changed by user or want back/forward, execute this method.
  * @param hash [string] current hash from browse
  */
-IWebapp.prototype.onHashChange=function(hash){
+IWebapp.prototype.onHashChange = function (hash) {
 
-    if(window.location.hash=="#"+this._currentPageAlias){
+    if (window.location.hash == "#" + this._currentPageAlias) {
         //trace("this is the same hash as app");
         return;
     }
 
 
     //remove "#" from hash tag.
-    if(hash.indexOf("#/")==0){
-        hash=hash.substring(2);
+    if (hash.indexOf("#/") == 0) {
+        hash = hash.substring(2);
     }
 
 
-    var hashArray=hash.split("/");
+    var hashArray = hash.split("/");
 
 
+    if (this._currentPageAlias == null) this._currentPageAlias = "";
+    var currentHash = this._currentPageAlias.toString();
+    if (currentHash.indexOf("/") == 0) currentHash = currentHash.substring(1);
 
-    if(this._currentPageAlias==null) this._currentPageAlias="";
-    var currentHash=this._currentPageAlias.toString();
-    if(currentHash.indexOf("/")==0) currentHash=currentHash.substring(1);
-
-    if(currentHash.length>0){
-        var currentHashArray=currentHash.split("/");
+    if (currentHash.length > 0) {
+        var currentHashArray = currentHash.split("/");
     }
 
-    else{
-         currentHashArray=[]
+    else {
+        currentHashArray = []
     }
 
 
-    var diffIndex=0;
-    var maxLen=(currentHashArray.length>hashArray.length)?currentHashArray.length:hashArray.length;
-    for(var i=0;i<maxLen;i++){
-        if(currentHashArray[i]==null || hashArray[i]==null ||  currentHashArray[i]!=hashArray[i]){
-            diffIndex=i;
+    var diffIndex = 0;
+    var maxLen = (currentHashArray.length > hashArray.length) ? currentHashArray.length : hashArray.length;
+    for (var i = 0; i < maxLen; i++) {
+        if (currentHashArray[i] == null || hashArray[i] == null || currentHashArray[i] != hashArray[i]) {
+            diffIndex = i;
             break;
         }
     }
 
 
-    if(diffIndex>0){
+    if (diffIndex > 0) {
 
         //find the parent page:
-        var len=this._pages.length;
-        var page=null;
-        var parentAlias=hashArray[diffIndex-1];
+        var len = this._pages.length;
+        var page = null;
+        var parentAlias = hashArray[diffIndex - 1];
 
-        for(i=len-1;i>=0;i--){
-            page=this._pages[this._pages[i]];
-            if(page.alias==parentAlias){
+        for (i = len - 1; i >= 0; i--) {
+            page = this._pages[this._pages[i]];
+            if (page.alias == parentAlias) {
                 break;
             }
         }
 
 
-        hashArray.splice(0,diffIndex);
+        hashArray.splice(0, diffIndex);
 
-        if(page!=null){
+        if (page != null) {
             page.onHashChange(hashArray)
         }
 
 
+    } else {
 
-    }else{
-
-        var rootPage=this._hashList[hashArray[0]];
+        var rootPage = this._hashList[hashArray[0]];
 
 
-        if(rootPage==null) rootPage=this._defualtPageId;
-        else rootPage=rootPage.name;
+        if (rootPage == null) rootPage = this._defualtPageId;
+        else rootPage = rootPage.name;
 
-        hashArray.splice(0,1)
+        hashArray.splice(0, 1)
 
-        this.openPage(rootPage,null,hashArray);
+        this.openPage(rootPage, null, hashArray);
     }
-
-
-
-
-
 
 
 }
@@ -670,13 +657,13 @@ IWebapp.prototype.onHashChange=function(hash){
 IWebapp.prototype.back = function () {
 
     //find current page.
-    var pageId=this._pages[this._pages.length-1];
-    var currentPage=this._pages[pageId];
+    var pageId = this._pages[this._pages.length - 1];
+    var currentPage = this._pages[pageId];
 
-    if(currentPage==null){
+    if (currentPage == null) {
         trace("no current page right now.")
-    }else{
-        if(currentPage.onBack()==false){
+    } else {
+        if (currentPage.onBack() == false) {
             //system hold back event
 
         }
@@ -686,19 +673,19 @@ IWebapp.prototype.back = function () {
 }
 
 
-IWebapp.prototype.alert = function (content,confirmCallBack,cancelCallBack,alertName,pageData) {
-    if(alertName==null) alertName="IWPAlert";
-    var pageId=this.openPage(alertName,pageData);
-    var page=this._pages[pageId];
-    page.show(content,confirmCallBack,cancelCallBack);
+IWebapp.prototype.alert = function (content, confirmCallBack, cancelCallBack, alertName, pageData) {
+    if (alertName == null) alertName = "IWPAlert";
+    var pageId = this.openPage(alertName, pageData);
+    var page = this._pages[pageId];
+    page.show(content, confirmCallBack, cancelCallBack);
 }
 
-IWebapp.prototype.confirm = function (content,confirmCallBack,cancelCallBack,confirmName,pageData) {
+IWebapp.prototype.confirm = function (content, confirmCallBack, cancelCallBack, confirmName, pageData) {
 
-    if(confirmName==null) confirmName="IWPConfirm";
-    var pageId=this.openPage(confirmName,pageData);
-    var page=this._pages[pageId];
-    page.show(content,confirmCallBack,cancelCallBack);
+    if (confirmName == null) confirmName = "IWPConfirm";
+    var pageId = this.openPage(confirmName, pageData);
+    var page = this._pages[pageId];
+    page.show(content, confirmCallBack, cancelCallBack);
 
 }
 
@@ -706,58 +693,56 @@ IWebapp.prototype.confirm = function (content,confirmCallBack,cancelCallBack,con
  * @desc set the default system view for the app.
  * @param obj [object]: {alertViewId:string, confirmViewId:string, nofifyViewId:string}
  */
-IWebapp.prototype.setSystemViews=function(obj){
+IWebapp.prototype.setSystemViews = function (obj) {
 
 
-    if(obj.alertViewId!=null){
-        this._alertViewId=obj.alertViewId;
+    if (obj.alertViewId != null) {
+        this._alertViewId = obj.alertViewId;
     }
 
-    if(obj.notifyViewId!=null){
-        this._notifyViewId=obj.notifyViewId;
+    if (obj.notifyViewId != null) {
+        this._notifyViewId = obj.notifyViewId;
     }
 
-    if(obj.confirmViewId!=null){
-        this._confirmViewId=obj.confirmViewId;
+    if (obj.confirmViewId != null) {
+        this._confirmViewId = obj.confirmViewId;
     }
 }
-IWebapp.prototype.notify = function (content,delay,viewId) {
+IWebapp.prototype.notify = function (content, delay, viewId) {
 
-    if(viewId==null) viewId=this._notifyViewId;
-    var notifyObj=new IWPNotify(viewId);
+    if (viewId == null) viewId = this._notifyViewId;
+    var notifyObj = new IWPNotify(viewId);
     notifyObj.onCreate();
-    this._notifications[notifyObj.id]=notifyObj;
+    this._notifications[notifyObj.id] = notifyObj;
     this._notifications.push(notifyObj.id);
 
     this._container.appendChild(notifyObj.view.html);
 
 
-    notifyObj.show(content,delay);
+    notifyObj.show(content, delay);
 }
 
-IWebapp.prototype.removeNotify=function(target){
-    if(target instanceof IWPNotify){
+IWebapp.prototype.removeNotify = function (target) {
+    if (target instanceof IWPNotify) {
 
-    }else if( typeof(target) =="string"){
-        target=this._notifications[target];
-    }else{
-        target=null;
+    } else if (typeof(target) == "string") {
+        target = this._notifications[target];
+    } else {
+        target = null;
     }
 
-    if(target!=null) {
+    if (target != null) {
         target.view.html.parentNode.removeChild(target.view.html);
-        this._notifications[target.id]=null;
+        this._notifications[target.id] = null;
         delete  this._notifications[target.id];
-        this._notifications.splice(this._notifications.indexOf(target.id),1);
+        this._notifications.splice(this._notifications.indexOf(target.id), 1);
         target.onDestroy();
 
     }
 
-    target=null;
+    target = null;
 
 }
-
-
 
 
 /**
@@ -923,13 +908,11 @@ IWebapp.prototype.addJsCss = function (file, assetsRoot, onAllLoad) {
 
 //protected function at below==============================
 
-IWebapp.prototype._ieFix=function(){
+IWebapp.prototype._ieFix = function () {
 
     //add indexOf to Array
-    if (!Array.prototype.indexOf)
-    {
-        Array.prototype.indexOf = function(elt , from)
-        {
+    if (!Array.prototype.indexOf) {
+        Array.prototype.indexOf = function (elt, from) {
             var len = this.length >>> 0;
 
             var from = Number(arguments[1]) || 0;
@@ -939,8 +922,7 @@ IWebapp.prototype._ieFix=function(){
             if (from < 0)
                 from += len;
 
-            for (; from < len; from++)
-            {
+            for (; from < len; from++) {
                 if (from in this &&
                     this[from] === elt)
                     return from;
@@ -1062,67 +1044,66 @@ IWebapp.prototype._viewItemLoaded = function (index, content) {
 }
 
 
-IWebapp.prototype._onReady=function(){
+IWebapp.prototype._onReady = function () {
 
-    var views=this._assetsXML.find("data > views")
-    var obj={notifyViewId:views.attr("notifyViewId"),alertViewId:views.attr("alertViewId"),confirmViewId:views.attr("confirmViewId")};
+    var views = this._assetsXML.find("data > views")
+    var obj = {notifyViewId: views.attr("notifyViewId"), alertViewId: views.attr("alertViewId"), confirmViewId: views.attr("confirmViewId")};
     this.setSystemViews(obj);
 
-    views=null;
+    views = null;
 
     //these data are use for web mode, not app mode.
-    var pages=this._assetsXML.find("data > pages");
+    var pages = this._assetsXML.find("data > pages");
 
-    var alias=pages.attr("defualtPageAlias")
-    var pagesMap=this._hashList;
-    if(pages!=null){
-        pages.children("page").each(function(){
-            var pageObj=initPageMap(this,alias)
+    var alias = pages.attr("defualtPageAlias")
+    var pagesMap = this._hashList;
+    if (pages != null) {
+        pages.children("page").each(function () {
+            var pageObj = initPageMap(this, alias)
             pagesMap.push(pageObj.alias);
-            pagesMap[pageObj.alias]=pageObj;
-            if(alias==pageObj.alias){
-                IWebapp.getInstance()._defualtPageId=pageObj.name;
+            pagesMap[pageObj.alias] = pageObj;
+            if (alias == pageObj.alias) {
+                IWebapp.getInstance()._defualtPageId = pageObj.name;
             }
         })
     }
-   // trace("this._defualtPageId:"+this._defualtPageId)
+    // trace("this._defualtPageId:"+this._defualtPageId)
     //trace(pagesMap)
-    pages=null;
-    pagesMap=null;
+    pages = null;
+    pagesMap = null;
 
-    function initPageMap(target,parentAlias){
-        var pageObj={};
-        var page=$(target);
-        pageObj.name=page.attr("name");
-        pageObj.alias=page.attr("alias");
+    function initPageMap(target, parentAlias) {
+        var pageObj = {};
+        var page = $(target);
+        pageObj.name = page.attr("name");
+        pageObj.alias = page.attr("alias");
 
-        if(parentAlias!=pageObj.alias){
-            pageObj.parentAlias=parentAlias;
-        }else{
-            pageObj.parentAlias="";
+        if (parentAlias != pageObj.alias) {
+            pageObj.parentAlias = parentAlias;
+        } else {
+            pageObj.parentAlias = "";
         }
 
-        pageObj.pages=[]
+        pageObj.pages = []
 
 
-        page.children("page").each(function(){
+        page.children("page").each(function () {
 
-            var childObj=initPageMap(this,pageObj.alias);
-            pageObj.pages.push( childObj.alias);
-            pagesMap[childObj.alias]=childObj;
+            var childObj = initPageMap(this, pageObj.alias);
+            pageObj.pages.push(childObj.alias);
+            pagesMap[childObj.alias] = childObj;
         })
 
-        page=null;
+        page = null;
         return pageObj;
     }
 
-    if (this._configData.onReady != null){
+    if (this._configData.onReady != null) {
         this._configData.onReady();
-        this._configData.onReady=null;//clear reference
+        this._configData.onReady = null;//clear reference
     }
 
 }
-
 
 
 //IWebapp.prototype._createViewElement = function (view, viewData) {
@@ -1152,16 +1133,15 @@ IWebapp.prototype._onReady=function(){
 IWebapp.prototype._addPageToStage = function (page) {
     if (page == null || page.view == null || page.view.html == null) throw new Error(IWPError.PAGE_NOT_EXIST_VIEW);
 
-    var context=this;
+    var context = this;
 
-    if(page.type==IWPPage.PAGE_TYPE_NORMAL){
-
+    if (page.type == IWPPage.PAGE_TYPE_NORMAL) {
 
 
         if (page.view.fillView == true) {
             //find out the chain of parent page
-            var pageChain=this._getPageChain(page.id);
-          //  trace(pageChain)
+            var pageChain = this._getPageChain(page.id);
+            //  trace(pageChain)
 
             //remove pages
             var $page = null;
@@ -1170,25 +1150,25 @@ IWebapp.prototype._addPageToStage = function (page) {
 
 
                 //&& $page.type!=IWPPage.PAGE_TYPE_DIALOG
-                if ($page.view != null && $page.view.html != null && $page.id != page.id && $page.type!=IWPPage.PAGE_TYPE_NOTIFY ) {
+                if ($page.view != null && $page.view.html != null && $page.id != page.id && $page.type != IWPPage.PAGE_TYPE_NOTIFY) {
 
                     //If target page is  parent of current page,hidden target page.
                     if ($page.id == page._parentPageId) {
 //                        IWebapp.addClass($page.view.html, IWPPage.PAGE_CLASS_PAUSEPAGE);
 //                        $page._status=IWPPage.STATUS_PAUSED;
 //                        $page.onPause();
-                        var p=this._pages[i];
+                        var p = this._pages[i];
 
-                        if(this._switchPlus!=null){
-                            if(this._switchPlus.hideParentPage!=null){
-                               // this._switchPlus.hideParentPage($page,context._container,function(){context._hidePage(p)})
-                                this._switchPlus.hideParentPage($page,context._container,context._hidePage,[p])
+                        if (this._switchPlus != null) {
+                            if (this._switchPlus.hideParentPage != null) {
+                                // this._switchPlus.hideParentPage($page,context._container,function(){context._hidePage(p)})
+                                this._switchPlus.hideParentPage($page, context._container, context._hidePage, [p])
                             }
 
-                        }else{
+                        } else {
                             context._hidePage(p);
                         }
-                    } else if(pageChain.indexOf($page.id)<0) {
+                    } else if (pageChain.indexOf($page.id) < 0) {
                         //If not, remove it.
 //                         trace("pageChain:"+pageChain.indexOf($page.id) +"  id:"+$page.id)
 //                         trace(pageChain)
@@ -1207,7 +1187,7 @@ IWebapp.prototype._addPageToStage = function (page) {
 //                            this.removePage($page);
 //                        }
 
-                        this.removePage($page,null,false);
+                        this.removePage($page, null, false);
 
                     }
 
@@ -1218,7 +1198,7 @@ IWebapp.prototype._addPageToStage = function (page) {
             trace("The page have not fill view ")
         }
 
-    }else if(page.type==IWPPage.PAGE_TYPE_DIALOG){
+    } else if (page.type == IWPPage.PAGE_TYPE_DIALOG) {
         //Current page is a dialog, so we can not remove old page.
         //Just display over these layers
 //         $page = null;
@@ -1234,24 +1214,24 @@ IWebapp.prototype._addPageToStage = function (page) {
 
     this._$container.append(page.view.html);
 
-    if(this._switchPlus!=null){
-        if(page.type==IWPPage.PAGE_TYPE_NORMAL){
-            this._switchPlus.showPage(page,context._container);
-        }else if(page.type==IWPPage.PAGE_TYPE_DIALOG){
-            this._switchPlus.showDialog(page,context._container);
-        }else if(page.type==IWPPage.PAGE_TYPE_NOTIFY){
-            this._switchPlus.showNotify(page,context._container);
+    if (this._switchPlus != null) {
+        if (page.type == IWPPage.PAGE_TYPE_NORMAL) {
+            this._switchPlus.showPage(page, context._container);
+        } else if (page.type == IWPPage.PAGE_TYPE_DIALOG) {
+            this._switchPlus.showDialog(page, context._container);
+        } else if (page.type == IWPPage.PAGE_TYPE_NOTIFY) {
+            this._switchPlus.showNotify(page, context._container);
         }
 
     }
 
-    context=null;
-    page=null;
+    context = null;
+    page = null;
 }
 
-IWebapp.prototype._hidePage=function(pageObj){
-    var context=IWebapp.getInstance()
-    var page=null;
+IWebapp.prototype._hidePage = function (pageObj) {
+    var context = IWebapp.getInstance()
+    var page = null;
     if (typeof pageObj == "string") {
         page = context._pages[pageObj]
     } else if (pageObj instanceof IWPPage) {
@@ -1259,17 +1239,17 @@ IWebapp.prototype._hidePage=function(pageObj){
     }
 
     IWebapp.addClass(page.view.html, IWPPage.PAGE_CLASS_PAUSEPAGE);
-    page._status=IWPPage.STATUS_PAUSED;
+    page._status = IWPPage.STATUS_PAUSED;
     page.onPause();
 
-    context=null;
-    page=null;
+    context = null;
+    page = null;
 
 }
 
-IWebapp.prototype._resumePage=function(pageObj){
-    var context=IWebapp.getInstance()
-    var page=null;
+IWebapp.prototype._resumePage = function (pageObj) {
+    var context = IWebapp.getInstance()
+    var page = null;
     if (typeof pageObj == "string") {
         page = context._pages[pageObj]
     } else if (pageObj instanceof IWPPage) {
@@ -1280,27 +1260,27 @@ IWebapp.prototype._resumePage=function(pageObj){
 
 //    var index = page._childPages.indexOf(page.id);
 //    if (index >= 0)  page._childPages.splice(index, 1);
-    page._status=IWPPage.STATUS_NORMAL;
+    page._status = IWPPage.STATUS_NORMAL;
     page.onResume();
 
-    context=null;
-    page=null;
+    context = null;
+    page = null;
 
 }
 
 
-IWebapp.prototype._getPageChain=function(pageId,chain){
-    if(chain==null) chain=[];
+IWebapp.prototype._getPageChain = function (pageId, chain) {
+    if (chain == null) chain = [];
 
-    var page=this._pages[pageId];
-    if(page==null){
+    var page = this._pages[pageId];
+    if (page == null) {
         return chain;
-    }else{
+    } else {
         chain.push(page.id);
-        var parentPage=this._pages[page._parentPageId];
-        if(parentPage!=null){
+        var parentPage = this._pages[page._parentPageId];
+        if (parentPage != null) {
 
-            this._getPageChain(parentPage.id,chain)
+            this._getPageChain(parentPage.id, chain)
         }
     }
 
@@ -1310,17 +1290,16 @@ IWebapp.prototype._getPageChain=function(pageId,chain){
 
 IWebapp.prototype._destroyPage = function (page) {
 
-    var context=IWebapp.getInstance();
+    var context = IWebapp.getInstance();
 
 
     if (typeof page == "string") {
         page = context._pages[page]
     }
 
-    if(page==null){
+    if (page == null) {
         return;
     }
-
 
 
     IWebapp.removeNode(page.view.html); //remove view from stage
@@ -1328,14 +1307,14 @@ IWebapp.prototype._destroyPage = function (page) {
     var index = context._pages.indexOf(page.id);
 
     //trace("remove page:"+page.id+" index:"+index)
-   // trace(this._pages)
+    // trace(this._pages)
     if (index >= 0) {
         context._pages.splice(index, 1);//remove the id from page list.
     }
     page.onDestroy();
 
-    context=null;
-    page=null;
+    context = null;
+    page = null;
 }
 
 IWebapp.prototype._initPage = function (pageObj) {
@@ -1376,12 +1355,11 @@ IWebapp.prototype._handleMouse = function () {
 IWebapp.prototype._onTouchStart = function (e, context) {
 
 
-
     if (context._touchTarget != null) {
         var preTarget = context._touchTarget;
         preTarget.removeAttribute(context._tapEventTag);
-        IWebapp.removeClass(preTarget,context._touchTapAttr);
-        IWebapp.removeClass(preTarget,context._touchLongTapAttr);
+        IWebapp.removeClass(preTarget, context._touchTapAttr);
+        IWebapp.removeClass(preTarget, context._touchLongTapAttr);
 
 
         if (IWebapp.touchable == true) {
@@ -1392,10 +1370,10 @@ IWebapp.prototype._onTouchStart = function (e, context) {
             removeEvent(window.document.body, "mouseup", context._onTouchEnd);
         }
 
-        preTarget.tap=null;
-        preTarget.touchX=0;
-        preTarget.touchY=0;
-        preTarget.touchTime=0;
+        preTarget.tap = null;
+        preTarget.touchX = 0;
+        preTarget.touchY = 0;
+        preTarget.touchTime = 0;
 
         clearInterval(preTarget.timer);
         preTarget.timer = null;
@@ -1418,15 +1396,15 @@ IWebapp.prototype._onTouchStart = function (e, context) {
         addEvent(window.document.body, "touchend", context._onTouchEnd, context);
 
 
-        if(context._touchTarget.onFingerStart){
-            context._touchTarget.onFingerStart(touch.pageX,touch.pageY);
+        if (context._touchTarget.onFingerStart) {
+            context._touchTarget.onFingerStart(touch.pageX, touch.pageY);
         }
 
     }
 
     //e.preventDefault();
-   // return false;
-    if(context._touchTarget!=null && context._touchBubblesNodes.indexOf(context._touchTarget.nodeName)<0){
+    // return false;
+    if (context._touchTarget != null && context._touchBubblesNodes.indexOf(context._touchTarget.nodeName) < 0) {
         e.preventDefault();
         return false;
     }
@@ -1438,7 +1416,7 @@ IWebapp.prototype._onTouching = function (target) {
     var context = IWebapp.getInstance();
     if (target == null) target = context._touchTarget;
 
-    if(target==null){
+    if (target == null) {
 
 
         return;
@@ -1447,22 +1425,21 @@ IWebapp.prototype._onTouching = function (target) {
     var delayTime = Date.now() - target.touchTime;
     if (delayTime >= context._touchStartTimeThreshold) {
         //trace("short:"+(target.tap ==null)+"   :"+typeof  target.tap)
-        if (target.tap == null || target.tap=="") {
+        if (target.tap == null || target.tap == "") {
             //IE8,IE7 has bug when use css selector: .classname[attr=""]
             //target.setAttribute(context._touchTapAttr, IWebapp.TAP_TYPE_SHORT);
 
-            IWebapp.addClass(target,context._touchTapAttr)
+            IWebapp.addClass(target, context._touchTapAttr)
             target.tap = IWebapp.TAP_TYPE_SHORT;
 
 
-
-        } else if ((target.tap == IWebapp.TAP_TYPE_SHORT) && (delayTime >= context._touchLongTapTimeThreshold) && (IWebapp.hasClass(context._touchLongTapAttr) ==false)) {
+        } else if ((target.tap == IWebapp.TAP_TYPE_SHORT) && (delayTime >= context._touchLongTapTimeThreshold) && (IWebapp.hasClass(context._touchLongTapAttr) == false)) {
             target.tap = IWebapp.TAP_TYPE_LONG;
 
-           // target.setAttribute(context._touchTapAttr, IWebapp.TAP_TYPE_LONG);
+            // target.setAttribute(context._touchTapAttr, IWebapp.TAP_TYPE_LONG);
 
-            IWebapp.addClass(target,context._touchLongTapAttr);
-            IWebapp.removeClass(target,context._touchTapAttr);
+            IWebapp.addClass(target, context._touchLongTapAttr);
+            IWebapp.removeClass(target, context._touchTapAttr);
             clearInterval(target.timer);
             target.timer = null;
 
@@ -1475,7 +1452,7 @@ IWebapp.prototype._onTouching = function (target) {
     }
 
 
-   // trace("toccc:"+target.tap  +" delayTime:"+delayTime+"/"+context._touchStartTimeThreshold)
+    // trace("toccc:"+target.tap  +" delayTime:"+delayTime+"/"+context._touchStartTimeThreshold)
 
 
 }
@@ -1486,22 +1463,23 @@ IWebapp.prototype._onTouchMove = function (e, context) {
     var touch = e.touches[0];
 
     var target = context._touchTarget;
-    if(target==null) {
+    if (target == null) {
 
         return;
-    } ;
+    }
+    ;
     target.touchXMov = touch.pageX;
     target.touchYMov = touch.pageY;
 
 
-    if(target.onFingerMove){
-        target.onFingerMove(target.touchXMov,target.touchYMov );
+    if (target.onFingerMove) {
+        target.onFingerMove(target.touchXMov, target.touchYMov);
     }
 }
 
 IWebapp.prototype._onTouchEnd = function (e, context) {
 
-    context._isMouseDown=false;
+    context._isMouseDown = false;
 
     if (IWebapp.touchable == true) {
         removeEvent(window.document.body, "touchmove", context._onTouchMove);
@@ -1512,7 +1490,7 @@ IWebapp.prototype._onTouchEnd = function (e, context) {
     }
 
     var target = context._touchTarget;
-    if(target==null){
+    if (target == null) {
 
         return;
     }
@@ -1530,7 +1508,7 @@ IWebapp.prototype._onTouchEnd = function (e, context) {
 
     }
 
-    if(context._touchTarget.onFingerUp){
+    if (context._touchTarget.onFingerUp) {
         context._touchTarget.onFingerUp();
     }
     clearInterval(target.timer);
@@ -1542,10 +1520,10 @@ IWebapp.prototype._onTouchEnd = function (e, context) {
 //    delete target.touchY;
 //    delete target.touchTime;
 
-    target.tap=null;
-    target.touchX=0;
-    target.touchY=0;
-    target.touchTime=0;
+    target.tap = null;
+    target.touchX = 0;
+    target.touchY = 0;
+    target.touchTime = 0;
 
 //    delete target["timer"];
 //    delete target["tap"];
@@ -1553,18 +1531,13 @@ IWebapp.prototype._onTouchEnd = function (e, context) {
 //    delete target["touchY"];
 //    delete target["touchTime"];
 
-   // target.setAttribute(context._touchTapAttr, "");
-    IWebapp.removeClass(target,context._touchTapAttr);
-    IWebapp.removeClass(target,context._touchLongTapAttr);
-
-
-
-
+    // target.setAttribute(context._touchTapAttr, "");
+    IWebapp.removeClass(target, context._touchTapAttr);
+    IWebapp.removeClass(target, context._touchLongTapAttr);
 
 
     context._touchTarget = null;
     target = null;
-
 
 
 }
@@ -1602,14 +1575,13 @@ IWebapp.prototype._dispatchEvent = function (target, EventType) {
 IWebapp.prototype._onMouseDown = function (e, context) {
 
 
-
-    context._isMouseDown=true;
+    context._isMouseDown = true;
     //
     if (context._touchTarget != null) {
         var preTarget = context._touchTarget;
         preTarget.removeAttribute(context._tapEventTag);
-        IWebapp.removeClass(preTarget,context._touchTapAttr);
-        IWebapp.removeClass(preTarget,context._touchLongTapAttr);
+        IWebapp.removeClass(preTarget, context._touchTapAttr);
+        IWebapp.removeClass(preTarget, context._touchLongTapAttr);
 
 
         if (IWebapp.touchable == true) {
@@ -1620,14 +1592,13 @@ IWebapp.prototype._onMouseDown = function (e, context) {
             removeEvent(window.document.body, "mouseup", context._onTouchEnd);
         }
 
-        preTarget.tap=null;
-        preTarget.touchX=0;
-        preTarget.touchY=0;
-        preTarget.touchTime=0;
+        preTarget.tap = null;
+        preTarget.touchX = 0;
+        preTarget.touchY = 0;
+        preTarget.touchTime = 0;
 
         clearInterval(preTarget.timer);
         preTarget.timer = null;
-
 
 
     }
@@ -1639,22 +1610,21 @@ IWebapp.prototype._onMouseDown = function (e, context) {
     if (context._touchTarget != null) {
 
 
-
         context._touchTarget.touchTime = (e.timestamp || Date.now());
-        context._touchTarget.touchXMov = context._touchTarget.touchX = e.pageX || e.clientX ;
-        context._touchTarget.touchYMov = context._touchTarget.touchY = e.pageY || e.clientY ;
+        context._touchTarget.touchXMov = context._touchTarget.touchX = e.pageX || e.clientX;
+        context._touchTarget.touchYMov = context._touchTarget.touchY = e.pageY || e.clientY;
 
 
         context._touchTarget.timer = setInterval(context._onTouching, 30);
         addEvent(window.document.body, "mousemove", context._onMouseMove, context);
         addEvent(window.document.body, "mouseup", context._onTouchEnd, context);
 
-        if(context._touchTarget.onFingerStart){
-            context._touchTarget.onFingerStart(context._touchTarget.touchX,context._touchTarget.touchY);
+        if (context._touchTarget.onFingerStart) {
+            context._touchTarget.onFingerStart(context._touchTarget.touchX, context._touchTarget.touchY);
         }
     }
 
-    if(context._touchTarget!=null && context._touchBubblesNodes.indexOf(context._touchTarget.nodeName)<0){
+    if (context._touchTarget != null && context._touchBubblesNodes.indexOf(context._touchTarget.nodeName) < 0) {
         e.preventDefault();
         return false;
     }
@@ -1665,26 +1635,24 @@ IWebapp.prototype._onMouseMove = function (e, context) {
     //e.preventDefault();
 
 
-    if(context._isMouseDown!=true){
-        IWebapp.prototype._onTouchEnd(e,context);
+    if (context._isMouseDown != true) {
+        IWebapp.prototype._onTouchEnd(e, context);
         return;
     }
     var target = context._touchTarget;
-    if(target==null) {
+    if (target == null) {
 
         return;
     }
 
-    target.touchXMov = e.pageX || e.clientX ;
+    target.touchXMov = e.pageX || e.clientX;
     target.touchYMov = e.pageY || e.clientY;
 
-    if(target.onFingerMove){
-        target.onFingerMove(target.touchXMov ,target.touchYMov );
+    if (target.onFingerMove) {
+        target.onFingerMove(target.touchXMov, target.touchYMov);
     }
 
 }
-
-
 
 
 IWebapp.prototype._getTouchTarget = function (target) {
@@ -1692,11 +1660,7 @@ IWebapp.prototype._getTouchTarget = function (target) {
     while (target != null) {
 
 
-
-
-
-
-        if (target.getAttribute != null &&  (target.getAttribute(this._disableTag)===null ||target.getAttribute(this._disableTag)===false ||  target.getAttribute("disabled").value==undefined) && (target.getAttribute(this._ignoreTouchTag) == null) && (this._touchableNodes.indexOf(target.nodeName) >= 0 || target.getAttribute(this._touchableAttr) == "true")) {
+        if (target.getAttribute != null && (target.getAttribute(this._disableTag) === null || target.getAttribute(this._disableTag) === false || target.getAttribute("disabled").value == undefined) && (target.getAttribute(this._ignoreTouchTag) == null) && (this._touchableNodes.indexOf(target.nodeName) >= 0 || target.getAttribute(this._touchableAttr) == "true")) {
 
             return target;
         } else {
@@ -1712,12 +1676,11 @@ IWebapp.prototype._getTouchTarget = function (target) {
 //            trace("touchable:"+this._touchableNodes.indexOf(target.nodeName)+">>"+target.nodeName+"?"+this._touchableNodes);
 //            trace("continure find:"+target.nodeName+ " parent:"+target.parentNode);
 
-           // trace("===>"+target.nodeName +">>"+">"+( (target.getAttribute("disabled").value)==undefined)+">"+ (target.getAttribute(this._ignoreTouchTag) == null)+">"+(this._touchableNodes.indexOf(target.nodeName) >= 0 || target.getAttribute(this._touchableAttr) == this._touchableAttr))
+            // trace("===>"+target.nodeName +">>"+">"+( (target.getAttribute("disabled").value)==undefined)+">"+ (target.getAttribute(this._ignoreTouchTag) == null)+">"+(this._touchableNodes.indexOf(target.nodeName) >= 0 || target.getAttribute(this._touchableAttr) == this._touchableAttr))
 
-           // trace("<"+target.getAttribute("disabled")+">")
+            // trace("<"+target.getAttribute("disabled")+">")
             target = target.parentNode;
         }
-
 
 
     }
@@ -1729,9 +1692,9 @@ IWebapp.prototype._getTouchTarget = function (target) {
 }
 
 
-IWebapp.prototype._addToHistory=function(page,pageData,parentPage){
-    if(page.type!=IWPPage.PAGE_TYPE_NORMAL) return;
-    var hash= window.location.hash.split("/");
+IWebapp.prototype._addToHistory = function (page, pageData, parentPage) {
+    if (page.type != IWPPage.PAGE_TYPE_NORMAL) return;
+    var hash = window.location.hash.split("/");
 
 //    var pageItem={};
 //    pageItem.constructorName=page.constructor.name;
@@ -1740,22 +1703,21 @@ IWebapp.prototype._addToHistory=function(page,pageData,parentPage){
 //    pageItem.parentPageId=page._parentPageId;
 
 
-    var hash2="";
-    if(parentPage){
+    var hash2 = "";
+    if (parentPage) {
         //set hash tag
-        hash.splice(0,1)
-        var parentHash=parentPage.alias;
-        var index=hash.indexOf(parentHash);
-        hash.splice(index+1);
+        hash.splice(0, 1)
+        var parentHash = parentPage.alias;
+        var index = hash.indexOf(parentHash);
+        hash.splice(index + 1);
 
         hash.push(page.alias);
-        hash2="/"+hash.join("/");
+        hash2 = "/" + hash.join("/");
 
 
-
-    }else{
+    } else {
         //set hash tag
-        hash2="/"+page.alias;
+        hash2 = "/" + page.alias;
 
 
     }
@@ -1767,28 +1729,24 @@ IWebapp.prototype._addToHistory=function(page,pageData,parentPage){
     this._setHash(hash2);
 
 
-
-
-
 }
 
 
-IWebapp.prototype._setHash=function(hash){
+IWebapp.prototype._setHash = function (hash) {
 
 
-    trace("will set hash to :"+hash)
+    trace("will set hash to :" + hash)
 
-    if(hash==null || hash =="undefined"){
-        hash="";
+    if (hash == null || hash == "undefined") {
+        hash = "";
         //window.location.href = window.location.href.replace(/#.*$/, '#');
     }
-    this._currentPageAlias=hash;
-    window.location.hash=hash;
+    this._currentPageAlias = hash;
+    window.location.hash = hash;
 
-    trace("set hash:"+hash)
+    trace("set hash:" + hash)
 
 }
-
 
 
 //==============OTHER CLASS=================================
@@ -1840,35 +1798,35 @@ function IWPPage() {
      * @desc The class name, don't set it.
      * @type {string}
      */
-    this.name=this.constructor.name;
+    this.name = this.constructor.name;
 
     //fix ie
-    if(this.name==null){
-        this.name=this.constructor.toString();
-        this.name=this.name.substring(0, this.name.indexOf("(")).replace("function","").trim();
+    if (this.name == null) {
+        this.name = this.constructor.toString();
+        this.name = this.name.substring(0, this.name.indexOf("(")).replace("function", "").trim();
     }
 
-    this.id = this.name+"_" + IWPPage._index++;
+    this.id = this.name + "_" + IWPPage._index++;
 
     /**
      * @desc alias will display in url.
      * @type {string} default value is the page's name, maybe it's not friendly for user, should reset it.
      */
-    //trace("name:"+this.name)
-    //trace(IWebapp.getInstance()._hashList)
-    //this.alias=IWebapp.getInstance()._hashList[this.name].alias;
-    this.alias=this.name;
-    this.childAliasList=[];
+        //trace("name:"+this.name)
+        //trace(IWebapp.getInstance()._hashList)
+        //this.alias=IWebapp.getInstance()._hashList[this.name].alias;
+    this.alias = this.name;
+    this.childAliasList = [];
 
-    for (var i in IWebapp.getInstance()._hashList){
-        var item=IWebapp.getInstance()._hashList[i];
-       // trace("item.name:"+item.name  +"/"+ this.name)
-        if(item.name==this.name){
-            this.alias=item.alias;
+    for (var i in IWebapp.getInstance()._hashList) {
+        var item = IWebapp.getInstance()._hashList[i];
+        // trace("item.name:"+item.name  +"/"+ this.name)
+        if (item.name == this.name) {
+            this.alias = item.alias;
 
             trace(item)
-            for(var k=0;k<item.pages.length;k++){
-                this.childAliasList[k]=item.pages[k];
+            for (var k = 0; k < item.pages.length; k++) {
+                this.childAliasList[k] = item.pages[k];
 
             }
             break;
@@ -1906,7 +1864,7 @@ function IWPPage() {
      * @desc the page's type.
      * @type {number}  value should be: [IWPPage.PAGE_TYPE_NORMAL|IWPPage.PAGE_TYPE_DIALOG|IWPPage.PAGE_TYPE_NOTIFY]
      */
-    this.type=IWPPage.PAGE_TYPE_NORMAL;
+    this.type = IWPPage.PAGE_TYPE_NORMAL;
 
 
 }
@@ -1916,15 +1874,15 @@ IWPPage.STATUS_NORMAL = 1;
 IWPPage.STATUS_PAUSED = 2;
 
 
-IWPPage.PAGE_TYPE_NORMAL=0;
-IWPPage.PAGE_TYPE_DIALOG=1;
-IWPPage.PAGE_TYPE_NOTIFY=2;
+IWPPage.PAGE_TYPE_NORMAL = 0;
+IWPPage.PAGE_TYPE_DIALOG = 1;
+IWPPage.PAGE_TYPE_NOTIFY = 2;
 
-IWPPage.PAGE_CLASS_NORMAL="page";
-IWPPage.PAGE_CLASS_DIALOG="dialog";
-IWPPage.PAGE_CLASS_NOTIFY="notify";
-IWPPage.PAGE_CLASS_PAUSEPAGE="pausePage";
-IWPPage._index=0;
+IWPPage.PAGE_CLASS_NORMAL = "page";
+IWPPage.PAGE_CLASS_DIALOG = "dialog";
+IWPPage.PAGE_CLASS_NOTIFY = "notify";
+IWPPage.PAGE_CLASS_PAUSEPAGE = "pausePage";
+IWPPage._index = 0;
 
 /**
  * check the page's status, don't set it.
@@ -1960,31 +1918,31 @@ IWPPage.prototype.onDestroy = function () {
  * @desc IWPPage can hold back event come from device or browser.
  * @returns {boolean} If return false, use default function of IWEBAPP hold back event.
  */
-IWPPage.prototype.onBack=function(){
+IWPPage.prototype.onBack = function () {
     return false;
 };
 
-IWPPage.prototype.onHashChange=function(hash){
-  //  trace(this.name+ "   >>page hash changed:"+hash)
+IWPPage.prototype.onHashChange = function (hash) {
+    //  trace(this.name+ "   >>page hash changed:"+hash)
 
-   // hash.splice(0,1);
-    var childHash=hash[0];
-    hash.splice(0,1);
+    // hash.splice(0,1);
+    var childHash = hash[0];
+    hash.splice(0, 1);
 //    trace("childHash:"+childHash +">>>>>>>>"+hash)
 //    trace("childAliasList:"+this.childAliasList)
 //    trace("find index:"+this.childAliasList.indexOf(childHash))
-    if(childHash==""|| childHash==null){
-       // trace("remove child page")
+    if (childHash == "" || childHash == null) {
+        // trace("remove child page")
         this.removeChildPage(false);//don't change hash when remove page.
-    }else if(this.childAliasList.indexOf(childHash)>=0){
-       // trace("open child page!!!!!!!"+hash)
-        var pageObj=IWebapp.getInstance()._hashList[childHash];
-        if(pageObj!=null){
-            core.openChildPage(pageObj.name, null, this,hash);
+    } else if (this.childAliasList.indexOf(childHash) >= 0) {
+        // trace("open child page!!!!!!!"+hash)
+        var pageObj = IWebapp.getInstance()._hashList[childHash];
+        if (pageObj != null) {
+            core.openChildPage(pageObj.name, null, this, hash);
         }
 
-    }else{
-        trace("can not find child page, current alias is:"+IWebapp.getInstance()._currentPageAlias);
+    } else {
+        trace("can not find child page, current alias is:" + IWebapp.getInstance()._currentPageAlias);
         IWebapp.getInstance()._setHash(IWebapp.getInstance()._currentPageAlias)
     }
 //    if(childHash=="annouce"){
@@ -1995,12 +1953,12 @@ IWPPage.prototype.onHashChange=function(hash){
 //    }
 }
 
-IWPPage.prototype.removeChildPage=function(changeLink){
-    var len=this._childPages.length;
+IWPPage.prototype.removeChildPage = function (changeLink) {
+    var len = this._childPages.length;
 
-    if(len>0){
-        for(var i=0;i<len;i++){
-            IWebapp.getInstance().removePage(this._childPages[i],changeLink);
+    if (len > 0) {
+        for (var i = 0; i < len; i++) {
+            IWebapp.getInstance().removePage(this._childPages[i], changeLink);
 
         }
 
@@ -2019,7 +1977,7 @@ IWPPage.prototype.findViewItem = function (id, needUpdateId, newId) {
         return null;
     }
 
-    if(needUpdateId==null) needUpdateId=true;
+    if (needUpdateId == null) needUpdateId = true;
 
     if (needUpdateId == true) {
         if (newId != null) {
@@ -2045,7 +2003,6 @@ IWPPage.prototype.setView = function (viewId, viewData, autoAddedToStage) {
     }
 
 
-
     this._createViewElement(viewData);
     if (autoAddedToStage != false) {
 
@@ -2054,25 +2011,25 @@ IWPPage.prototype.setView = function (viewId, viewData, autoAddedToStage) {
     }
 }
 
-IWPPage.prototype._createViewElement = function ( viewData) {
+IWPPage.prototype._createViewElement = function (viewData) {
 
-    var container=null;
+    var container = null;
     if (this.view.html == null) {
         var viewContainer = window.document.createElement("div");
-        container=viewContainer;
-        if(this.type==IWPPage.PAGE_TYPE_DIALOG){
+        container = viewContainer;
+        if (this.type == IWPPage.PAGE_TYPE_DIALOG) {
             viewContainer.className = IWPPage.PAGE_CLASS_DIALOG;
 
-            var wrapper=window.document.createElement("div");
-            wrapper.className="dialogWrapper";
+            var wrapper = window.document.createElement("div");
+            wrapper.className = "dialogWrapper";
             viewContainer.appendChild(wrapper);
 
-            container=wrapper;
+            container = wrapper;
 
-        }else if(this.type==IWPPage.PAGE_TYPE_NORMAL){
+        } else if (this.type == IWPPage.PAGE_TYPE_NORMAL) {
             viewContainer.className = IWPPage.PAGE_CLASS_NORMAL;
 
-        }else if(this.type==IWPPage.PAGE_TYPE_NOTIFY){
+        } else if (this.type == IWPPage.PAGE_TYPE_NOTIFY) {
             viewContainer.className = IWPPage.PAGE_CLASS_NOTIFY;
 
         }
@@ -2080,15 +2037,13 @@ IWPPage.prototype._createViewElement = function ( viewData) {
         this.view.html = viewContainer;
         container.innerHTML = this.view.text;
 
-        if(this.type==IWPPage.PAGE_TYPE_DIALOG){
-            IWebapp.addClass(container.childNodes[0],"dialogContent");
+        if (this.type == IWPPage.PAGE_TYPE_DIALOG) {
+            IWebapp.addClass(container.childNodes[0], "dialogContent");
         }
     }//end if
 
 
-
-    container=null;
-
+    container = null;
 
 
 }
@@ -2106,8 +2061,6 @@ IWPPage.prototype.close = function () {
     IWebapp.getInstance().removePage(this);
 
 
-
-
 }
 
 function IWPPageData() {
@@ -2119,33 +2072,33 @@ IWebapp.extend(IWPNotify, IWPPage);
  * Set the message node's id to "msgTxt", the message will display in that node
  * @constructor
  */
-function IWPNotify(viewId){
+function IWPNotify(viewId) {
     IWPNotify.$super(this);
-    this.type=IWPPage.PAGE_TYPE_NOTIFY;
-    this.msgTxt=null;
-    this.delay=1000;
-    this.viewId=viewId;
-    this.timer=null;
+    this.type = IWPPage.PAGE_TYPE_NOTIFY;
+    this.msgTxt = null;
+    this.delay = 1000;
+    this.viewId = viewId;
+    this.timer = null;
 }
 
-IWPNotify.prototype.onCreate=function(pageData){
+IWPNotify.prototype.onCreate = function (pageData) {
 
 
     this.setView(this.viewId);
-    var txtId=this.view.html.childNodes[0].getAttribute("data-notify-target");
-    if(txtId==null || txtId.trim().length==0) this.msgTxt= this.view.html.childNodes[0];
-    else  this.msgTxt=this.findViewItem(txtId);
+    var txtId = this.view.html.childNodes[0].getAttribute("data-notify-target");
+    if (txtId == null || txtId.trim().length == 0) this.msgTxt = this.view.html.childNodes[0];
+    else  this.msgTxt = this.findViewItem(txtId);
 
 }
 
 
-IWPNotify.prototype.close=function(target){
+IWPNotify.prototype.close = function (target) {
 
-    target=(target!=null)?target:this;
-    var context=IWebapp.getInstance();
+    target = (target != null) ? target : this;
+    var context = IWebapp.getInstance();
     context.removeNotify(target);
 
-    target=null;
+    target = null;
 }
 
 /**
@@ -2153,291 +2106,283 @@ IWPNotify.prototype.close=function(target){
  * @param content [object | string]
  * @param delay [number]
  */
-IWPNotify.prototype.show=function(content,delay){
-    if(typeof content =="string"){
-        this.msgTxt.innerHTML=content
-    }else {
+IWPNotify.prototype.show = function (content, delay) {
+    if (typeof content == "string") {
+        this.msgTxt.innerHTML = content
+    } else {
         this.msgTxt.appendChild(content);
     }
 
-    if(delay!=null) this.delay=delay;
+    if (delay != null) this.delay = delay;
 
-    var target=this;
-    var context=IWebapp.getInstance();
-    if(context._switchPlus!=null){
-        context._switchPlus.showNotify(target,context._container,target.startTimer,[target]);
-    }else{
+    var target = this;
+    var context = IWebapp.getInstance();
+    if (context._switchPlus != null) {
+        context._switchPlus.showNotify(target, context._container, target.startTimer, [target]);
+    } else {
         target.startTimer();
     }
 
-    target=null;
+    target = null;
 
 }
 
-IWPNotify.prototype.startTimer=function(target){
-      target=(target!=null)?target:this;
-    var context=IWebapp.getInstance();
-    if(context._switchPlus!=null){
+IWPNotify.prototype.startTimer = function (target) {
+    target = (target != null) ? target : this;
+    var context = IWebapp.getInstance();
+    if (context._switchPlus != null) {
 
 
-        target.timer=setTimeout(function(){
+        target.timer = setTimeout(function () {
 
 
-            context._switchPlus.removeNotify(target,context._container,target.close,[target]);
-            target=null;
-        },target.delay);
-    }else{
+            context._switchPlus.removeNotify(target, context._container, target.close, [target]);
+            target = null;
+        }, target.delay);
+    } else {
 
-        target.timer=setTimeout(function(){target.close();target=null;},target.delay);
+        target.timer = setTimeout(function () {
+            target.close();
+            target = null;
+        }, target.delay);
     }
 
 
 }
 
 
-
-IWPNotify.prototype.onDestroy=function(){
+IWPNotify.prototype.onDestroy = function () {
     clearTimeout(this.timer);
-    this.timer=null;
-    this.msgTxt=null;
+    this.timer = null;
+    this.msgTxt = null;
 
 }
-
 
 
 IWebapp.extend(IWPConfirm, IWPPage);
-function IWPConfirm(){
+function IWPConfirm() {
     IWPConfirm.$super(this);
     this.viewId = null;
-    this.type=IWPPage.PAGE_TYPE_DIALOG;
-    this.onCancel=null;
-    this.onConfirm=null;
-    this.msgTxt=null;
-    this.cancelBtn=null;
-    this.confirmBtn=null;
-    this.closeBtn=null;
+    this.type = IWPPage.PAGE_TYPE_DIALOG;
+    this.onCancel = null;
+    this.onConfirm = null;
+    this.msgTxt = null;
+    this.cancelBtn = null;
+    this.confirmBtn = null;
+    this.closeBtn = null;
 }
 
-IWPConfirm.prototype.onCreate=function(pageData){
-    if(pageData!=null && pageData.viewId!=null){
-        this.viewId=pageData.viewId;
-    }else{
-        this.viewId=IWebapp.getInstance()._confirmViewId;
+IWPConfirm.prototype.onCreate = function (pageData) {
+    if (pageData != null && pageData.viewId != null) {
+        this.viewId = pageData.viewId;
+    } else {
+        this.viewId = IWebapp.getInstance()._confirmViewId;
     }
     this.setView(this.viewId);
-    var dataNode=this.view.html.childNodes[0].childNodes[0];
+    var dataNode = this.view.html.childNodes[0].childNodes[0];
 
-    this.msgTxt=this.findViewItem(dataNode.getAttribute("data-confirm-msg"));
-    this.cancelBtn=this.findViewItem(dataNode.getAttribute("data-confirm-cancel"));
-    this.confirmBtn=this.findViewItem(dataNode.getAttribute("data-confirm-submit"));
-    this.closeBtn=this.findViewItem(dataNode.getAttribute("data-confirm-close"));
+    this.msgTxt = this.findViewItem(dataNode.getAttribute("data-confirm-msg"));
+    this.cancelBtn = this.findViewItem(dataNode.getAttribute("data-confirm-cancel"));
+    this.confirmBtn = this.findViewItem(dataNode.getAttribute("data-confirm-submit"));
+    this.closeBtn = this.findViewItem(dataNode.getAttribute("data-confirm-close"));
 
 
-
-    addEvent(this.view.html,IWebapp.getInstance()._tapEventTag,this.onClicked,this);
+    addEvent(this.view.html, IWebapp.getInstance()._tapEventTag, this.onClicked, this);
 }
 
-IWPConfirm.prototype.onDestroy=function(){
-    removeEvent(this.view.html,IWebapp.getInstance()._tapEventTag,this.onClicked);
-    this.onCancel=null;
-    this.onConfirm=null;
-    this.msgTxt=null;
-    this.cancelBtn=null;
-    this.confirmBtn=null;
-    this.closeBtn=null;
+IWPConfirm.prototype.onDestroy = function () {
+    removeEvent(this.view.html, IWebapp.getInstance()._tapEventTag, this.onClicked);
+    this.onCancel = null;
+    this.onConfirm = null;
+    this.msgTxt = null;
+    this.cancelBtn = null;
+    this.confirmBtn = null;
+    this.closeBtn = null;
 }
 
-IWPConfirm.prototype.onClicked=function(e,context){
+IWPConfirm.prototype.onClicked = function (e, context) {
     var target = (e.target) ? e.target : e.srcElement;//fot ie8
-    if(target==context.confirmBtn){
-        if(context.onConfirm!=null){
+    if (target == context.confirmBtn) {
+        if (context.onConfirm != null) {
             context.onConfirm();
         }
-    }else if(target==context.cancelBtn || target==context.closeBtn){
-        if(context.onCancel!=null){
+    } else if (target == context.cancelBtn || target == context.closeBtn) {
+        if (context.onCancel != null) {
             context.onCancel();
         }
     }
 
     context.close();
-    context=null;
-    target=null;
+    context = null;
+    target = null;
 }
 
 
-IWPConfirm.prototype.show=function(content,confirmCallBack,cancelCallBack){
-    this.onCancel=cancelCallBack;
-    this.onConfirm=confirmCallBack;
+IWPConfirm.prototype.show = function (content, confirmCallBack, cancelCallBack) {
+    this.onCancel = cancelCallBack;
+    this.onConfirm = confirmCallBack;
 
 
-    if(typeof content =="string"){
-        this.msgTxt.innerHTML=content
-    }else {
+    if (typeof content == "string") {
+        this.msgTxt.innerHTML = content
+    } else {
         this.msgTxt.appendChild(content);
     }
 
 }
-
 
 
 IWebapp.extend(IWPAlert, IWPPage);
-function IWPAlert(){
+function IWPAlert() {
     IWPAlert.$super(this);
     this.viewId = null;
-    this.type=IWPPage.PAGE_TYPE_DIALOG;
-    this.onCancel=null;
-    this.onConfirm=null;
-    this.msgTxt=null;
+    this.type = IWPPage.PAGE_TYPE_DIALOG;
+    this.onCancel = null;
+    this.onConfirm = null;
+    this.msgTxt = null;
 
-    this.confirmBtn=null;
-    this.closeBtn=null;
+    this.confirmBtn = null;
+    this.closeBtn = null;
 }
 
-IWPAlert.prototype.onCreate=function(pageData){
-    if(pageData!=null && pageData.viewId!=null){
-        this.viewId=pageData.viewId;
-    }else{
-        this.viewId=IWebapp.getInstance()._alertViewId;
+IWPAlert.prototype.onCreate = function (pageData) {
+    if (pageData != null && pageData.viewId != null) {
+        this.viewId = pageData.viewId;
+    } else {
+        this.viewId = IWebapp.getInstance()._alertViewId;
     }
     this.setView(this.viewId);
-    var dataNode=this.view.html.childNodes[0].childNodes[0];
+    var dataNode = this.view.html.childNodes[0].childNodes[0];
 
     trace(dataNode)
 
-    this.msgTxt=this.findViewItem(dataNode.getAttribute("data-alert-msg"));
+    this.msgTxt = this.findViewItem(dataNode.getAttribute("data-alert-msg"));
 
-    this.confirmBtn=this.findViewItem(dataNode.getAttribute("data-alert-submit"));
-    this.closeBtn=this.findViewItem(dataNode.getAttribute("data-alert-close"));
+    this.confirmBtn = this.findViewItem(dataNode.getAttribute("data-alert-submit"));
+    this.closeBtn = this.findViewItem(dataNode.getAttribute("data-alert-close"));
 
 
-
-    addEvent(this.view.html,IWebapp.getInstance()._tapEventTag,this.onClicked,this);
+    addEvent(this.view.html, IWebapp.getInstance()._tapEventTag, this.onClicked, this);
 }
 
-IWPAlert.prototype.onDestroy=function(){
-    removeEvent(this.view.html,IWebapp.getInstance()._tapEventTag,this.onClicked);
-    this.onCancel=null;
-    this.onConfirm=null;
-    this.msgTxt=null;
+IWPAlert.prototype.onDestroy = function () {
+    removeEvent(this.view.html, IWebapp.getInstance()._tapEventTag, this.onClicked);
+    this.onCancel = null;
+    this.onConfirm = null;
+    this.msgTxt = null;
 
-    this.confirmBtn=null;
-    this.closeBtn=null;
+    this.confirmBtn = null;
+    this.closeBtn = null;
 }
 
-IWPAlert.prototype.onClicked=function(e,context){
+IWPAlert.prototype.onClicked = function (e, context) {
     var target = (e.target) ? e.target : e.srcElement;//fot ie8
-    if(target==context.confirmBtn){
-        if(context.onConfirm!=null){
+    if (target == context.confirmBtn) {
+        if (context.onConfirm != null) {
             context.onConfirm();
         }
-    }else if(target==context.closeBtn){
-        if(context.onCancel!=null){
+    } else if (target == context.closeBtn) {
+        if (context.onCancel != null) {
             context.onCancel();
         }
     }
 
     context.close();
-    context=null;
-    target=null;
+    context = null;
+    target = null;
 }
 
 
-IWPAlert.prototype.show=function(content,confirmCallBack,cancelCallBack){
-    this.onCancel=cancelCallBack;
-    this.onConfirm=confirmCallBack;
+IWPAlert.prototype.show = function (content, confirmCallBack, cancelCallBack) {
+    this.onCancel = cancelCallBack;
+    this.onConfirm = confirmCallBack;
 
 
-    if(typeof content =="string"){
-        this.msgTxt.innerHTML=content
-    }else {
+    if (typeof content == "string") {
+        this.msgTxt.innerHTML = content
+    } else {
         this.msgTxt.appendChild(content);
     }
 
 }
 
 
-function IWPSwitch(){
+function IWPSwitch() {
 
 }
 
-IWPSwitch.prototype.showPage=function(page,container,onComplete,completeParams,isBack){
+IWPSwitch.prototype.showPage = function (page, container, onComplete, completeParams, isBack) {
 
-    if(onComplete!=null) {
-        onComplete.apply(this,completeParams);
+    if (onComplete != null) {
+        onComplete.apply(this, completeParams);
 
     }
 }
-IWPSwitch.prototype.removePage=function(page,container,onComplete,completeParams,isBack){
-    if(onComplete!=null) {
+IWPSwitch.prototype.removePage = function (page, container, onComplete, completeParams, isBack) {
+    if (onComplete != null) {
 
-        onComplete.apply(this,completeParams);
-
-    }
-}
-
-
-IWPSwitch.prototype.resumeParentPage=function(page,container,onComplete,completeParams,isBack){
-    if(onComplete!=null) {
-        onComplete.apply(this,completeParams);
-
-    }
-}
-
-IWPSwitch.prototype.hideParentPage=function(page,container,onComplete,completeParams,isBack){
-    if(onComplete!=null) {
-        onComplete.apply(this,completeParams);
-
-    }
-}
-
-IWPSwitch.prototype.showChildPage=function(page,container,onComplete,completeParams,isBack){
-    if(onComplete!=null) {
-        onComplete.apply(this,completeParams);
-
-    }
-}
-
-IWPSwitch.prototype.removeChildPage=function(page,container,onComplete,completeParams,isBack){
-    if(onComplete!=null) {
-        onComplete.apply(this,completeParams);
+        onComplete.apply(this, completeParams);
 
     }
 }
 
 
-
-
-IWPSwitch.prototype.showDialog=function(page,container,onComplete,completeParams,isBack){
-    if(onComplete!=null) {
-        onComplete.apply(this,completeParams);
+IWPSwitch.prototype.resumeParentPage = function (page, container, onComplete, completeParams, isBack) {
+    if (onComplete != null) {
+        onComplete.apply(this, completeParams);
 
     }
 }
 
-IWPSwitch.prototype.removeDialog=function(page,container,onComplete,completeParams,isBack){
-    if(onComplete!=null) {
-        onComplete.apply(this,completeParams);
+IWPSwitch.prototype.hideParentPage = function (page, container, onComplete, completeParams, isBack) {
+    if (onComplete != null) {
+        onComplete.apply(this, completeParams);
 
     }
 }
 
-IWPSwitch.prototype.showNotify=function(page,container,onComplete,completeParams,isBack){
-    if(onComplete!=null) {
-        onComplete.apply(this,completeParams);
+IWPSwitch.prototype.showChildPage = function (page, container, onComplete, completeParams, isBack) {
+    if (onComplete != null) {
+        onComplete.apply(this, completeParams);
 
     }
 }
 
-IWPSwitch.prototype.removeNotify=function(page,container,onComplete,completeParams,isBack){
-    if(onComplete!=null) {
-        onComplete.apply(this,completeParams);
+IWPSwitch.prototype.removeChildPage = function (page, container, onComplete, completeParams, isBack) {
+    if (onComplete != null) {
+        onComplete.apply(this, completeParams);
 
     }
 }
 
 
+IWPSwitch.prototype.showDialog = function (page, container, onComplete, completeParams, isBack) {
+    if (onComplete != null) {
+        onComplete.apply(this, completeParams);
 
+    }
+}
 
+IWPSwitch.prototype.removeDialog = function (page, container, onComplete, completeParams, isBack) {
+    if (onComplete != null) {
+        onComplete.apply(this, completeParams);
+
+    }
+}
+
+IWPSwitch.prototype.showNotify = function (page, container, onComplete, completeParams, isBack) {
+    if (onComplete != null) {
+        onComplete.apply(this, completeParams);
+
+    }
+}
+
+IWPSwitch.prototype.removeNotify = function (page, container, onComplete, completeParams, isBack) {
+    if (onComplete != null) {
+        onComplete.apply(this, completeParams);
+
+    }
+}
 
 
 /**
@@ -2630,6 +2575,460 @@ function IWPLoadItem() {
      * @type {string}
      */
     this.alias = null;
+
+}
+
+
+Math.linearTween = function (t, b, c, d) {
+    return c * t / d + b;
+};
+Math.easeInQuad = function (t, b, c, d) {
+    t /= d;
+    return c * t * t + b;
+};
+Math.easeOutQuad = function (t, b, c, d) {
+    t /= d;
+    return -c * t * (t - 2) + b;
+};
+Math.easeInOutQuad = function (t, b, c, d) {
+    t /= d / 2;
+    if (t < 1) return c / 2 * t * t + b;
+    t--;
+    return -c / 2 * (t * (t - 2) - 1) + b;
+};
+
+Math.easeInCubic = function (t, b, c, d) {
+    t /= d;
+    return c * t * t * t + b;
+};
+Math.easeOutCubic = function (t, b, c, d) {
+    t /= d;
+    t--;
+    return c * (t * t * t + 1) + b;
+};
+Math.easeInOutCubic = function (t, b, c, d) {
+    t /= d / 2;
+    if (t < 1) return c / 2 * t * t * t + b;
+    t -= 2;
+    return c / 2 * (t * t * t + 2) + b;
+};
+Math.easeInQuart = function (t, b, c, d) {
+    t /= d;
+    return c * t * t * t * t + b;
+};
+Math.easeOutQuart = function (t, b, c, d) {
+    t /= d;
+    t--;
+    return -c * (t * t * t * t - 1) + b;
+};
+Math.easeInOutQuart = function (t, b, c, d) {
+    t /= d / 2;
+    if (t < 1) return c / 2 * t * t * t * t + b;
+    t -= 2;
+    return -c / 2 * (t * t * t * t - 2) + b;
+};
+Math.easeInQuint = function (t, b, c, d) {
+    t /= d;
+    return c * t * t * t * t * t + b;
+};
+Math.easeOutQuint = function (t, b, c, d) {
+    t /= d;
+    t--;
+    return c * (t * t * t * t * t + 1) + b;
+};
+Math.easeInOutQuint = function (t, b, c, d) {
+    t /= d / 2;
+    if (t < 1) return c / 2 * t * t * t * t * t + b;
+    t -= 2;
+    return c / 2 * (t * t * t * t * t + 2) + b;
+};
+Math.easeInSine = function (t, b, c, d) {
+    return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
+};
+Math.easeOutSine = function (t, b, c, d) {
+    return c * Math.sin(t / d * (Math.PI / 2)) + b;
+};
+Math.easeInOutSine = function (t, b, c, d) {
+    return -c / 2 * (Math.cos(Math.PI * t / d) - 1) + b;
+};
+Math.easeInExpo = function (t, b, c, d) {
+    return c * Math.pow(2, 10 * (t / d - 1)) + b;
+};
+Math.easeOutExpo = function (t, b, c, d) {
+    return c * ( -Math.pow(2, -10 * t / d) + 1 ) + b;
+};
+
+Math.easeInOutExpo = function (t, b, c, d) {
+    t /= d / 2;
+    if (t < 1) return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
+    t--;
+    return c / 2 * ( -Math.pow(2, -10 * t) + 2 ) + b;
+};
+
+Math.easeInCirc = function (t, b, c, d) {
+    t /= d;
+    return -c * (Math.sqrt(1 - t * t) - 1) + b;
+};
+Math.easeOutCirc = function (t, b, c, d) {
+    t /= d;
+    t--;
+    return c * Math.sqrt(1 - t * t) + b;
+};
+Math.easeInOutCirc = function (t, b, c, d) {
+    t /= d / 2;
+    if (t < 1) return -c / 2 * (Math.sqrt(1 - t * t) - 1) + b;
+    t -= 2;
+    return c / 2 * (Math.sqrt(1 - t * t) + 1) + b;
+};
+
+/**
+ * @desc use this class to tween css of elements. It's specially for gpu accelerator.
+ * @constructor
+ */
+function IWPTween() {
+
+}
+
+IWPTween._targets = [];
+IWPTween._count = 0;
+IWPTween._tweenId = 0;
+IWPTween._targetId = 0;
+IWPTween._transform = getsupportedprop(['transform', 'MozTransform', 'WebkitTransform', 'OTransform']);
+IWPTween._transition = getsupportedprop([ 'transition', 'MozTransition', 'WebkitTransition', 'OTransition']);
+IWPTween.isBadBrowser = (IWPTween._transform == null || IWPTween._transition == null);
+IWPTween._timer = null;
+IWPTween.isBadBrowser = true
+IWPTween.killOf = function () {
+
+}
+
+IWPTween.to = function (target, time, obj) {
+    if (obj == null) {
+        return;
+    }
+
+
+    var css = {};
+    var cssUnit = {};
+    var ease = (obj.ease == null) ? "easeInOutQuart" : obj.ease;
+    var origin = {css: {}}
+    if (obj.css != null) {
+        for (var style in obj.css) {
+            if (typeof obj.css[style] == "string") {
+                cssUnit[style] = obj.css[style].replace(/[\d\.\-]/g,"")
+                css[style] = Number(obj.css[style].replace(/[^\d\.\-]/g,""));
+
+
+            } else {
+                cssUnit[style] = "";
+                css[style] = obj.css[style];
+            }
+
+
+        }
+    }
+    var tweenObj = {time: time * 1000, ease: ease, css: css, cssUnit: cssUnit, spentTime: 0, onComplete: obj.onComplete, completeParams: obj.completeParams, _origin: origin}
+    if (time < 0.01) time = 0;
+
+
+    if (time == 0) {
+
+        if (IWPTween.isBadBrowser) {
+
+            if (tweenObj.css["x"] != null) {
+                target.style["left"] = tweenObj.css["x"] + tweenObj.cssUnit["x"];
+            }
+            if (tweenObj.css["y"] != null) {
+                target.style["top"] = tweenObj.css["y"] + tweenObj.cssUnit['y'];
+            }
+
+        } else {
+            if (tweenObj.css.x != null || tweenObj.css.y != null || tweenObj.css.z != null) {
+                var martix = window.getComputedStyle(target)[IWPTween._transform];
+
+                if (martix != "none") {
+                    if (martix.indexOf("3d") > 0) {
+                        martix = martix.split(",");
+                        var ox = martix[12];
+                        var oy = martix[13];
+                        var oz = martix[14];
+                    } else {
+                        martix = martix.split(",");
+                        ox = martix[4];
+                        oy = martix[5];
+                        oz = 0;
+                    }
+                } else {
+                    ox = 0;
+                    oy = 0;
+                    oz = 0;
+                }
+                if (tweenObj.css.x == null) {
+                    tweenObj.css.x = ox;
+                }
+
+                if (tweenObj.css.y == null) {
+                    tweenObj.css.y = oy;
+                }
+
+                if (tweenObj.css.z == null) {
+                    tweenObj.css.z = oz;
+                }
+
+
+                target.style[IWPTween._transform] = "translate3d(" + tweenObj.css.x + (tweenObj.cssUnit["x"] || "px") + "," + tweenObj.css.y + (tweenObj.cssUnit["y"] || "px") + "," + tweenObj.css.z + (tweenObj.cssUnit["z"] || "px") + ")";
+
+            }
+
+
+        }
+
+        for (var i in tweenObj.css) {
+
+
+            if (i != "x" && i != "y" && i != "z") {
+
+                target.style[i] = tweenObj.css[i] + tweenObj.cssUnit[i];
+
+            }
+
+
+        }
+
+
+        if (tweenObj.onComplete != null) {
+            if (tweenObj.completeParams == null) tweenObj.completeParams = [];
+            tweenObj.onComplete.apply(target, tweenObj.completeParams)
+            tweenObj.onComplete = null;
+            tweenObj.completeParams = null;
+        }
+
+
+    } else {
+
+        //update css in modern browsers
+        if (IWPTween.isBadBrowser != true) {
+            target.style[IWPTween._transition] = time + "s";
+
+
+            if (tweenObj.css.x != null || tweenObj.css.y != null || tweenObj.css.z != null) {
+                martix = window.getComputedStyle(target)[IWPTween._transform];
+
+                if (martix != "none") {
+                    if (martix.indexOf("3d") > 0) {
+                        martix = martix.split(",");
+                        ox = martix[12];
+                        oy = martix[13];
+                        oz = martix[14];
+                    } else {
+                        martix = martix.split(",");
+                        ox = martix[4];
+                        oy = martix[5];
+                        oz = 0;
+                    }
+                } else {
+                    ox = 0;
+                    oy = 0;
+                    oz = 0;
+                }
+                if (tweenObj.css.x == null) {
+                    tweenObj.css.x = ox;
+                }
+
+                if (tweenObj.css.y == null) {
+                    tweenObj.css.y = oy;
+                }
+
+                if (tweenObj.css.z == null) {
+                    tweenObj.css.z = oz;
+                }
+
+
+                var timer = setTimeout(function () {
+                    target.style[IWPTween._transform] = "translate3d(" + tweenObj.css.x + (tweenObj.cssUnit["x"] || "px") + "," + tweenObj.css.y + (tweenObj.cssUnit["y"] || "px") + "," + tweenObj.css.z + (tweenObj.cssUnit["z"] || "px") + ")";
+
+                    //update common style
+                    for (var i in tweenObj.css) {
+
+
+                        if (i != "x" && i != "y" && i != "z") {
+
+                            target.style[i] = tweenObj.css[i] + tweenObj.cssUnit[i];
+                        }
+
+
+                    }
+
+                }, 0);
+            }
+
+
+        }
+
+        //ge origin sytle
+
+        for (style in tweenObj.css) {
+
+
+            if (style != "z") {
+                var val = null;
+                if (style == "x") {
+                    val = target["offsetLeft"];
+                } else if (style == "y") {
+                    val = target["offsetTop"];
+                } else {
+                    val = target.style[style];
+                }
+
+
+                if (val == "undefined" || val == "none" || val == "" || val == undefined || val == "null") {
+
+                    if (style == "opacity") {
+
+                        val = 1;
+                    } else {
+                        val = 0;
+                    }
+                }
+
+
+                if (typeof val == "string") {
+                    val = val.replace(/[^\d\.\-]/g,"")
+
+                }
+
+
+                tweenObj._origin.css[style] = Number(val);
+                tweenObj.css[style] -= tweenObj._origin.css[style];
+
+                // trace(target.style.left)
+
+            }
+
+        }
+
+
+        IWPTween._addTweenItem(target, tweenObj);
+
+    }
+
+    return IWPTween._tweenId;
+
+}
+
+IWPTween._addTweenItem = function (target, tweenObj) {
+    if (IWPTween._targets == null) {
+        IWPTween._targets = {};
+    }
+
+    if (target._tweenTargetId == null && IWPTween._targets[target._tweenTargetId] == null) {
+        IWPTween._targets[++IWPTween._targetId] = target;
+        target._tweenTargetId = IWPTween._targetId;
+    }
+
+    if (target._tweens == null) {
+        target._tweens = {};
+    }
+
+    target._tweens[ ++IWPTween._tweenId] = tweenObj;
+    tweenObj._tweenId = IWPTween._tweenId;
+
+    IWPTween._count++;
+    IWPTween._initTimer();
+
+
+}
+IWPTween._initTimer = function () {
+    if (IWPTween._timer == null) {
+        IWPTween._timer = setInterval(IWPTween._tween, 30);
+    }
+
+}
+
+IWPTween._checkTweens = function () {
+
+
+    if (IWPTween._count <= 0) {
+        clearInterval(IWPTween._timer);
+        IWPTween._timer = null;
+        IWPTween._count = 0;
+        trace("Clear timer")
+    }
+}
+
+IWPTween._tween = function () {
+    IWPTween._checkTweens();
+
+    var tweens = null;
+    var item = null;
+    for (var i  in  IWPTween._targets) {
+        item = IWPTween._targets[i];
+        tweens = item._tweens;
+
+
+        var tweenObj = null;
+
+        for (var k in tweens) {
+            tweenObj = tweens[k];
+
+            //tween the css style of bad brwosers such as :ie6,7,8,9, else tween them by  css
+            if (IWPTween.isBadBrowser) {
+                if (tweenObj.css.x != null) {
+
+                    var result = Math[tweenObj.ease](tweenObj.spentTime, tweenObj._origin.css.x, tweenObj.css.x, tweenObj.time);
+
+                    //trace("result:"+result)
+
+                    item.style.left = result + tweenObj.cssUnit["x"];
+                }
+
+                if (tweenObj.css.y != null) {
+
+                    item.style.top = Math[tweenObj.ease](tweenObj.spentTime, tweenObj._origin.css.y, tweenObj.css.y, tweenObj.time) + tweenObj.cssUnit["y"]
+                }
+
+
+                // trace("style:top "+item.style.top+",left "+item.style.left+">>> oy "+tweenObj._origin.css.y+",ox "+tweenObj._origin.css.x+"  time:"+tweenObj.time+",spentTime:"+tweenObj.spentTime+", target pos:"+tweenObj.css.y+", "+tweenObj.css.x+" ease:"+tweenObj.ease)
+
+            }
+
+            //update common style
+            for (var style in tweenObj.css) {
+
+
+                if (style != "x" && style != "y" && style != "z") {
+
+                    // item.style[style] = tweenObj.css[style] + tweenObj.cssUnit[style];
+                    item.style[style] = Math[tweenObj.ease](tweenObj.spentTime, tweenObj._origin.css[style], tweenObj.css[style], tweenObj.time) + tweenObj.cssUnit[style];
+
+
+                }
+
+
+            }
+
+
+            tweenObj.spentTime += 30;
+
+            if (tweenObj.spentTime >= tweenObj.time) {
+
+                if (tweenObj.onComplete != null) {
+                    if (tweenObj.completeParams == null) tweenObj.completeParams = [];
+                    tweenObj.onComplete.apply(item, tweenObj.completeParams)
+                    tweenObj.onComplete = null;
+                    tweenObj.completeParams = null;
+                }
+                tweens[k] = null;
+                delete tweens[k];
+                IWPTween._count--;
+
+
+            }
+        }
+
+
+    }//end loop
+
 
 }
 

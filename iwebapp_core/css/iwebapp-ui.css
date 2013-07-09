@@ -51,26 +51,3 @@
 
 
 
-/*themes*/
-.iwp-ui-slider{
-    width: 300px;
-    display: block;
-    height: 50px;
-    margin-left: 250px;
-}
-.iwp-ui-slider-active{
-    display: block;
-
-    background: #0B1E13;
-}
-
-.iwp-ui-slider-down{
-
-    background: #B0FD21;
-}
-
-.iwp-ui-slider-slug{
-    width: 25%;
-    background:#ffffff;
-    /*transition: 1s;*/
-}

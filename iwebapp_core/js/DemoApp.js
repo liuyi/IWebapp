@@ -21,13 +21,14 @@ DemoApp.prototype.init = function () {
     }
 
 
-    var str="1000.0223222px";
-    var val=str.replace(/[^\d+\.]/g,"")
-    var val2=str.replace(/[\d+\.]/g,"")
+    var str="-1000.0223222px";
+    var val=str.replace(/[^\d\.\-]/g,"")
+    var val2=str.replace(/[\d\.\-\+]/g,"")
     trace("vvv:"+val)
     trace("uuuuu:"+val2)
     //handle deeplink, if this app is a web.
 
+    return
 
 
     if(checkIEVersion(8)==true ){
@@ -102,8 +103,9 @@ LoginPage.prototype.onCreate = function (pageData) {
     this.passwordTxt = this.findViewItem("password")
     this.learnLink = this.findViewItem("learnLink")
 
-    this.switchBtn=new IWebUISwitch();
-    this.switchBtn.create(this.findViewItem("switchBtn"));
+    this.switchBtn=new IWebUISwitch(this.findViewItem("switchBtn"));
+
+
     this.slider=new IWebUISlider(this.findViewItem("slider"),{min:200,max:1000,snap:true,increment:800,animate:true});
 
 
@@ -116,14 +118,10 @@ LoginPage.prototype.onCreate = function (pageData) {
       IWPTween.to(this.ball,1,{css:{x:"400px",y:"200px",opacity:0.5},
           onComplete:function(p){
           trace("commmm:"+p);
-         IWPTween.to(this,1,{css:{x:"200px",y:"200px",opacity:1}})
+         IWPTween.to(this,1,{css:{x:"200px",y:"-50px",opacity:1}})
       },completeParams:["hahahah"]});
 
-    var css="100%";
-  //var unit= css.replace(/\d/g,"")
-  var val= css.replace(/\D/g,"")
-   // trace("unit:"+unit)
-    trace("val:"+val)
+
 
     addEvent(this.setValBtn,"change",function(e,context){
         context.slider.setVal(Number(this.value))
