@@ -1,5 +1,7 @@
 *{ font-family:"helvetica,Arial"}
 
+
+.pageWrapper{ }
 .button {
     background: #55aa99;
     border-radius: 8px;
@@ -58,6 +60,7 @@
 
 .page {
     background: #6290A3;
+
 }
 
 /* special css*/
@@ -67,7 +70,7 @@
     width: 300px;
     display: block;
     height: 50px;
-    margin-left: 250px;
+
 }
 
 .iwp-ui-slider-active {
@@ -112,6 +115,8 @@
     border: 1px solid #3E8E8E;
     border-radius: 8px;
 }
+
+.slider{ background: #333333;}
 
 .bitBtn {
     -moz-box-shadow: inset 5px 1px 17px 5px #bee2f9;

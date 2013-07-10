@@ -23,6 +23,7 @@
 .iwp-ui-slider{
     display: block;
     position: relative;
+    cursor: pointer;
 }
 
 .iwp-ui-slider-active{

@@ -18,7 +18,7 @@ function IWebUISlider(target, opts) {
     this.snap = false;
     this.percent = 0;
     this.direction = 1;
-    this.supportTransform = getsupportedprop(['transform', 'MozTransform', 'WebkitTransform', 'OTransform']);
+
     this.supportTransition = getsupportedprop([ 'transition', 'MozTransition', 'WebkitTransition', 'OTransition']);
     this.onChange = null;
     this.min = 0;
@@ -67,9 +67,9 @@ IWebUISlider.prototype.create = function (target, opts) {
 
 
         if (opts.value != null) {
-            this.setVal(opts.value);
+           // this.setVal(opts.value);
         } else if (opts.percent != null) {
-            this.setPercent(opts.percent);
+           // this.setPercent(opts.percent);
         }
     }
 
@@ -204,6 +204,8 @@ IWebUISlider.prototype._onBarUp = function () {
 
 IWebUISlider.prototype._updateDrag = function (p) {
     var t = (this.animate != true) ? 0 : this.duration;
+
+    IWPTween.killOf(this.dragNode);
     if (this.direction == IWebUISlider.DIRECTION_HORIZON) {
 
         this.dragNode.pos = p * (this.container.offsetWidth - this.dragNode.offsetWidth);
@@ -223,11 +225,13 @@ IWebUISlider.prototype._updateDrag = function (p) {
 IWebUISlider.prototype._onTouchStart = function (x, y) {
 
     this.style[this.sliderObj.supportTransition] = "0s";
+    IWPTween.killOf(this);
     if (this.sliderObj.direction == IWebUISlider.DIRECTION_HORIZON) {
         this.prevPos = this.touchX;
     } else {
         this.prevPos = this.touchY;
     }
+
 
 }
 IWebUISlider.prototype._onTouchMove = function (x, y) {
@@ -316,7 +320,7 @@ function IWebUISwitch(target, opts) {
     opts.animate = true;
     opts.max = 100;
     opts.min = 0;
-    if(opts.value==null) opts.value=100;
+    if(opts.value==null) opts.value=0;
     this.activeNode = null;
     this.downNode = null;
     this.activeNode = IWebapp.getElementsByClassName(target, "iwp-ui-slider-active")[0];
@@ -369,6 +373,9 @@ IWebUISwitch.prototype._onTouchMove = function (x, y) {
 
 IWebUISwitch.prototype._updateDrag = function (p) {
     IWebUISwitch.method(this, "_updateDrag", p);
+
+    IWPTween.killOf(this.activeNode);
+    IWPTween.killOf(this.downNode);
     if (this.direction == IWebUISlider.DIRECTION_HORIZON) {
         IWPTween.to(this.activeNode, this.duration, {css: {x: (this.dragNode.pos - this.activeNode.offsetWidth + this.dragNode.offsetWidth * 0.5) + "px"}});
         IWPTween.to(this.downNode, this.duration, {css: {x: (this.dragNode.pos + this.dragNode.offsetWidth * 0.5) + "px"}});
@@ -376,4 +383,18 @@ IWebUISwitch.prototype._updateDrag = function (p) {
         IWPTween.to(this.activeNode, this.duration, {css: {x: (this.dragNode.pos - this.activeNode.offsetHeight + this.dragNode.offsetHeight * 0.5) + "px"}});
         IWPTween.to(this.downNode, this.duration, {css: {x: (this.dragNode.pos + this.dragNode.offsetHeight * 0.5) + "px"}});
     }
+}
+
+
+IWebUISwitch.prototype._onTouchStart = function (x, y) {
+
+
+    IWPTween.killOf(this.sliderObj.activeNode);
+    IWPTween.killOf(this.sliderObj.downNode);
+    IWebUISwitch.method(this, "_onTouchStart", x,y);
+
+
+
+
+
 }

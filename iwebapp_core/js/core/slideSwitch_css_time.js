@@ -25,8 +25,7 @@ SlideSwitch.prototype.showPage=function(page,container,onComplete,completeParams
 
        IWPTween.to(page.view.html,0,{css:{x:IWebapp.getInstance()._container.offsetWidth+"px"}});
        setTimeout(function(){
-
-            IWPTween.to(page.view.html,0.6,{css:{x:"0px"},ease:"easeOut",onComplete:onComplete,onCompleteParams:completeParams});
+            IWPTween.to(page.view.html,1.6,{css:{x:"0px"},ease:"easeOut",onComplete:onComplete,onCompleteParams:completeParams});
         },0)
 
     }
@@ -42,7 +41,8 @@ SlideSwitch.prototype.removePage=function(page,container,onComplete,completePara
         TweenLite.to(page.view.html,0.6,{left:"100%",onComplete:onComplete,onCompleteParams:completeParams});
     }else{
 
-        IWPTween.to(page.view.html,0.6,{css:{x:"-"+IWebapp.getInstance()._container.offsetWidth+"px"},ease:"easeOut",onComplete:onComplete,onCompleteParams:completeParams});
+        //TweenLite.to(page.view.html,0.6,{left:"-100%",onComplete:onComplete,onCompleteParams:completeParams});
+        IWPTween.to(page.view.html,1.6,{css:{x:"-"+IWebapp.getInstance()._container.offsetWidth+"px"},ease:"easeOut",onComplete:onComplete,onCompleteParams:completeParams});
     }
 
 }

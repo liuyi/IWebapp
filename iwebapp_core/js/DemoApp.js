@@ -21,12 +21,7 @@ DemoApp.prototype.init = function () {
     }
 
 
-    var str="-1000.0223222px";
-    var val=str.replace(/[^\d\.\-]/g,"")
-    var val2=str.replace(/[\d\.\-\+]/g,"")
-    trace("vvv:"+val)
-    trace("uuuuu:"+val2)
-    //handle deeplink, if this app is a web.
+
 
     return
 
@@ -103,41 +98,46 @@ LoginPage.prototype.onCreate = function (pageData) {
     this.passwordTxt = this.findViewItem("password")
     this.learnLink = this.findViewItem("learnLink")
 
+    var t=Date.now();
+    console.time("initSwitch")
     this.switchBtn=new IWebUISwitch(this.findViewItem("switchBtn"));
-
-
-    this.slider=new IWebUISlider(this.findViewItem("slider"),{min:200,max:1000,snap:true,increment:800,animate:true});
-
-
-
-    this.setValBtn=this.findViewItem("setValBtn");
-    this.setPerBtn=this.findViewItem("setPerBtn");
-    this.ball=this.findViewItem("ball");
-
-
-      IWPTween.to(this.ball,1,{css:{x:"400px",y:"200px",opacity:0.5},
-          onComplete:function(p){
-          trace("commmm:"+p);
-         IWPTween.to(this,1,{css:{x:"200px",y:"-50px",opacity:1}})
-      },completeParams:["hahahah"]});
+    console.timeEnd("initSwitch")
 
 
 
-    addEvent(this.setValBtn,"change",function(e,context){
-        context.slider.setVal(Number(this.value))
-    },this)
-
-    addEvent(this.setPerBtn,"change",function(e,context){
-        context.slider.setPercent(Number(this.value))
-    },this)
+    t2=Date.now();
+    this.slider=new IWebUISlider(this.findViewItem("slider"),{min:200,max:1000,animate:true});
+   // alert((t2-t)+" slider:"+(Date.now()-t2))
 
 
-    var sliderVal= this.sliderVal=this.findViewItem("sliderVal");
-
-
-    this.slider.onChange=function(p,val){
-        sliderVal.innerText="percent:"+Math.round(p*100)+"  value:"+val;
-    }
+//    this.setValBtn=this.findViewItem("setValBtn");
+//    this.setPerBtn=this.findViewItem("setPerBtn");
+//    this.ball=this.findViewItem("ball");
+//
+//
+//     // IWPTween.to(this.ball,1,{css:{x:"400px",y:"200px",opacity:0.5},
+//         // onComplete:function(p){
+//          //trace("commmm:"+p);
+//       //  IWPTween.to(this,1,{css:{x:"200px",y:"300px",opacity:1}})
+//     // },onCompleteParams:["hahahah"]});
+//
+//
+//
+//    addEvent(this.setValBtn,"change",function(e,context){
+//        context.slider.setVal(Number(this.value))
+//    },this)
+//
+//    addEvent(this.setPerBtn,"change",function(e,context){
+//        context.slider.setPercent(Number(this.value))
+//    },this)
+//
+//
+//    var sliderVal= this.sliderVal=this.findViewItem("sliderVal");
+//
+//
+//    this.slider.onChange=function(p,val){
+//        sliderVal.innerText="percent:"+Math.round(p*100)+"  value:"+val;
+//    }
 
 
     // addEvent(this.view.html, "click", this.onClicked, this);
@@ -191,6 +191,7 @@ LoginPage.prototype.onTap = function (e, context) {
         iwp.getInstance().confirm("Do you want open a new page?",function(){trace("ok")},function(){trace("cancel")})
 
     }else if(target==context.forget){
+        trace("forgot....")
         iwp.getInstance().notify("HI, check your email!")
     }else if(target==context.learnLink){
         trace("learnLink tap!!");

@@ -21,7 +21,7 @@ SlideSwitch.prototype.showPage=function(page,container,onComplete,completeParams
         TweenLite.to(page.view.html,0.8,{left:"0px",onComplete:onComplete,onCompleteParams:completeParams});
     }else{
         page.view.html.style.left="100%";
-        TweenLite.to(page.view.html,0.8,{left:"0px",onComplete:onComplete,onCompleteParams:completeParams});
+        TweenLite.to(page.view.html,0.8,{left:"0",onComplete:onComplete,onCompleteParams:completeParams});
     }
 
 }
