@@ -1,7 +1,8 @@
 *{ font-family:"helvetica,Arial"}
 
 
-.pageWrapper{ }
+.page{ padding: 20px;}
+.pageWrapper{}
 .button {
     background: #55aa99;
     border-radius: 8px;
@@ -68,10 +69,10 @@ body,.page {
 
 /*themes*/
 .iwp-ui-slider {
-    width: 300px;
+    width: 90%;
     display: block;
     height: 50px;
-
+    border-radius: 8px;
 }
 
 .iwp-ui-slider-active {
@@ -96,7 +97,7 @@ body,.page {
 .iwp-ui-slider-slug {
     width: 25%;
     background: #ffffff;
-
+    border-radius: 8px;
     /*transition: 1s;*/
 }
 
