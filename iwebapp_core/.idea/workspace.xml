@@ -17,8 +17,13 @@
       <change type="DELETED" beforePath="E:\Dropbox\iwebapp\iwebapp_core\js\core\iwebapp_BAK.js" afterPath="" />
       <change type="DELETED" beforePath="E:\Dropbox\iwebapp\iwebapp_core\js\core\utils (lier-notebook 的冲突副本 2013-07-06).js" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/DemoApp.js" afterPath="$PROJECT_DIR$/js/DemoApp.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/css/iwebapp-ui.css" afterPath="$PROJECT_DIR$/css/iwebapp-ui.css" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/core/iwebapp-ui.js" afterPath="$PROJECT_DIR$/js/core/iwebapp-ui.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/core/iwebapp.js" afterPath="$PROJECT_DIR$/js/core/iwebapp.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/core/iwpTween.js" afterPath="$PROJECT_DIR$/js/core/iwpTween.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/html/loginView.html" afterPath="$PROJECT_DIR$/html/loginView.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/css/theme.css" afterPath="$PROJECT_DIR$/css/theme.css" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="iwebapp_core.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -35,14 +40,14 @@
     <file path="/config.xml" changelist="0d32bd38-43ea-47c1-9458-b5d391ceae36" time="1372748540220" ignored="false" />
     <file path="/en.js" changelist="0d32bd38-43ea-47c1-9458-b5d391ceae36" time="1370239069803" ignored="false" />
     <file path="/loadingView.html" changelist="0d32bd38-43ea-47c1-9458-b5d391ceae36" time="1370252495049" ignored="false" />
-    <file path="/DemoApp.js" changelist="0d32bd38-43ea-47c1-9458-b5d391ceae36" time="1373529713857" ignored="false" />
+    <file path="/DemoApp.js" changelist="0d32bd38-43ea-47c1-9458-b5d391ceae36" time="1373539558827" ignored="false" />
     <file path="/a.dummy" changelist="0d32bd38-43ea-47c1-9458-b5d391ceae36" time="1373361778333" ignored="false" />
     <file path="/login.html" changelist="0d32bd38-43ea-47c1-9458-b5d391ceae36" time="1370487405502" ignored="false" />
-    <file path="/loginView.html" changelist="0d32bd38-43ea-47c1-9458-b5d391ceae36" time="1373425536487" ignored="false" />
+    <file path="/loginView.html" changelist="0d32bd38-43ea-47c1-9458-b5d391ceae36" time="1373540132181" ignored="false" />
     <file path="/core.css" changelist="0d32bd38-43ea-47c1-9458-b5d391ceae36" time="1373522952538" ignored="false" />
     <file path="/homeView.html" changelist="0d32bd38-43ea-47c1-9458-b5d391ceae36" time="1372401733411" ignored="false" />
     <file path="/announceView.html" changelist="0d32bd38-43ea-47c1-9458-b5d391ceae36" time="1372386023064" ignored="false" />
-    <file path="/theme.css" changelist="0d32bd38-43ea-47c1-9458-b5d391ceae36" time="1373528761237" ignored="false" />
+    <file path="/theme.css" changelist="0d32bd38-43ea-47c1-9458-b5d391ceae36" time="1373532100695" ignored="false" />
     <file path="/confirmView.html" changelist="0d32bd38-43ea-47c1-9458-b5d391ceae36" time="1372754075045" ignored="false" />
     <file path="/notifiactionView.html" changelist="0d32bd38-43ea-47c1-9458-b5d391ceae36" time="1372125189823" ignored="false" />
     <file path="/notificationView.html" changelist="0d32bd38-43ea-47c1-9458-b5d391ceae36" time="1372213717653" ignored="false" />
@@ -51,9 +56,9 @@
     <file path="/alertView.html" changelist="0d32bd38-43ea-47c1-9458-b5d391ceae36" time="1372754060197" ignored="false" />
     <file path="/iwebappui.js" changelist="0d32bd38-43ea-47c1-9458-b5d391ceae36" time="1372751433280" ignored="false" />
     <file path="/iwebapp-ui.css" changelist="0d32bd38-43ea-47c1-9458-b5d391ceae36" time="1373434310300" ignored="false" />
-    <file path="/iwebapp-ui.js" changelist="0d32bd38-43ea-47c1-9458-b5d391ceae36" time="1373528266101" ignored="false" />
+    <file path="/iwebapp-ui.js" changelist="0d32bd38-43ea-47c1-9458-b5d391ceae36" time="1373535861116" ignored="false" />
     <file path="/dd" changelist="0d32bd38-43ea-47c1-9458-b5d391ceae36" time="1373361120959" ignored="false" />
-    <file path="/iwpTween.js" changelist="0d32bd38-43ea-47c1-9458-b5d391ceae36" time="1373526128909" ignored="false" />
+    <file path="/iwpTween.js" changelist="0d32bd38-43ea-47c1-9458-b5d391ceae36" time="1373535677904" ignored="false" />
     <file path="/Dummy.txt" changelist="0d32bd38-43ea-47c1-9458-b5d391ceae36" time="1373504420826" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -77,7 +82,7 @@
       <file leaf-file-name="iwebapp.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/js/core/iwebapp.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="1632" column="46" selection-start="45230" selection-end="45243" vertical-scroll-proportion="-23.68">
+            <state line="1611" column="5" selection-start="44446" selection-end="44446" vertical-scroll-proportion="-29.8">
               <folding />
             </state>
           </provider>
@@ -86,7 +91,7 @@
       <file leaf-file-name="iwebapp-ui.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/js/core/iwebapp-ui.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="349" column="0" selection-start="10079" selection-end="10079" vertical-scroll-proportion="0.0">
+            <state line="404" column="57" selection-start="12270" selection-end="12270" vertical-scroll-proportion="-4.96">
               <folding>
                 <element signature="n#!!block;n#IWebUI#0" expanded="false" />
                 <element signature="n#!!doc;n#IWebUISlider#0" expanded="false" />
@@ -131,22 +136,43 @@
                 <element signature="e#8387#8490#0" expanded="false" />
                 <element signature="e#8496#8595#0" expanded="false" />
                 <element signature="e#9066#9280#0" expanded="false" />
+                <element signature="n#!!block;n#IWebUISwitchRd#0" expanded="false" />
+                <element signature="e#9919#10154#0" expanded="false" />
+                <element signature="e#10201#10233#0" expanded="false" />
+                <element signature="e#10281#10386#0" expanded="false" />
+                <element signature="e#10309#10343#0" expanded="false" />
+                <element signature="e#10349#10383#0" expanded="false" />
+                <element signature="e#10434#10460#0" expanded="false" />
+                <element signature="e#10509#10535#0" expanded="false" />
+                <element signature="e#10593#11254#0" expanded="false" />
+                <element signature="e#10718#10984#0" expanded="false" />
+                <element signature="e#10990#11252#0" expanded="false" />
+                <element signature="e#11313#12210#0" expanded="false" />
+                <element signature="e#11573#11925#0" expanded="false" />
+                <element signature="e#11931#12205#0" expanded="false" />
                 <element signature="n#!!block;n#IWebUISwitch#0" expanded="false" />
-                <element signature="e#9844#10077#0" expanded="false" />
-                <element signature="e#10122#10154#0" expanded="false" />
-                <element signature="e#10200#10305#0" expanded="false" />
-                <element signature="e#10228#10262#0" expanded="false" />
-                <element signature="e#10268#10302#0" expanded="false" />
-                <element signature="e#10351#10377#0" expanded="false" />
-                <element signature="e#10424#10450#0" expanded="false" />
-                <element signature="e#10506#11158#0" expanded="false" />
-                <element signature="e#10629#10888#0" expanded="false" />
-                <element signature="e#10894#11156#0" expanded="false" />
-                <element signature="e#11215#12026#0" expanded="false" />
-                <element signature="e#11473#11744#0" expanded="false" />
-                <element signature="e#11750#12024#0" expanded="false" />
-                <element signature="e#12084#12241#0" expanded="false" />
+                <element signature="e#12993#13226#0" expanded="false" />
+                <element signature="e#13271#13303#0" expanded="false" />
+                <element signature="e#13349#13454#0" expanded="false" />
+                <element signature="e#13377#13411#0" expanded="false" />
+                <element signature="e#13417#13451#0" expanded="false" />
+                <element signature="e#13500#13526#0" expanded="false" />
+                <element signature="e#13573#13599#0" expanded="false" />
+                <element signature="e#13655#14307#0" expanded="false" />
+                <element signature="e#13778#14037#0" expanded="false" />
+                <element signature="e#14043#14305#0" expanded="false" />
+                <element signature="e#14622#14893#0" expanded="false" />
+                <element signature="e#14899#15173#0" expanded="false" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="iwebapp-ui.css" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/css/iwebapp-ui.css">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="39" column="4" selection-start="501" selection-end="514" vertical-scroll-proportion="0.0">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -163,16 +189,16 @@
       <file leaf-file-name="iwpTween.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/js/core/iwpTween.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="264" column="0" selection-start="7271" selection-end="7271" vertical-scroll-proportion="-19.92">
+            <state line="118" column="2" selection-start="3144" selection-end="3144" vertical-scroll-proportion="-10.2">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DemoApp.js" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="DemoApp.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/js/DemoApp.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="103" column="116" selection-start="2414" selection-end="2417" vertical-scroll-proportion="0.47380155">
+            <state line="101" column="90" selection-start="2309" selection-end="2309" vertical-scroll-proportion="-16.68">
               <folding />
             </state>
           </provider>
@@ -181,17 +207,26 @@
       <file leaf-file-name="theme.css" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/css/theme.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="99" column="23" selection-start="1573" selection-end="1573" vertical-scroll-proportion="-42.84">
+            <state line="88" column="21" selection-start="1389" selection-end="1389" vertical-scroll-proportion="-15.84">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="loginView.html" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="loginView.html" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/html/loginView.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="18" column="0" selection-start="623" selection-end="623" vertical-scroll-proportion="-11.769231">
-              <folding />
+            <state line="15" column="92" selection-start="587" selection-end="587" vertical-scroll-proportion="0.29276693">
+              <folding>
+                <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#div#0;n#div#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#span#0;n#div#0;n#div#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#span#1;n#div#0;n#div#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#span#0;n#div#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#span#1;n#div#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#a#0;n#div#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#div#1;n#!!top" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -239,18 +274,18 @@
         <option value="$PROJECT_DIR$/html/alertView.html" />
         <option value="$PROJECT_DIR$/html/confirmView.html" />
         <option value="$PROJECT_DIR$/js/core/utils.js" />
-        <option value="$PROJECT_DIR$/css/iwebapp-ui.css" />
         <option value="$PROJECT_DIR$/js/core/dd" />
         <option value="$PROJECT_DIR$/js/core/slideSwitch2.js" />
         <option value="$PROJECT_DIR$/index.html" />
-        <option value="$PROJECT_DIR$/js/core/iwebapp.js" />
-        <option value="$PROJECT_DIR$/js/core/iwpTween.js" />
         <option value="$PROJECT_DIR$/js/core/slideSwitch.js" />
-        <option value="$PROJECT_DIR$/html/loginView.html" />
         <option value="$PROJECT_DIR$/css/core.css" />
-        <option value="$PROJECT_DIR$/js/core/iwebapp-ui.js" />
+        <option value="$PROJECT_DIR$/js/core/iwebapp.js" />
         <option value="$PROJECT_DIR$/css/theme.css" />
+        <option value="$PROJECT_DIR$/js/core/iwebapp-ui.js" />
+        <option value="$PROJECT_DIR$/js/core/iwpTween.js" />
+        <option value="$PROJECT_DIR$/css/iwebapp-ui.css" />
         <option value="$PROJECT_DIR$/js/DemoApp.js" />
+        <option value="$PROJECT_DIR$/html/loginView.html" />
       </list>
     </option>
   </component>
@@ -477,7 +512,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32962137" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3206934" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -605,13 +640,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/css/iwebapp-ui.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="25" column="19" selection-start="323" selection-end="323" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/js/core/dd">
       <provider editor-type-id="com.intellij.persistence.database.editor.CsvTableFileEditorProvider">
         <state />
@@ -643,30 +671,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="30" column="30" selection-start="1012" selection-end="1012" vertical-scroll-proportion="-19.615385">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/js/core/iwebapp.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="1632" column="46" selection-start="45230" selection-end="45243" vertical-scroll-proportion="-23.68">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/js/core/slideSwitch.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="133" column="8" selection-start="4868" selection-end="4868" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/js/core/iwpTween.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="264" column="0" selection-start="7271" selection-end="7271" vertical-scroll-proportion="-19.92">
           <folding />
         </state>
       </provider>
@@ -678,23 +685,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/html/loginView.html">
+    <entry file="file://$PROJECT_DIR$/js/core/iwebapp.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="18" column="0" selection-start="623" selection-end="623" vertical-scroll-proportion="-11.769231">
+        <state line="1611" column="5" selection-start="44446" selection-end="44446" vertical-scroll-proportion="-29.8">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/css/theme.css">
+    <entry file="file://$PROJECT_DIR$/js/core/iwpTween.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="99" column="23" selection-start="1573" selection-end="1573" vertical-scroll-proportion="-42.84">
+        <state line="118" column="2" selection-start="3144" selection-end="3144" vertical-scroll-proportion="-10.2">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="30" column="30" selection-start="1012" selection-end="1012" vertical-scroll-proportion="-19.615385">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/js/core/iwebapp-ui.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="349" column="0" selection-start="10079" selection-end="10079" vertical-scroll-proportion="0.0">
+        <state line="404" column="57" selection-start="12270" selection-end="12270" vertical-scroll-proportion="-4.96">
           <folding>
             <element signature="n#!!block;n#IWebUI#0" expanded="false" />
             <element signature="n#!!doc;n#IWebUISlider#0" expanded="false" />
@@ -739,29 +753,71 @@
             <element signature="e#8387#8490#0" expanded="false" />
             <element signature="e#8496#8595#0" expanded="false" />
             <element signature="e#9066#9280#0" expanded="false" />
+            <element signature="n#!!block;n#IWebUISwitchRd#0" expanded="false" />
+            <element signature="e#9919#10154#0" expanded="false" />
+            <element signature="e#10201#10233#0" expanded="false" />
+            <element signature="e#10281#10386#0" expanded="false" />
+            <element signature="e#10309#10343#0" expanded="false" />
+            <element signature="e#10349#10383#0" expanded="false" />
+            <element signature="e#10434#10460#0" expanded="false" />
+            <element signature="e#10509#10535#0" expanded="false" />
+            <element signature="e#10593#11254#0" expanded="false" />
+            <element signature="e#10718#10984#0" expanded="false" />
+            <element signature="e#10990#11252#0" expanded="false" />
+            <element signature="e#11313#12210#0" expanded="false" />
+            <element signature="e#11573#11925#0" expanded="false" />
+            <element signature="e#11931#12205#0" expanded="false" />
             <element signature="n#!!block;n#IWebUISwitch#0" expanded="false" />
-            <element signature="e#9844#10077#0" expanded="false" />
-            <element signature="e#10122#10154#0" expanded="false" />
-            <element signature="e#10200#10305#0" expanded="false" />
-            <element signature="e#10228#10262#0" expanded="false" />
-            <element signature="e#10268#10302#0" expanded="false" />
-            <element signature="e#10351#10377#0" expanded="false" />
-            <element signature="e#10424#10450#0" expanded="false" />
-            <element signature="e#10506#11158#0" expanded="false" />
-            <element signature="e#10629#10888#0" expanded="false" />
-            <element signature="e#10894#11156#0" expanded="false" />
-            <element signature="e#11215#12026#0" expanded="false" />
-            <element signature="e#11473#11744#0" expanded="false" />
-            <element signature="e#11750#12024#0" expanded="false" />
-            <element signature="e#12084#12241#0" expanded="false" />
+            <element signature="e#12993#13226#0" expanded="false" />
+            <element signature="e#13271#13303#0" expanded="false" />
+            <element signature="e#13349#13454#0" expanded="false" />
+            <element signature="e#13377#13411#0" expanded="false" />
+            <element signature="e#13417#13451#0" expanded="false" />
+            <element signature="e#13500#13526#0" expanded="false" />
+            <element signature="e#13573#13599#0" expanded="false" />
+            <element signature="e#13655#14307#0" expanded="false" />
+            <element signature="e#13778#14037#0" expanded="false" />
+            <element signature="e#14043#14305#0" expanded="false" />
+            <element signature="e#14622#14893#0" expanded="false" />
+            <element signature="e#14899#15173#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/css/theme.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="88" column="21" selection-start="1389" selection-end="1389" vertical-scroll-proportion="-15.84">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/css/iwebapp-ui.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="39" column="4" selection-start="501" selection-end="514" vertical-scroll-proportion="0.0">
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/js/DemoApp.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="103" column="116" selection-start="2414" selection-end="2417" vertical-scroll-proportion="0.47380155">
+        <state line="101" column="90" selection-start="2309" selection-end="2309" vertical-scroll-proportion="-16.68">
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/html/loginView.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="92" selection-start="587" selection-end="587" vertical-scroll-proportion="0.29276693">
+          <folding>
+            <element signature="n#style#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#div#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#span#0;n#div#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#span#1;n#div#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#span#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#span#1;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#a#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#div#1;n#!!top" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

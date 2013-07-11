@@ -253,12 +253,12 @@ IWPTween.to = function (target, time, obj) {
             cssUnit[style] = obj.css[style].replace(/[\d\.\-]/g, "") //GET UNIT
             css[style] = Number(obj.css[style].replace(/[^\d\.\-]/g, "")); //GET VALUE
 
-              trace(style + "***" + obj.css[style] + "**" + css[style])
+             // trace(style + "***" + obj.css[style] + "**" + css[style])
 
         } else {
             cssUnit[style] = "";
             css[style] = obj.css[style];
-              trace(style + "XXXXX" + obj.css[style] + "XXXX" + css[style])
+             // trace(style + "XXXXX" + obj.css[style] + "XXXX" + css[style])
 
         }
 
@@ -278,7 +278,9 @@ IWPTween.to = function (target, time, obj) {
             }else{
                  val = target["offsetTop"]
             }
-        } else {
+        } else{
+
+
             val = target.style[style];
         }
 
@@ -464,7 +466,7 @@ IWPTween._tween = function () {
 
                     // item.style[style] = tweenObj.css[style] + tweenObj.cssUnit[style];
                     item.style[style] = tweenObj.jsEase(tweenObj.spentTime, tweenObj.origin.css[style], tweenObj.css[style], tweenObj.time) + (tweenObj.cssUnit[style] || "");
-                    trace("tween update:"+style+":"+item.style[style]+" origin:"+ tweenObj.origin.css[style])
+                   // trace("tween update:"+style+":"+item.style[style]+" origin:"+ tweenObj.origin.css[style])
 
                 }
 

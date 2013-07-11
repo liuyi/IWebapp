@@ -321,6 +321,101 @@ IWebUISlider.prototype._updateData = function (p) {
 }
 
 
+IWebapp.extend(IWebUISwitchRd, IWebUISlider);
+function IWebUISwitchRd(target, opts) {
+    if (opts == null) opts = {}
+    opts.snap = true;
+    opts.increment = 100;
+    opts.animate = true;
+    opts.max = 100;
+    opts.min = 0;
+
+    this.activeNode = null;
+    this.downNode = null;
+    this.activeNode = IWebapp.getElementsByClassName(target, "iwp-ui-slider-active")[0];
+    this.downNode = IWebapp.getElementsByClassName(target, "iwp-ui-slider-down")[0];
+    this.downNode.style.right="0";
+    this.downNode.style.left="";
+    IWebUISwitchRd.$super(this, target, opts);
+
+
+}
+
+IWebUISwitchRd.prototype.create = function (target, opts) {
+    IWebUISwitchRd.method(this, "create", target, opts);
+    this.activeNode = IWebapp.getElementsByClassName(target, "iwp-ui-slider-active")[0];
+    this.downNode = IWebapp.getElementsByClassName(target, "iwp-ui-slider-down")[0];
+
+}
+
+
+IWebUISwitchRd.prototype.isOn = function () {
+    return this.percent == 1
+}
+
+IWebUISwitchRd.prototype.toggle = function () {
+    if (this.percent < 1) {
+        this.setPercent(1)
+    } else {
+        this.setPercent(0)
+    }
+
+}
+
+IWebUISwitchRd.prototype.turnOn = function () {
+    this.setPercent(1)
+}
+
+IWebUISwitchRd.prototype.turnOff = function () {
+    this.setPercent(0)
+}
+
+IWebUISwitchRd.prototype._onTouchMove = function (x, y) {
+    IWebUISwitchRd.method(this, "_onTouchMove", x, y);
+    if (this.sliderObj.direction == IWebUISlider.DIRECTION_HORIZON) {
+        IWPTween.to(this.sliderObj.activeNode, 0, {css: {width: (this.pos   + this.offsetWidth * 0.5) + "px"}});
+        IWPTween.to(this.sliderObj.downNode, 0, {css: {width: (this.sliderObj.container.offsetWidth-this.pos - this.offsetWidth * 0.5) + "px"}});
+    } else {
+        IWPTween.to(this.sliderObj.activeNode, 0, {css: {x: (this.pos - this.sliderObj.activeNode.offsetHeight + this.offsetHeight * 0.5) + "px"}});
+        IWPTween.to(this.sliderObj.downNode, 0, {css: {x: (this.pos + this.offsetHeight * 0.5) + "px"}});
+    }
+}
+
+IWebUISwitchRd.prototype._updateDrag = function (p,anim) {
+    IWebUISwitchRd.method(this, "_updateDrag", p,anim);
+
+    IWPTween.killOf(this.activeNode);
+    IWPTween.killOf(this.downNode);
+
+    var time=(this.animate ==false || anim==false)?0:this.duration;
+    if (this.direction == IWebUISlider.DIRECTION_HORIZON) {
+        IWPTween.to(this.activeNode, time, {css: {width: (this.dragNode.pos   + this.dragNode.offsetWidth * 0.5) + "px"}});
+        IWPTween.to(this.downNode, time, {css: {width: (this.container.offsetWidth-this.dragNode.pos - this.dragNode.offsetWidth * 0.5) + "px"}});
+        IWPTween.to(this.container, time, {css: {border_radius:"8px" }});
+    } else {
+        IWPTween.to(this.activeNode, time, {css: {x: (this.dragNode.pos - this.activeNode.offsetHeight + this.dragNode.offsetHeight * 0.5) + "px"}});
+        IWPTween.to(this.downNode, time, {css: {x: (this.dragNode.pos + this.dragNode.offsetHeight * 0.5) + "px"}});
+    }
+
+
+
+}
+
+
+IWebUISwitchRd.prototype._onTouchStart = function (x, y) {
+
+
+    IWPTween.killOf(this.sliderObj.activeNode);
+    IWPTween.killOf(this.sliderObj.downNode);
+    IWebUISwitchRd.method(this, "_onTouchStart", x,y);
+
+
+
+
+
+}
+
+
 IWebapp.extend(IWebUISwitch, IWebUISlider);
 function IWebUISwitch(target, opts) {
     if (opts == null) opts = {}
@@ -394,6 +489,7 @@ IWebUISwitch.prototype._updateDrag = function (p,anim) {
         IWPTween.to(this.activeNode, time, {css: {x: (this.dragNode.pos - this.activeNode.offsetHeight + this.dragNode.offsetHeight * 0.5) + "px"}});
         IWPTween.to(this.downNode, time, {css: {x: (this.dragNode.pos + this.dragNode.offsetHeight * 0.5) + "px"}});
     }
+
 }
 
 

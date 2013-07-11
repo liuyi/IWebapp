@@ -1629,7 +1629,6 @@ IWebapp.prototype._onMouseDown = function (e, context) {
 
         if (context._touchTarget.onFingerStart) {
 
-              trace("dddddddddddddddd")
             context._touchTarget.onFingerStart(context._touchTarget.touchX, context._touchTarget.touchY);
         }
     }

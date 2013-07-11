@@ -83,6 +83,7 @@ body,.page {
     font-size: 2em;
     line-height: 1.5em;
     font-weight: bold;
+    border-radius: 8px;
 }
 
 .iwp-ui-slider-down {
@@ -92,6 +93,7 @@ body,.page {
     font-size: 2em;
     line-height:  1.5em;
     font-weight: bold;
+    border-radius: 8px;
 }
 
 .iwp-ui-slider-slug {
@@ -112,12 +114,13 @@ body,.page {
 .switchBtn {
     width: 120px;height: 50px;
     overflow: hidden;
+    background: #000;
 
-    background: #0B1E13;
-    border: 1px solid #3E8E8E;
-    border-radius: 8px;
+
 }
 
+.switchBtnWrapper{ position: absolute}
+.switchBtnWrapperBox{ overflow: hidden;  border-radius: 8px;}
 .slider{ background: #333333;}
 
 .bitBtn {
@@ -229,4 +232,18 @@ body,.page {
     position: absolute;
     top: 100px;
     left: 100px
+}
+
+#wrapper {
+    position: absolute;
+}
+
+#middle {
+    border-radius: 100px;
+    overflow: hidden;
+}
+
+#box {
+    width: 300px; height: 300px;
+    background-color: #cde;
 }

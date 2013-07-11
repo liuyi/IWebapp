@@ -99,7 +99,7 @@ LoginPage.prototype.onCreate = function (pageData) {
     this.learnLink = this.findViewItem("learnLink")
 
 
-    this.switchBtn=new IWebUISwitch(this.findViewItem("switchBtn"),{value:100});
+    this.switchBtn=new IWebUISwitch(this.findViewItem("switchBtn"),{value:100,dragOffset:6});
 
     this.slider=new IWebUISlider(this.findViewItem("slider"),{min:200,max:1000,animate:true,snap:false,increment:100});
    // alert((t2-t)+" slider:"+(Date.now()-t2))
