@@ -223,7 +223,7 @@ IWebUISlider.prototype._updateDrag = function (p) {
 
 
 IWebUISlider.prototype._onTouchStart = function (x, y) {
-
+    trace("_onTouchStart ===>>>>>")
     this.style[this.sliderObj.supportTransition] = "0s";
     IWPTween.killOf(this);
     if (this.sliderObj.direction == IWebUISlider.DIRECTION_HORIZON) {
@@ -231,6 +231,8 @@ IWebUISlider.prototype._onTouchStart = function (x, y) {
     } else {
         this.prevPos = this.touchY;
     }
+    trace("_onTouchStart  this.prevPos:"+this.prevPos)
+
 
 
 }
@@ -241,18 +243,22 @@ IWebUISlider.prototype._onTouchMove = function (x, y) {
         this.pos = 0;
     }
 
+
     if (this.sliderObj.direction == IWebUISlider.DIRECTION_HORIZON) {
 
         this.pos = this.pos + this.touchXMov - this.prevPos;
-
+        trace("pos1:"+this.pos+" this.touchXMov:"+this.touchXMov+" this.prevPos:"+this.prevPos);
         if (this.pos < 0) this.pos = 0;
+
         else if (this.pos >= (this.sliderObj.container.offsetWidth - this.offsetWidth)) {
             this.pos = this.sliderObj.container.offsetWidth - this.offsetWidth
 
         }
+        trace("pos:"+this.pos);
 
+       // this.style.left=this.pos+"px"
 
-        IWPTween.to(this, 0, {css: {x: this.pos + "px"}});
+       IWPTween.to(this, 0, {css: {x: this.pos + "px"}});
         this.prevPos = this.touchXMov;
 
         if (this.sliderObj.snap != true)

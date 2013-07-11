@@ -100,6 +100,7 @@ Math.easeInOutCirc = function (t, b, c, d) {
     return c / 2 * (Math.sqrt(1 - t * t) + 1) + b;
 };
 
+
 /**
  * @desc use this class to tween css of elements. It's specially for gpu accelerator.
  * @constructor
@@ -114,8 +115,9 @@ IWPTween._tweenId = 0;
 IWPTween._targetId = 0;
 IWPTween._transform = getsupportedprop(['transform', 'MozTransform', 'WebkitTransform', 'OTransform']);
 IWPTween._transition = getsupportedprop([ 'transition', 'MozTransition', 'WebkitTransition', 'OTransition']);
-IWPTween.t3dDisable = (IWPTween._transform == null || IWPTween._transition == null);
-IWPTween.t3dDisable=true
+IWPTween.hasTranslate3d = (IWPTween._transform != null || IWPTween._transition != null);
+//IWPTween.hasTranslate3d=false;
+IWPTween.useCssTimer = false;
 IWPTween._timer = null;
 IWPTween._cssEaseList = {
     easeIn: "ease-in",
@@ -164,12 +166,16 @@ IWPTween.killOf = function (target) {
 
         obj.onComplete = null;
         obj.onCompleteParams = null;
+        obj.jsEase=null;
         IWPTween._count--;
     }
 
     obj = null;
-    IWPTween._targets[target._tweenTargetId]._tweens = null;
-    delete IWPTween._targets[target._tweenTargetId]._tweens;
+    if(  IWPTween._targets[target._tweenTargetId]._tweens!=null){
+        IWPTween._targets[target._tweenTargetId]._tweens = null;
+        //delete IWPTween._targets[target._tweenTargetId]["_tweens"];
+    }
+
 }
 
 IWPTween.to = function (target, time, obj) {
@@ -182,103 +188,157 @@ IWPTween.to = function (target, time, obj) {
     var cssUnit = {};
     var ease = (obj.ease == null) ? "easeOut" : obj.ease;
     var origin = {css: {}}
-    if (obj.css != null) {
-        for (var style in obj.css) {
-            if (typeof obj.css[style] == "string") {
-                cssUnit[style] = obj.css[style].replace(/[\d\.\-]/g, "")
-                css[style] = Number(obj.css[style].replace(/[^\d\.\-]/g, ""));
-
-                // trace(style + "***" + obj.css[style] + "**" + css[style])
-
-            } else {
-                cssUnit[style] = "";
-                css[style] = obj.css[style];
-                // trace(style + "XXXXX" + obj.css[style] + "XXXX" + css[style])
-
-            }
-
-
-        }
-    }
-    var tweenObj = {time: time * 1000, ease: ease, css: css, cssUnit: cssUnit, spentTime: 0, onComplete: obj.onComplete, onCompleteParams: obj.onCompleteParams, _origin: origin}
-    tweenObj.jsEase = IWPTween._getJsEase(ease);
-    tweenObj.cssEase = IWPTween._getCssEase(ease);
     if (time < 0.01) time = 0;
 
+    //[get ride of x,y,z]
+    if (obj.css != null) {
+        if (IWPTween.hasTranslate3d == true) {
+            if (obj.css.x != null || obj.css.y != null || obj.css.z != null) {
+                var pos = IWPTween._getCurrentTransform(target);
+                origin.css.x = pos[0]//-target["offsetLeft"];//add offset to x
+                origin.css.y = pos[1]//-target["offsetTop"];//add offset to y
+                origin.css.z = pos[2];
 
-    if (time == 0) {
+               // trace("left:"+target["offsetLeft"]+">"+target["offsetTop"])
 
-        if (IWPTween.t3dDisable) {
 
-            if (tweenObj.css["x"] != null) {
-                target.style["left"] = tweenObj.css["x"] + tweenObj.cssUnit["x"];
+                if (obj.css.x == null) {
+                    css.x = origin.css.x;
+                } else {
+                    css.x = Number(obj.css.x.replace(/[^\d\.\-]/g, ""));
+                    cssUnit.x = obj.css.x.replace(/[\d\.\-]/g, "");
+                    delete obj.css.x;
+                }
+                if (obj.css.y == null) {
+                    css.y = origin.css.y
+                } else {
+                    css.y = Number(obj.css.y.replace(/[^\d\.\-]/g, ""));
+                    cssUnit.y = obj.css.y.replace(/[\d\.\-]/g, "");
+                    delete obj.css.y;
+                }
+                if (obj.css.z == null) {
+                    css.z = origin.css.z;
+                } else {
+                    css.z = Number(obj.css.z.replace(/[^\d\.\-]/g, ""));
+                    cssUnit.z = obj.css.z.replace(/[\d\.\-]/g, "");
+                    delete obj.css.z;
+                }
+
+                if (IWPTween.useCssTimer == false) {
+                    css.x -= origin.css.x;
+                    css.y -= origin.css.y;
+                    css.z -= origin.css.z;
+                }
             }
-            if (tweenObj.css["y"] != null) {
-                target.style["top"] = tweenObj.css["y"] + tweenObj.cssUnit['y'];
-            }
+        } else if (obj.css.z != null) {
+            delete obj.css.z;
+        } else if (obj.css.x != null) {
+            obj.css.left = obj.css.x;
+            delete obj.css.x;
+
+        } else if (obj.css.y != null) {
+            obj.css.top = obj.css.y;
+            delete obj.css.y;
+
+        }
+
+    }
+
+
+    var val = null;
+    for (var style in obj.css) {
+
+
+        if (typeof obj.css[style] == "string") {
+            cssUnit[style] = obj.css[style].replace(/[\d\.\-]/g, "") //GET UNIT
+            css[style] = Number(obj.css[style].replace(/[^\d\.\-]/g, "")); //GET VALUE
+
+              trace(style + "***" + obj.css[style] + "**" + css[style])
 
         } else {
-            if (tweenObj.css.x != null || tweenObj.css.y != null || tweenObj.css.z != null) {
-                var martix = window.getComputedStyle(target)[IWPTween._transform];
+            cssUnit[style] = "";
+            css[style] = obj.css[style];
+              trace(style + "XXXXX" + obj.css[style] + "XXXX" + css[style])
 
-                target.style[IWPTween._transition] = time + "s" + " " + tweenObj.cssEase;
-
-                if (martix != "none") {
-                    if (martix.indexOf("3d") > 0) {
-                        martix = martix.split(",");
-                        var ox = Number(martix[12]);
-                        var oy = Number(martix[13]);
-                        var oz = Number(martix[14]);
-                    } else {
-                        martix = martix.split(",");
+        }
 
 
-                        ox = Number(martix[4]);
-                        oy = Number(martix[5].replace(")", ""));
-                        oz = 0;
+        //get origin value
 
-                    }
-                } else {
-                    ox = 0;
-                    oy = 0;
-                    oz = 0;
-                }
-                if (tweenObj.css.x == null) {
-                    tweenObj.css.x = ox;
-                }
+        if (style == "x" || style == "left") {
+            if(cssUnit[style]=="%"){
+                val = target.style[style]
+            }else{
+                val = target["offsetLeft"]
+            }
 
-                if (tweenObj.css.y == null) {
-                    tweenObj.css.y = oy;
-                }
+        } else if (style == "y" || style == "top") {
+            if(cssUnit[style]=="%"){
+                val = target.style[style]
+            }else{
+                 val = target["offsetTop"]
+            }
+        } else {
+            val = target.style[style];
+        }
 
-                if (tweenObj.css.z == null) {
-                    tweenObj.css.z = oz;
-                }
+        if (val == "undefined" || val == "none" || val == "" || val == undefined || val == "null") {
 
-                var timer = setTimeout(function () {
-                    target.style[IWPTween._transform] = "translate3d(" + tweenObj.css.x + (tweenObj.cssUnit["x"] || "px") + "," + tweenObj.css.y + (tweenObj.cssUnit["y"] || "px") + "," + tweenObj.css.z + (tweenObj.cssUnit["z"] || "px") + ")";
-                    clearTimeout(timer);
-                }, 0)
+            if (style == "opacity") {
+
+                val = 1;
+            } else {
+                val = 0;
+            }
+        }
+
+        //remove unit
+
+        if (typeof val == "string") {
+            val = val.replace(/[^\d\.\-]/g, "")
+
+        }
+
+        origin.css[style] = Number(val);
+        css[style] -= origin.css[style];
+
+
+    }
+
+
+    var tweenObj = {time: time * 1000, ease: ease, css: css, cssUnit: cssUnit, spentTime: 0, onComplete: obj.onComplete, onCompleteParams: obj.onCompleteParams, origin: origin}
+
+
+    if (tweenObj.time == 0) {
+        if (tweenObj.css.x != null || tweenObj.css.y != null || tweenObj.css.z != null) {
+
+             trace("set translate3d>>>>"+tweenObj.css.x );
+            var tx=(tweenObj.css.x+tweenObj.origin.css.x) + (tweenObj.cssUnit["x"] || "px");
+            var ty=(tweenObj.css.y +tweenObj.origin.css.y)+ (tweenObj.cssUnit["y"] || "px")
+            var tz=(tweenObj.css.z +tweenObj.origin.css.z)+ (tweenObj.cssUnit["z"] || "px")
+            target.style[IWPTween._transform] = "translate3d(" +  tx+ "," + ty + "," + tz+ ")";
+
+        }
+
+
+        //update common style
+        for (var style in tweenObj.css) {
+
+
+            if (style != "x" && style != "y" && style != "z") {
+
+
+                // item.style[style] = tweenObj.css[style] + tweenObj.cssUnit[style];
+                var unit=(tweenObj.cssUnit[style] || "")
+
+                target.style[style] = ( tweenObj.css[style] + tweenObj.origin.css[style]) +unit ;
+                trace("update:" + style + ":" + target.style[style])
 
             }
 
 
         }
 
-        for (var i in tweenObj.css) {
-
-
-            if (i != "x" && i != "y" && i != "z") {
-
-                target.style[i] = tweenObj.css[i] + tweenObj.cssUnit[i];
-
-
-                trace(i + ">" + target.style[i])
-
-            }
-
-
-        }
 
         if (tweenObj.onComplete != null) {
             if (tweenObj.onCompleteParams == null) tweenObj.onCompleteParams = [];
@@ -290,132 +350,9 @@ IWPTween.to = function (target, time, obj) {
 
     } else {
 
-        //update css in modern browsers
-        //get current transform
-
-        if (IWPTween.t3dDisable != true && (tweenObj.css.x != null || tweenObj.css.y != null || tweenObj.css.z != null)) {
-
-
-            martix = window.getComputedStyle(target)[IWPTween._transform];
-
-            if (martix != "none") {
-
-                if (martix.indexOf("3d") > 0) {
-                    martix = martix.split(",");
-                    ox = Number(martix[12]);
-                    oy = Number(martix[13]);
-                    oz = Number(martix[14]);
-                } else {
-                    martix = martix.split(",");
-
-
-                    ox = Number(martix[4]);
-                    oy = Number(martix[5].replace(")", ""));
-                    oz = 0;
-
-                }
-            } else {
-                ox = 0;
-                oy = 0;
-                oz = 0;
-            }
-
-
-            tweenObj._origin.css["x"] = ox;
-            tweenObj._origin.css["y"] = oy;
-            tweenObj._origin.css["z"] = oz;
-
-
-            if (tweenObj.css.x == null) {
-                tweenObj.css.x = ox;
-                delete tweenObj.css.x
-
-            }else{
-                tweenObj.css["x"] -= tweenObj._origin.css["x"];
-            }
-
-            if (tweenObj.css.y == null) {
-                tweenObj.css.y = oy;
-                delete tweenObj.css.y
-            }else{
-                tweenObj.css["y"] -= tweenObj._origin.css["y"];
-            }
-
-            if (tweenObj.css.z == null) {
-                tweenObj.css.z = oz;
-                delete tweenObj.css.z
-            }else{
-                tweenObj.css["z"] -= tweenObj._origin.css["z"];
-            }
-
-            //trace("ox:"+ox+",oy:"+oy+",oz:"+oz)
-
-
-        }
-
-        var val = null;
-
-
-
-        for (style in tweenObj.css) {
-
-
-            if (IWPTween.t3dDisable == true) {
-                if (style == "x") {
-                    val = target.style["offsetLeft"]
-                } else if (style == "y") {
-
-                    val = target.style["offsetTop"]
-                }else{
-                    val = target.style[style];
-                }
-
-                if (val == "undefined" || val == "none" || val == "" || val == undefined || val == "null") {
-
-                    if (style == "opacity") {
-
-                        val = 1;
-                    } else {
-                        val = 0;
-                    }
-                }
-
-
-            } else  {
-
-                val = target.style[style];
-                if (val == "undefined" || val == "none" || val == "" || val == undefined || val == "null") {
-
-                    if (style == "opacity") {
-
-                        val = 1;
-                    } else {
-                        val = 0;
-                    }
-                }
-
-            }
-
-
-            if (typeof val == "string") {
-                val = val.replace(/[^\d\.\-]/g, "")
-
-            }
-
-
-            if (style != "x" && style != "y" && style != "z") {
-                tweenObj._origin.css[style] = Number(val);
-                tweenObj.css[style] -= tweenObj._origin.css[style];
-            }
-
-
-
-             trace("target to :"+style+":"+tweenObj.css[style]+"  origin:"+tweenObj._origin.css[style]+" unit:"+tweenObj.cssUnit[style])
-        }
-
-
+        tweenObj.jsEase = Math[IWPTween._getJsEase(ease)];
+        tweenObj.cssEase = IWPTween._getCssEase(ease);
         IWPTween._addTweenItem(target, tweenObj);
-
     }
 
 
@@ -423,8 +360,32 @@ IWPTween.to = function (target, time, obj) {
 
 }
 
-IWPTween.prototype._getCurrentTransform = function (element) {
+IWPTween._getCurrentTransform = function (target) {
+    var martix = window.getComputedStyle(target)[IWPTween._transform];
 
+
+    if (martix != "none") {
+        if (martix.indexOf("3d") > 0) {
+            martix = martix.split(",");
+            var ox = Number(martix[12]);
+            var oy = Number(martix[13]);
+            var oz = Number(martix[14]);
+        } else {
+            martix = martix.split(",");
+
+
+            ox = Number(martix[4]);
+            oy = Number(martix[5].replace(")", ""));
+            oz = 0;
+
+        }
+    } else {
+        ox = 0;
+        oy = 0;
+        oz = 0;
+    }
+
+    return [ox, oy, oz];
 }
 
 IWPTween._addTweenItem = function (target, tweenObj) {
@@ -482,36 +443,18 @@ IWPTween._tween = function () {
         for (var k in tweens) {
             tweenObj = tweens[k];
 
-            //tween the css style of bad brwosers such as :ie6,7,8,9, else tween them by  css
-            if (IWPTween.t3dDisable) {
-                if (tweenObj.css.x != null) {
+            if (IWPTween.hasTranslate3d && IWPTween.useCssTimer == false &&(tweenObj.css["x"]!=null || tweenObj.css["y"]!=null || tweenObj.css["z"]!=null)) {
+                var tx = tweenObj.jsEase(tweenObj.spentTime, tweenObj.origin.css["x"], tweenObj.css["x"], tweenObj.time) + (tweenObj.cssUnit["x"] || "px")
+                var ty = tweenObj.jsEase(tweenObj.spentTime, tweenObj.origin.css["y"], tweenObj.css["y"], tweenObj.time) + (tweenObj.cssUnit["y"] || "px")
+                var tz = tweenObj.jsEase(tweenObj.spentTime, tweenObj.origin.css["z"], tweenObj.css["z"], tweenObj.time) + (tweenObj.cssUnit["z"] || "px")
 
-                    var result = Math[tweenObj.jsEase](tweenObj.spentTime, tweenObj._origin.css.x, tweenObj.css.x, tweenObj.time);
+               // trace(">>>>" + tx + "," + ty + "," + tz)
 
-                    //trace("result:"+result)
-
-                    item.style.left = result + tweenObj.cssUnit["x"];
-                }
-
-                if (tweenObj.css.y != null) {
-
-                    item.style.top = Math[tweenObj.jsEase](tweenObj.spentTime, tweenObj._origin.css.y, tweenObj.css.y, tweenObj.time) + tweenObj.cssUnit["y"]
-                }
-
-
-                // trace("style:top "+item.style.top+",left "+item.style.left+">>> oy "+tweenObj._origin.css.y+",ox "+tweenObj._origin.css.x+"  time:"+tweenObj.time+",spentTime:"+tweenObj.spentTime+", target pos:"+tweenObj.css.y+", "+tweenObj.css.x+" ease:"+tweenObj.ease)
-
-
-            }else if(tweenObj.css.x !=null || tweenObj.css.y !=null || tweenObj.css.z !=null){
-//                var tx=;
-//                var ty=Math[tweenObj.jsEase](tweenObj.spentTime, tweenObj._origin.css["y"], tweenObj.css["y"], tweenObj.time) + (tweenObj.cssUnit["y"] || "px");
-//                var tz=Math[tweenObj.jsEase](tweenObj.spentTime, tweenObj._origin.css["z"], tweenObj.css["z"], tweenObj.time) + (tweenObj.cssUnit["z"] || "px");
-
-               // trace(tx+","+ty+","+tz)
-
-                item.style[IWPTween._transform] = "translate3d(" + Math[tweenObj.jsEase](tweenObj.spentTime, tweenObj._origin.css["x"], tweenObj.css["x"], tweenObj.time) + (tweenObj.cssUnit["x"] || "px") +"," + Math[tweenObj.jsEase](tweenObj.spentTime, tweenObj._origin.css["y"], tweenObj.css["y"], tweenObj.time) + (tweenObj.cssUnit["y"] || "px") + "," + Math[tweenObj.jsEase](tweenObj.spentTime, tweenObj._origin.css["z"], tweenObj.css["z"], tweenObj.time) + (tweenObj.cssUnit["z"] || "px")+ ")";
+//                item.style[IWPTween._transform] = "translate3d(" + tweenObj.jsEase(tweenObj.spentTime, tweenObj.origin.css["x"], tweenObj.css["x"], tweenObj.time) + (tweenObj.cssUnit["x"] || "px") +"," + tweenObj.jsEase(tweenObj.spentTime, tweenObj.origin.css["y"], tweenObj.css["y"], tweenObj.time) + (tweenObj.cssUnit["y"] || "px") + "," + tweenObj.jsEase(tweenObj.spentTime, tweenObj.origin.css["z"], tweenObj.css["z"], tweenObj.time) + (tweenObj.cssUnit["z"] || "px")+ ")";
+                item.style[IWPTween._transform] = "translate3d(" + tx + "," + ty + "," + tz + ")";
 
             }
+
 
             //update common style
             for (var style in tweenObj.css) {
@@ -520,8 +463,8 @@ IWPTween._tween = function () {
                 if (style != "x" && style != "y" && style != "z") {
 
                     // item.style[style] = tweenObj.css[style] + tweenObj.cssUnit[style];
-                    item.style[style] = Math[tweenObj.jsEase](tweenObj.spentTime, tweenObj._origin.css[style], tweenObj.css[style], tweenObj.time) + (tweenObj.cssUnit[style] || "");
-                    //trace("update:"+style+":"+item.style[style])
+                    item.style[style] = tweenObj.jsEase(tweenObj.spentTime, tweenObj.origin.css[style], tweenObj.css[style], tweenObj.time) + (tweenObj.cssUnit[style] || "");
+                    trace("tween update:"+style+":"+item.style[style]+" origin:"+ tweenObj.origin.css[style])
 
                 }
 
@@ -545,10 +488,9 @@ IWPTween._tween = function () {
 
 
             }
-        }
 
 
-    }//end loop
-
+        }//end tweens
+    }//end targets
 
 }

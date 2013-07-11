@@ -98,14 +98,9 @@ LoginPage.prototype.onCreate = function (pageData) {
     this.passwordTxt = this.findViewItem("password")
     this.learnLink = this.findViewItem("learnLink")
 
-    var t=Date.now();
-    console.time("initSwitch")
+
     this.switchBtn=new IWebUISwitch(this.findViewItem("switchBtn"));
-    console.timeEnd("initSwitch")
 
-
-
-    t2=Date.now();
     this.slider=new IWebUISlider(this.findViewItem("slider"),{min:200,max:1000,animate:true});
    // alert((t2-t)+" slider:"+(Date.now()-t2))
 

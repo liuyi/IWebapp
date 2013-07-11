@@ -70,47 +70,68 @@ SlideSwitch.prototype.removeChildPage=function(page,container,onComplete,complet
 
 
 SlideSwitch.prototype.showDialog=function(page,container,onComplete,completeParams){
-    page.view.html.style.opacity="0";
 
-   // TweenLite.to(page.view.html,0.3,{opacity:1,onComplete:onComplete,onCompleteParams:completeParams});
-    IWPTween.to(page.view.html,0,{css:{opacity:0},onComplete:function(){
-        IWPTween.to(page.view.html,0.3,{css:{opacity:1},onComplete:onComplete,onCompleteParams:completeParams});
-    }});
+    trace(window.document.body.opacity)
+    if(window.document.body.opacity==undefined ){
+        if(onComplete!=null){
+            onComplete.apply(page.view.html,completeParams)
+        }
+    }else{
+        IWPTween.to(page.view.html,0,{css:{opacity:0},onComplete:function(){
+            IWPTween.to(page.view.html,0.2,{css:{opacity:1},onComplete:onComplete,onCompleteParams:completeParams});
+        }});
+    }
+
 
 }
 
 SlideSwitch.prototype.removeDialog=function(page,container,onComplete,completeParams){
-
+    if(window.document.body.opacity==undefined ){
+        if(onComplete!=null){
+            onComplete.apply(page.view.html,completeParams)
+        }
+    }else{
+        IWPTween.to(page.view.html,0.2,{css:{opacity:0},onComplete:onComplete,onCompleteParams:completeParams});
+    }
     //TweenLite.to(page.view.html,0.3,{opacity:0,onComplete:onComplete,onCompleteParams:completeParams});
-    IWPTween.to(page.view.html,0.3,{css:{opacity:0},onComplete:onComplete,onCompleteParams:completeParams});
+
 }
 
 
 SlideSwitch.prototype.showNotify=function(page,container,onComplete,completeParams){
-    trace("SlideSwitch showNotify")
-//    page.view.html.style.opacity="0";
-//    page.view.html.style.top="55%";
-//    TweenLite.to(page.view.html,0.3,{opacity:1,top:(Math.random()*5+45-Math.random()*5)+"%",onComplete:onComplete,onCompleteParams:completeParams});
 
-trace(window.getComputedStyle(window.document.body)["offsetHeight"])
-    IWPTween.to(page.view.html,0,{css:{y:IWebapp.getInstance()._container.offsetHeight*0.55+"px",opacity:0},onComplete:function(){
-        IWPTween.to(page.view.html,0.3,{css:{opacity:1,y:((Math.random()*5+(IWebapp.getInstance()._container.offsetHeight*0.45)-Math.random()*5)+"px")},onComplete:onComplete,onCompleteParams:completeParams});
+    if(IWPTween.hasTranslate3d){
+        var middle=IWebapp.getInstance()._container.offsetHeight*0.5 -page.view.html.offsetTop;
+        IWPTween.to(page.view.html,0,{css:{y:(middle-40)+"px",opacity:1},onComplete:function(){
+            IWPTween.to(page.view.html,0.3,{css:{opacity:1,y:((Math.random()*25+(middle-25)-Math.random()*25)+"px")},onComplete:onComplete,onCompleteParams:completeParams});
 
-    }});
+        }});
+    }else{
+         middle=50;
+        IWPTween.to(page.view.html,0,{css:{y:(middle+10)+"%",opacity:1},onComplete:function(){
+             IWPTween.to(page.view.html,0.3,{css:{opacity:1,y:((Math.random()*5+(middle)-Math.random()*5)+"%")},onComplete:onComplete,onCompleteParams:completeParams});
+
+        }});
+    }
 
 
-   // setTimeout(function(){
+    trace("middle:"+middle+" page height:"+IWebapp.getInstance()._container.offsetHeight+"  ,dialog top:"+page.view.html.offsetTop)
 
 
-
-    // },10)
 
 
 }
 
 SlideSwitch.prototype.removeNotify=function(page,container,onComplete,completeParams){
 
-   // TweenLite.to(page.view.html,0.3,{opacity:0,top:"40%",onComplete:onComplete,onCompleteParams:completeParams});
-    IWPTween.to(page.view.html,0.3,{css:{opacity:0,y:IWebapp.getInstance()._container.offsetHeight*0.35+"px"},onComplete:onComplete,onCompleteParams:completeParams});
+    if(IWPTween.hasTranslate3d){
+        var middle=IWebapp.getInstance()._container.offsetHeight*0.5-page.view.html.offsetTop;
+
+        IWPTween.to(page.view.html,0.3,{css:{opacity:0,y:(middle-20)+"px"},onComplete:onComplete,onCompleteParams:completeParams});
+    }else{
+         middle=50;
+
+        IWPTween.to(page.view.html,0.3,{css:{opacity:0,y:(middle-10)+"%"},onComplete:onComplete,onCompleteParams:completeParams});
+    }
 }
 
