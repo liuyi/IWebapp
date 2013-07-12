@@ -388,9 +388,9 @@ IWebapp.prototype.openPage = function (pageObj, pageData, hash) {
     this._pages.push(page.id);//only push the id of page to array
     this._pages[page.id] = page;
 
-    console.time("create_page")
+    //console.time("create_page")
     page.onCreate(pageData);
-    console.timeEnd("create_page")
+    //console.timeEnd("create_page")
     this._onPageInited(page);
 
     if (hash == null || hash.length === 0) {
@@ -399,8 +399,6 @@ IWebapp.prototype.openPage = function (pageObj, pageData, hash) {
     } else {
 
         this._currentPageAlias = "/" + page.alias;
-
-
         page.onHashChange(hash);
     }
 
@@ -1454,6 +1452,14 @@ IWebapp.prototype._onTouching = function (target) {
             target.tap = IWebapp.TAP_TYPE_SHORT;
 
 
+            //defualt set longtap to false
+            if(target.getAttribute(this._touchLongTapAttr) != "true"){
+
+                clearInterval(target.timer);
+                target.timer = null;
+
+            }
+
         } else if ((target.tap == IWebapp.TAP_TYPE_SHORT) && (delayTime >= context._touchLongTapTimeThreshold) && (IWebapp.hasClass(context._touchLongTapAttr) == false)) {
             target.tap = IWebapp.TAP_TYPE_LONG;
 
@@ -1463,7 +1469,9 @@ IWebapp.prototype._onTouching = function (target) {
             IWebapp.removeClass(target, context._touchTapAttr);
             clearInterval(target.timer);
             target.timer = null;
-
+            if(target["onLongTap"]!=null){
+                target.onLongTap();
+            }
             context._dispatchEvent(target, context._longTapEventTag)
         } else {
 
@@ -1517,11 +1525,15 @@ IWebapp.prototype._onTouchEnd = function (e, context) {
     }
 
     if (target.tap != null) {
-
+        if (context._touchTarget.onFingerUp) {
+            context._touchTarget.onFingerUp();
+        }
         var distance = (target.touchXMov - target.touchX) * (target.touchXMov - target.touchX) + (target.touchYMov - target.touchY) * (target.touchYMov - target.touchY);
         //trace("x:"+target.touchXMov+"-"+target.touchX+",y:"+target.touchYMov+"-"+target.touchY+","+distance +"/"+context._touchDisThreshold+"   " +target.tap+"/"+IWebapp.TAP_TYPE_SHORT)
         if (distance < context._touchDisThreshold && target.tap == IWebapp.TAP_TYPE_SHORT) {
-
+            if(target["onTap"]!=null){
+                target.onTap();
+            }
             context._dispatchEvent(target, context._tapEventTag);
 
         }
@@ -1529,9 +1541,7 @@ IWebapp.prototype._onTouchEnd = function (e, context) {
 
     }
 
-    if (context._touchTarget.onFingerUp) {
-        context._touchTarget.onFingerUp();
-    }
+
     clearInterval(target.timer);
     target.timer = null;
     //IE 8 don't have delete.

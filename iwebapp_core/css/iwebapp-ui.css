@@ -73,3 +73,45 @@
 
 /*Basic css of slider and switch done.*/
 
+
+/*Checkbox */
+.iwp-ui-checkbox{ position: relative; display: block;}
+.iwp-ui-checkbox-icon {
+    background: #fff;
+    display: block;
+    float: left;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+}
+
+.iwp-ui-checkbox-icon-tick{
+    border: 3px solid #000000;
+    border-top: none;
+    border-right: none;
+    width: 55%;
+    height: 25%;
+    display: block;
+    -webkit-transform:rotate(-45deg);
+    transform:rotate(-45deg);
+
+    position: absolute;
+    top:25%;
+    left: 20%;
+
+
+}
+
+.iwp-ui-checkbox-label{
+    line-height: 1em;
+    font-size: 2em;
+    margin-left: 0.5em;
+}
+
+.iwp-ui-checkbox[class~="selected"] .iwp-ui-checkbox-icon-tick{visibility: hidden;opacity: 1;}
+.iwp-ui-checkbox[class~="tap"] .iwp-ui-checkbox-icon-tick{visibility: visible; opacity: 0.5;}
+
+
+
