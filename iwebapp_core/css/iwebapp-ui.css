@@ -1,54 +1,75 @@
-.iwebui-switch-container{
-
-    display: block;
-    position: relative;
-
-}
-
-.iwebui-switch-drag-container{
-    position:absolute ;
-    left: 0;
-    height: 100%;
-    width: 100%;
-
-}
-
-.iwebui-switch-drag{
-    float: right;
-    height: 100%;
-
-}
-
-
-.iwp-ui-slider{
+/*Basic css of slider*/
+.iwp-ui-slider {
     display: block;
     position: relative;
     cursor: pointer;
+
 }
 
-.iwp-ui-slider-active{
+/*If the slider has one or more labels, then it need put the labels to a container.*/
+.iwp-ui-slider-wrapper {
+    padding-left: 5px;
+    padding-right: 5px;
+    height: 100%;
+}
+
+/*default label of slider*/
+.iwp-ui-slider-labels {
+    overflow: hidden;
+    height: 100%;
+    position: relative;
+
+}
+
+/* the active label*/
+.iwp-ui-slider-active {
     display: block;
     height: 100%;
     position: absolute;
-    top:0;
-    left:0;
+    top: 0;
+    left: 0;
     width: 100%;
+    margin-left: -8px;
 }
 
-.iwp-ui-slider-down{
+/*the off label*/
+.iwp-ui-slider-down {
     display: block;
     height: 100%;
     position: absolute;
-    top:0;
+    top: 0;
     right: 0;
     width: 100%;
 }
 
-.iwp-ui-slider-slug{
-   /*height: 100%;*/
-   position: absolute;
+/*the slug of slider*/
+.iwp-ui-slider-slug {
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
 
 }
 
+/*chrome has a bug about border-radius, we have to fix it with two block mask it*/
+.iwp-ui-slider-rd-r, .iwp-ui-slider-rd-l {
 
+    width: 10px;
+    height: 100%;
+    display: block;
+    position: absolute;
+    top: 0;
+    margin: 0;
+}
+
+.iwp-ui-slider-rd-r{
+    border-radius: 0px 8px 8px 0px;
+}
+
+.iwp-ui-slider-rd-l{
+    border-radius: 8px 0px 0px 8px;
+}
+
+
+/*Basic css of slider and switch done.*/
 

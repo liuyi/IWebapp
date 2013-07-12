@@ -314,7 +314,7 @@ IWPTween.to = function (target, time, obj) {
     if (tweenObj.time == 0) {
         if (tweenObj.css.x != null || tweenObj.css.y != null || tweenObj.css.z != null) {
 
-             trace("set translate3d>>>>"+tweenObj.css.x );
+            // trace("set translate3d>>>>"+tweenObj.css.x );
             var tx=(tweenObj.css.x+tweenObj.origin.css.x) + (tweenObj.cssUnit["x"] || "px");
             var ty=(tweenObj.css.y +tweenObj.origin.css.y)+ (tweenObj.cssUnit["y"] || "px")
             var tz=(tweenObj.css.z +tweenObj.origin.css.z)+ (tweenObj.cssUnit["z"] || "px")

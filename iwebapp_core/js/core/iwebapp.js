@@ -388,7 +388,10 @@ IWebapp.prototype.openPage = function (pageObj, pageData, hash) {
     this._pages.push(page.id);//only push the id of page to array
     this._pages[page.id] = page;
 
+    console.time("create_page")
     page.onCreate(pageData);
+    console.timeEnd("create_page")
+
     if (hash == null || hash.length === 0) {
 
         this._addToHistory(page, pageData);
@@ -1235,6 +1238,8 @@ IWebapp.prototype._addPageToStage = function (page) {
     context = null;
     page = null;
 }
+
+
 
 
 IWebapp.prototype._hidePage = function (pageObj) {

@@ -26,7 +26,7 @@ function IWebUISlider(target, opts) {
     this.value = 0;
     this.increment = 1;
     this.animate = true;
-    this.duration = 0.3;
+    this.duration = 0.2;
 
     this._timer = null;
     this.dragOffset=0;
@@ -42,6 +42,7 @@ function IWebUISlider(target, opts) {
 
 IWebUISlider.prototype.create = function (target, opts) {
     this.container = target;
+
 
 
     this.dragNode = IWebapp.getElementsByClassName(target, "iwp-ui-slider-slug")[0];
@@ -212,6 +213,8 @@ IWebUISlider.prototype._updateDrag = function (p,anima) {
 
         this.dragNode.pos = p * (this.container.offsetWidth+(this.dragOffset*2) - this.dragNode.offsetWidth);
 
+       // trace(this.container.className)
+        //trace("this.dragNode.pos:"+this.dragNode.pos+"  p:"+p+", this.container.offsetWidth:"+this.container.offsetWidth+", this.dragNode.offsetWidth:"+this.dragNode.offsetWidth+", "+this.dragNode.offsetWidth+"  , id:"+this.container.id)
 
         IWPTween.to(this.dragNode, t, {css: {x: (this.dragNode.pos-this.dragOffset )+ "px"}})
 
@@ -251,9 +254,9 @@ IWebUISlider.prototype._onTouchMove = function (x, y) {
         this.pos = this.pos + this.touchXMov - this.prevPos;
       //  trace("pos1:"+this.pos+" this.touchXMov:"+this.touchXMov+" this.prevPos:"+this.prevPos);
         //if (this.pos < 0) this.pos = 0;
-        if (this.pos < -this.sliderObj.dragOffset) this.pos = -this.sliderObj.dragOffset;
-
-        else if (this.pos >= (this.sliderObj.container.offsetWidth+(this.sliderObj.dragOffset*2)  - this.offsetWidth)) {
+        if (this.pos < -this.sliderObj.dragOffset) {
+            this.pos = -this.sliderObj.dragOffset;
+        }  else if (this.pos >= (this.sliderObj.container.offsetWidth+(this.sliderObj.dragOffset*2)  - this.offsetWidth)) {
             this.pos = this.sliderObj.container.offsetWidth+(this.sliderObj.dragOffset*2) - this.offsetWidth
 
         }
@@ -270,9 +273,10 @@ IWebUISlider.prototype._onTouchMove = function (x, y) {
     } else {
         this.pos = this.pos + this.touchYMov - this.prevPos;
 
-        if (this.pos < 0) this.pos = 0;
-        else if (this.pos >= (this.sliderObj.container.offsetHeight+(this.sliderObj.dragOffset*2) - this.offsetHeight)) {
-            this.pos = this.sliderObj.container.offsetHeight - this.offsetHeight
+        if (this.pos < -this.sliderObj.dragOffset) {
+            this.pos = -this.sliderObj.dragOffset;
+        }else if (this.pos >= (this.sliderObj.container.offsetHeight+(this.sliderObj.dragOffset*2) - this.offsetHeight)) {
+            this.pos = this.sliderObj.container.offsetHeight +(this.sliderObj.dragOffset*2)- this.offsetHeight
         }
 
 
@@ -348,7 +352,7 @@ IWebUISwitchRd.prototype.create = function (target, opts) {
 
 }
 
-
+/*
 IWebUISwitchRd.prototype.isOn = function () {
     return this.percent == 1
 }
@@ -413,7 +417,7 @@ IWebUISwitchRd.prototype._onTouchStart = function (x, y) {
 
 
 
-}
+}*/
 
 
 IWebapp.extend(IWebUISwitch, IWebUISlider);
@@ -470,8 +474,8 @@ IWebUISwitch.prototype._onTouchMove = function (x, y) {
         IWPTween.to(this.sliderObj.activeNode, 0, {css: {x: (this.pos - this.sliderObj.activeNode.offsetWidth + this.offsetWidth * 0.5) + "px"}});
         IWPTween.to(this.sliderObj.downNode, 0, {css: {x: (this.pos + this.offsetWidth * 0.5) + "px"}});
     } else {
-        IWPTween.to(this.sliderObj.activeNode, 0, {css: {x: (this.pos - this.sliderObj.activeNode.offsetHeight + this.offsetHeight * 0.5) + "px"}});
-        IWPTween.to(this.sliderObj.downNode, 0, {css: {x: (this.pos + this.offsetHeight * 0.5) + "px"}});
+        IWPTween.to(this.sliderObj.activeNode, 0, {css: {y: (this.pos - this.sliderObj.activeNode.offsetHeight + this.offsetHeight * 0.5) + "px"}});
+        IWPTween.to(this.sliderObj.downNode, 0, {css: {y: (this.pos + this.offsetHeight * 0.5) + "px"}});
     }
 }
 
@@ -483,11 +487,11 @@ IWebUISwitch.prototype._updateDrag = function (p,anim) {
 
     var time=(this.animate ==false || anim==false)?0:this.duration;
     if (this.direction == IWebUISlider.DIRECTION_HORIZON) {
-        IWPTween.to(this.activeNode, time, {css: {x: (this.dragNode.pos - this.activeNode.offsetWidth + this.dragNode.offsetWidth * 0.5) + "px"}});
+        IWPTween.to(this.activeNode, time, {css: {x: (this.dragNode.pos - this.activeNode.offsetWidth -this.dragOffset+ this.dragNode.offsetWidth * 0.5) + "px"}});
         IWPTween.to(this.downNode, time, {css: {x: (this.dragNode.pos + this.dragNode.offsetWidth * 0.5) + "px"}});
     } else {
-        IWPTween.to(this.activeNode, time, {css: {x: (this.dragNode.pos - this.activeNode.offsetHeight + this.dragNode.offsetHeight * 0.5) + "px"}});
-        IWPTween.to(this.downNode, time, {css: {x: (this.dragNode.pos + this.dragNode.offsetHeight * 0.5) + "px"}});
+        IWPTween.to(this.activeNode, time, {css: {y: (this.dragNode.pos - this.activeNode.offsetHeight -this.dragOffset+ this.dragNode.offsetHeight * 0.5) + "px"}});
+        IWPTween.to(this.downNode, time, {css: {y: (this.dragNode.pos + this.dragNode.offsetHeight * 0.5) + "px"}});
     }
 
 }
