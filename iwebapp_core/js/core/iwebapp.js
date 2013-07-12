@@ -391,6 +391,7 @@ IWebapp.prototype.openPage = function (pageObj, pageData, hash) {
     console.time("create_page")
     page.onCreate(pageData);
     console.timeEnd("create_page")
+    this._onPageInited(page);
 
     if (hash == null || hash.length === 0) {
 
@@ -443,6 +444,8 @@ IWebapp.prototype.openChildPage = function (pageObj, pageData, parentObj, hash) 
 
 
     page.onCreate(pageData);
+    this._onPageInited(page);
+
     if (hash == null || hash.length === 0) {
 
         this._addToHistory(page, pageData, parentPage);
@@ -1138,7 +1141,7 @@ IWebapp.prototype._onReady = function () {
  * @desc append  view of  the page to stage
  * @param page
  */
-IWebapp.prototype._addPageToStage = function (page) {
+IWebapp.prototype._onPageInited = function (page) {
     if (page == null || page.view == null || page.view.html == null) throw new Error(IWPError.PAGE_NOT_EXIST_VIEW);
 
     var context = this;
@@ -1220,7 +1223,7 @@ IWebapp.prototype._addPageToStage = function (page) {
     }
 
 
-    this._$container.append(page.view.html);
+   // this._$container.append(page.view.html);
 
     if (this._switchPlus != null) {
         if (page.type == IWPPage.PAGE_TYPE_NORMAL) {
@@ -1240,6 +1243,11 @@ IWebapp.prototype._addPageToStage = function (page) {
 }
 
 
+
+IWebapp.prototype._addPageToStage=function(page){
+    if (page == null || page.view == null || page.view.html == null) throw new Error(IWPError.PAGE_NOT_EXIST_VIEW);
+    this._$container.append(page.view.html);
+}
 
 
 IWebapp.prototype._hidePage = function (pageObj) {
