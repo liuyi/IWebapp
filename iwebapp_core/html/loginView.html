@@ -1,76 +1,107 @@
-<h1>Login your world!</h1>
-
-<input type="text" id="username" placeholder="username"/>
-<input type="text" id="password" placeholder="password"/>
-
-<button id="loginBtn">Login</button>
-<button id="regBtn" class="greenBtn">Register</button>
-<button id="forget" class="greenBtn">Forget</button>
+<div  id="scrollerWrapper" class="scrollerWrapper  ">
+    <div class="scroller " >
+        <!--room list would be here.-->
 
 
-<a id="learnLink" class="button bitBtn " longtap="false">Learn more >></a>
-<h2> Components</h2>
+        <h1>Login your world!</h1>
+
+        <input type="text" id="username" placeholder="username"/>
+        <input type="text" id="password" placeholder="password"/>
+
+        <button id="loginBtn">Login</button>
+        <button id="regBtn" class="greenBtn">Register</button>
+        <button id="forget" class="greenBtn">Forget</button>
 
 
-<!-- switch button-->
-<div id="switchBtn" class="iwp-ui-slider  switchBtn" touchable="true" style="overflow:visible">
-    <div class="iwp-ui-slider-wrapper">
-        <div class="iwp-ui-slider-labels">
-            <span class="iwp-ui-slider-active">ON</span>
-            <span class="iwp-ui-slider-down">OFF</span>
+        <a id="learnLink" class="button bitBtn " longtap="false">Learn more >></a>
+
+        <h2 style="line-height: 60px;"> Components</h2>
+
+
+        <h4 class="clean">Switch button</h4>
+        <!-- slider-->
+        <div style="float: left; padding: 20px 0px 20px 0;  height: auto; width: 100%;">
+            <!-- switch button-->
+            <div id="switchBtn" class="ui-slider  switchBtn" touchable="true" style="overflow:visible">
+                <div class="ui-slider-wrapper">
+                    <div class="ui-slider-labels">
+                        <span class="ui-slider-active">ON</span>
+                        <span class="ui-slider-down">OFF</span>
+                    </div>
+                </div>
+
+                <span class="ui-slider-rd-l ui-slider-active"></span>
+                <span class="ui-slider-rd-r ui-slider-down"></span>
+                <a class="ui-slider-slug ui-switch-drag "></a>
+            </div>
         </div>
+
+        <h4 class="clean">Slider</h4>
+        <!-- slider-->
+        <div style="float: left; padding: 20px 0px 20px 0;width: 100%; height: auto;">
+            <div id="slider" class="ui-slider slider" touchable="true">
+                <a class="ui-slider-slug"></a>
+            </div>
+        </div>
+
+        <h4 class="clean">Checkbox </h4>
+        <!-- checkbox -->
+        <div style="width: 100%; float: left; padding: 20px 0px 20px 0;">
+            <a class="ui-checkbox" id="checkbox">
+        <span class="ui-icon">
+            <span class="ui-icon-tick"></span>
+        </span>
+                <span class="ui-label">checkbox</span>
+            </a>
+
+
+            <!-- checkbox -->
+
+            <a class="ui-checkbox" id="checkbox2">
+        <span class="ui-icon">
+            <span class="ui-icon-tick"></span>
+        </span>
+                <span class="ui-label">checkbox</span>
+            </a>
+
+        </div>
+        <h4 class="clean">Radiobox group</h4>
+
+
+        <!-- radioBox -->
+        <div class="ui-radio-group" id="radio_group"
+             style="padding: 20px 0px 20px 0; width: 100%; height: auto; float:left; ">
+            <a class="ui-radio" id="radioBox">
+            <span class="ui-icon">
+                <span class="ui-icon-tick"></span>
+            </span>
+                <span class="ui-label">radioBox</span>
+            </a>
+
+            <a class="ui-radio" id="radioBox2">
+            <span class="ui-icon">
+                <span class="ui-icon-tick"></span>
+            </span>
+                <span class="ui-label">radioBox</span>
+            </a>
+
+        </div>
+
+
+        <h4 class="clean">Button </h4>
+
+        <div style="width: 100%; float: left; padding: 20px 0px 20px 0;">
+            <a id="uibutton" class="ui-button"></a>
+        </div>
+
+        <h4 class="clean">Drop Button </h4>
+
+        <div style="width: 100%; float: left; padding: 20px 0px 20px 0;">
+            <div id="dropbtn" class="ui-dropbutton">
+
+            </div>
+        </div>
+
+
     </div>
-
-    <span class="iwp-ui-slider-rd-l iwp-ui-slider-active"></span>
-    <span class="iwp-ui-slider-rd-r iwp-ui-slider-down"></span>
-    <a class="iwp-ui-slider-slug iwp-ui-switch-drag "></a>
-</div>
-
-
-<!-- slider-->
-<div id="slider" class="iwp-ui-slider slider" touchable="true">
-    <a class="iwp-ui-slider-slug"></a>
-</div>
-
-
-<!-- checkbox -->
-
-<a class="iwp-ui-checkbox" id="checkbox">
-        <span class="iwp-ui-checkbox-icon">
-            <span class="iwp-ui-checkbox-icon-tick"></span>
-        </span>
-    <span class="iwp-ui-checkbox-label">checkbox</span>
-</a>
-
-
-<!-- checkbox -->
-
-<a class="iwp-ui-checkbox" id="checkbox2">
-        <span class="iwp-ui-checkbox-icon">
-            <span class="iwp-ui-checkbox-icon-tick"></span>
-        </span>
-    <span class="iwp-ui-checkbox-label">checkbox</span>
-</a>
-
-
-
-
-<!-- radioBox -->
-<div class="iwp-ui-radio-group">
-
-
-    <a class="iwp-ui-radio" id="radiusBox">
-            <span class="iwp-ui-radio-icon">
-                <span class="iwp-ui-radio-icon-tick"></span>
-            </span>
-        <span class="iwp-ui-radio-label">radioBox</span>
-    </a>
-
-    <a class="iwp-ui-radio" id="radiusBox2">
-            <span class="iwp-ui-radio-icon">
-                <span class="iwp-ui-radio-icon-tick"></span>
-            </span>
-        <span class="iwp-ui-radio-label">radioBox</span>
-    </a>
-
 </div>

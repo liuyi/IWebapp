@@ -385,7 +385,7 @@ function addEvent(element, type, handler,context) {
     handlers[handler.$$guid] = handler;
     element["on" + type] = handleEvent;
 
-    //trace("add event:"+type+">>"+element)
+   //trace("add event:"+type+">>"+element)
 }
 
 addEvent.guid = 1;
@@ -423,6 +423,8 @@ function handleEvent(event) {
 
         }
 
+//        trace("$$guid:");
+//        trace(this.$$handleEvent)
     }
 
 

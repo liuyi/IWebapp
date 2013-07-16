@@ -101,12 +101,23 @@ LoginPage.prototype.onCreate = function (pageData) {
     this.checkBox=new IWebUICheckBox(this.findViewItem("checkbox"));
     this.checkBox2=new IWebUICheckBox(this.findViewItem("checkbox2"));
 
+    //this.radio1=new IWebUIRadioBox(this.findViewItem("radioBox"))
+   // this.radio2=new IWebUIRadioBox(this.findViewItem("radioBox2"))
+
+    this.radios=new IWebUIRadioGroup(this.findViewItem("radio_group"),{selected:0})
 
     this.switchBtn=new IWebUISwitch(this.findViewItem("switchBtn"),{value:100,dragOffset:0});
 
     this.slider=new IWebUISlider(this.findViewItem("slider"),{min:200,max:1000,animate:true,snap:false,increment:100});
 
 
+    this.button=new IWebUIButton(this.findViewItem("uibutton"),{text:"Simple Button",icon:"close",onTap:function(){
+
+    },onLongTap:function(){
+        Dom.addClass(this,"disabled")
+    }});
+
+    this.dropbtn=new IWebUIDropButton(this.findViewItem("dropbtn"),{buttonOpts:{text:"Drop button",icon:"close"},data:[{text:"AAAA"},{text:"BBBBB"},{text:"CCCCC"},{text:"DDDDDDDDD"}]})
    // alert((t2-t)+" slider:"+(Date.now()-t2))
 
 
@@ -154,8 +165,8 @@ LoginPage.prototype.onCreate = function (pageData) {
 //        target.css("visibility","visible")
 //        target.fadeTo(500,1)
 //    },2000)
-
-
+    this.scrollWrapper=this.findViewItem("scrollerWrapper")
+    CreateScroller(this.scrollWrapper)
 
 }
 
@@ -382,4 +393,82 @@ ConfirmPage.prototype.onTap=function(e,context){
     }
 
     return false
+}
+
+
+
+
+function CreateScroller(scrollTarget,opts){
+    //we only need one scroll.
+    //if(myScroll!=null) {myScroll.destory();}
+    var bounce=false;
+    var hScroll=false;
+    var vScroll=true;
+    var snap= true;
+    var snapThreshold= 110;
+    var momentum= false;
+    var bounceLock=false;
+
+    var onScrollEnd=null;
+
+    if(opts!=null && opts.bounce!=null){
+        bounce=opts.bounce;
+    }
+    if(opts!=null && opts.bounceLock!=null){
+        bounce=opts.bounceLock;
+    }
+
+    if(opts!=null && opts.hScroll!=null){
+        hScroll=opts.hScroll;
+    }
+
+    if(opts!=null && opts.vScroll!=null){
+        vScroll=opts.vScroll;
+    }
+
+    if(opts!=null && opts.snapThreshold!=null){
+        snap=opts.snapThreshold;
+    }
+    if(opts!=null && opts.snap!=null){
+        snap=opts.snap;
+    }
+
+    if(opts!=null && opts.momentum!=null){
+        momentum=opts.momentum;
+    }
+
+    if(opts!=null&& opts.onScrollEnd!=null){
+        onScrollEnd=opts.onScrollEnd;
+    }
+
+
+
+
+    return  new iScroll(scrollTarget,{
+
+
+        onBeforeScrollStart:function(e){
+
+            var target = e.target;
+            while (target.nodeType != 1) target = target.parentNode;
+            if (target.tagName != 'SELECT' && target.tagName != 'INPUT' && target.tagName != 'TEXTAREA')
+                e.preventDefault();
+
+        },
+        hScrollbar: false,
+        vScrollbar: false,
+        zoom:false,
+        bounce:bounce,
+        bounceLock:bounceLock,
+        snap:snap,
+        snapThreshold:snapThreshold,
+        momentum:momentum,
+        handleClick:false,
+        hScroll:hScroll,
+        vScroll:vScroll,
+        onScrollEnd:onScrollEnd
+
+    });
+
+
 }

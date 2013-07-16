@@ -1,5 +1,5 @@
 /*Basic css of slider*/
-.iwp-ui-slider {
+.ui-slider {
     display: block;
     position: relative;
     cursor: pointer;
@@ -7,14 +7,14 @@
 }
 
 /*If the slider has one or more labels, then it need put the labels to a container.*/
-.iwp-ui-slider-wrapper {
+.ui-slider-wrapper {
     padding-left: 5px;
     padding-right: 5px;
     height: 100%;
 }
 
 /*default label of slider*/
-.iwp-ui-slider-labels {
+.ui-slider-labels {
     overflow: hidden;
     height: 100%;
     position: relative;
@@ -22,7 +22,7 @@
 }
 
 /* the active label*/
-.iwp-ui-slider-active {
+.ui-slider-active {
     display: block;
     height: 100%;
     position: absolute;
@@ -33,7 +33,7 @@
 }
 
 /*the off label*/
-.iwp-ui-slider-down {
+.ui-slider-down {
     display: block;
     height: 100%;
     position: absolute;
@@ -43,7 +43,7 @@
 }
 
 /*the slug of slider*/
-.iwp-ui-slider-slug {
+.ui-slider-slug {
     height: 100%;
     position: absolute;
     top: 0;
@@ -52,7 +52,7 @@
 }
 
 /*chrome has a bug about border-radius, we have to fix it with two block mask it*/
-.iwp-ui-slider-rd-r, .iwp-ui-slider-rd-l {
+.ui-slider-rd-r, .ui-slider-rd-l {
 
     width: 10px;
     height: 100%;
@@ -62,56 +62,106 @@
     margin: 0;
 }
 
-.iwp-ui-slider-rd-r{
+.ui-slider-rd-r {
     border-radius: 0px 8px 8px 0px;
 }
 
-.iwp-ui-slider-rd-l{
+.ui-slider-rd-l {
     border-radius: 8px 0px 0px 8px;
 }
 
-
 /*Basic css of slider and switch done.*/
 
-
 /*Checkbox */
-.iwp-ui-checkbox{ position: relative; display: block;}
-.iwp-ui-checkbox-icon {
-    background: #fff;
+.ui-checkbox {
+    position: relative;
+    /*display: block;*/
+}
+
+.ui-checkbox .ui-icon, .ui-radio .ui-icon {
     display: block;
     float: left;
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
     overflow: hidden;
     position: relative;
 }
 
-.iwp-ui-checkbox-icon-tick{
+.ui-checkbox .ui-icon {
+    border-radius: 8px;
+}
+
+.ui-checkbox .ui-icon-tick {
     border: 3px solid #000000;
     border-top: none;
     border-right: none;
     width: 55%;
     height: 25%;
     display: block;
-    -webkit-transform:rotate(-45deg);
-    transform:rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
 
     position: absolute;
-    top:25%;
+    top: 25%;
     left: 20%;
 
+    visibility: hidden;
+}
+
+
+
+.ui-checkbox[class~="selected"] .ui-icon-tick {
+    visibility: visible;
+    opacity: 1;
+}
+
+.ui-checkbox[class~="tap"] .ui-icon-tick {
+    visibility: visible;
+    opacity: 0.5;
+}
+
+.ui-radio {
+    position: relative;
+
+    /*display: block;*/
+}
+
+.ui-radio .ui-icon-tick {
+    border-radius: 50%;
+    width: 50%;
+    height: 50%;
+    top: 25%;
+    left: 25%;
+    position: absolute;
+    visibility: hidden;
+    background: #000000;
+    display: block;
 
 }
 
-.iwp-ui-checkbox-label{
-    line-height: 1em;
-    font-size: 2em;
-    margin-left: 0.5em;
+.ui-radio[class~="selected"] .ui-icon-tick {
+    visibility: visible;
+    opacity: 1;
 }
 
-.iwp-ui-checkbox[class~="selected"] .iwp-ui-checkbox-icon-tick{visibility: hidden;opacity: 1;}
-.iwp-ui-checkbox[class~="tap"] .iwp-ui-checkbox-icon-tick{visibility: visible; opacity: 0.5;}
+.ui-radio[class~="tap"] .ui-icon-tick {
+    visibility: visible;
+    opacity: 0.5;
+}
 
+.ui-button {
+    background: #333;
+    border: #000 solid 1px;
+    position: relative;
+    width: auto;
 
+    display: inline-block;
+    cursor: pointer;
 
+}
+
+.ui-icon{ display: block;   }
+.ui-button .ui-icon{ position: absolute;}
+
+.ui-dropbutton{ }
+.ui-list{  list-style: none; position: absolute ;  left: 0}
+
+.ui-list-item{}

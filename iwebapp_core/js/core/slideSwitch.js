@@ -34,8 +34,6 @@ SlideSwitch.prototype.showPage=function(page,container,onComplete,completeParams
 }
 
 SlideSwitch.prototype.removePage=function(page,container,onComplete,completeParams,isBack){
-    trace("slide remove page:"+page.id)
-
 
     if(isBack){
 
@@ -54,7 +52,7 @@ SlideSwitch.prototype.hideParentPage=function(page,container,onComplete,complete
 }
 
 SlideSwitch.prototype.resumeParentPage=function(page,container,onComplete,completeParams){
-    iwp.removeClass(page.view.html,IWPPage.PAGE_CLASS_PAUSEPAGE);
+    Dom.removeClass(page.view.html,IWPPage.PAGE_CLASS_PAUSEPAGE);
 
    // TweenLite.to(page.view.html,0.6,{left:"0",onComplete:onComplete,onCompleteParams:completeParams});
     IWPTween.to(page.view.html,0.6,{css:{x:"0px"},ease:"easeOut",onComplete:onComplete,onCompleteParams:completeParams});

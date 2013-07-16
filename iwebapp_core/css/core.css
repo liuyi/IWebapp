@@ -154,3 +154,19 @@ div#preload img {
 .disabled {
     opacity: 0.4;
 }
+
+.clean{ float: none; clear: both}
+
+
+
+.scroller{
+    position:absolute; z-index:1;
+    width:100%;
+    padding:0;
+}
+.scrollerWrapper{
+    position:absolute; z-index:1;
+    width:100%;
+    overflow:auto;
+    top:0;bottom:100px
+}

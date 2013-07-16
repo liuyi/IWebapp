@@ -1,3 +1,149 @@
+function Dom() {
+
+}
+Dom.removeNode = function (htmlElement) {
+    if (htmlElement.parentNode != null) htmlElement.parentNode.removeChild(htmlElement);
+}
+
+Dom.hasClass = function (target, className) {
+
+    if (target.className == null) return false;
+    var regx = new RegExp("\\b" + className + "\\b", "gi");
+    var has = target.className.match(regx);
+    return (has != null && has.length > 0);
+
+}
+
+Dom.removeClass = function (target, className) {
+    if (target.className == null) {
+        target.className = "";
+    } else {
+        var regx = new RegExp("\\b" + className + "\\b", "gi");
+        var has = target.className.match(regx);
+
+        if (has != null && has.length >= 0) {
+            target.className = target.className.replace(className, "").trim();
+
+        }
+    }
+
+}
+Dom.addClass = function (target, className) {
+    if (target.className == null) {
+        target.className = className;
+    } else {
+        var regx = new RegExp("\\b" + className + "\\b", "gi");
+        var has = target.className.match(regx);
+        if (has == null || has.length < 0) {
+            target.className = target.className.trim() + " " + className;
+
+            //  trace("className:"+className)
+        }
+    }
+
+
+}
+
+
+Dom.getElementsByClassName = function (target, classname) {
+    if (target.getElementsByClassName != null) {
+
+        return target.getElementsByClassName(classname);
+    } else {
+        var regx = new RegExp("\\b" + classname + "\\b", "gi");
+        var has = null;
+        var elements = [];
+        getList(target);
+        return elements;
+    }
+
+    function getList(target) {
+        if (target.childNodes == null || target.childNodes.length == 0)  return;
+
+
+        var len = target.childNodes.length;
+
+        for (var i = 0; i < len; i++) {
+            var item = target.childNodes[i];
+            if (item.className != null) {
+                has = item.className.match(regx);
+                if (has != null && has.length > 0) {
+
+                    elements.push(item);
+                }
+            }
+            getList(item);
+        }
+
+    }
+}
+
+
+Dom.getPageScrollY = function () {
+    if (window.pageYOffset) {//这一条滤去了大部分， 只留了IE678
+        return window.pageYOffset
+    } else if (document.documentElement.scrollTop) {//IE678 的非quirk模式
+        return document.documentElement.scrollTop
+    } else if (document.body.scrolltop) {//IE678 的quirk模式
+        return document.body.scrolltop;
+    }
+    return 0;
+};
+
+Dom.getPosition = function (element) {
+
+
+    var xPosition = 0;
+    var yPosition = 0;
+    var pos = null;
+
+    while (element) {
+        pos = IWPTween.getCurrentTransform(element)
+        xPosition += (element.offsetLeft - element.scrollLeft + element.clientLeft + pos[0]);
+        yPosition += (element.offsetTop - element.scrollTop + element.clientTop + pos[1]);
+        element = element.offsetParent;
+    }
+
+    return { x: xPosition, y: yPosition };
+}
+
+Dom.getPageSize = function () {
+    var scrW, scrH;
+    if (window.innerHeight && window.scrollMaxY) {
+        // Mozilla
+        scrW = window.innerWidth + window.scrollMaxX;
+        scrH = window.innerHeight + window.scrollMaxY;
+    } else if (document.body.scrollHeight > document.body.offsetHeight) {
+        // all but IE Mac
+        scrW = document.body.scrollWidth;
+        scrH = document.body.scrollHeight;
+    } else if (document.body) { // IE Mac
+        scrW = document.body.offsetWidth;
+        scrH = document.body.offsetHeight;
+    }
+
+    var winW, winH;
+    if (window.innerHeight) { // all except IE
+        winW = window.innerWidth;
+        winH = window.innerHeight;
+    } else if (document.documentElement
+        && document.documentElement.clientHeight) {
+        // IE 6 Strict Mode
+        winW = document.documentElement.clientWidth;
+        winH = document.documentElement.clientHeight;
+    } else if (document.body) { // other
+        winW = document.body.clientWidth;
+        winH = document.body.clientHeight;
+    }
+
+    // for small pages with total size less then the viewport
+    var pageW = (scrW < winW) ? winW : scrW;
+    var pageH = (scrH < winH) ? winH : scrH;
+
+    return {pageWidth: pageW, pageHeight: pageH, windowWidth: winW, windowHeight: winH};
+};
+
+
 //some hacks for ie7,ie8
 
 /**
@@ -226,94 +372,18 @@ IWebapp._simpleCheckTouchEnable = function () {
 
 IWebapp.touchable = IWebapp._simpleCheckTouchEnable();
 
-IWebapp.removeNode = function (htmlElement) {
-    if (htmlElement.parentNode != null) htmlElement.parentNode.removeChild(htmlElement);
-}
 
-IWebapp.hasClass = function (target, className) {
-
-    if (target.className == null) return false;
-    var regx = new RegExp("\\b" + className + "\\b", "gi");
-    var has = target.className.match(regx);
-    return (has != null && has.length > 0);
-
-}
-
-IWebapp.removeClass = function (target, className) {
-    if (target.className == null) {
-        target.className = "";
-    } else {
-        var regx = new RegExp("\\b" + className + "\\b", "gi");
-        var has = target.className.match(regx);
-
-        if (has != null && has.length >= 0) {
-            target.className = target.className.replace(className, "").trim();
-
-        }
-    }
-
-}
-IWebapp.addClass = function (target, className) {
-    if (target.className == null) {
-        target.className = className;
-    } else {
-        var regx = new RegExp("\\b" + className + "\\b", "gi");
-        var has = target.className.match(regx);
-        if (has == null || has.length < 0) {
-            target.className = target.className.trim() + " " + className;
-
-            //  trace("className:"+className)
-        }
-    }
-
-
-}
 IWebapp.disableNode = function (htmlElement) {
-    IWebapp.addClass(htmlElement, IWebapp.getInstance()._disableTag);
+    Dom.addClass(htmlElement, IWebapp.getInstance()._disableTag);
     htmlElement.setAttribute(IWebapp.getInstance()._disableTag)
 }
 
 IWebapp.resumeNode = function (htmlElement) {
 
 
-    IWebapp.removeClass(htmlElement, IWebapp.getInstance()._disableTag);
+    Dom.removeClass(htmlElement, IWebapp.getInstance()._disableTag);
     htmlElement.removeAttribute(IWebapp.getInstance()._disableTag)
 }
-
-IWebapp.getElementsByClassName = function (target, classname) {
-    if (target.getElementsByClassName != null) {
-
-        return target.getElementsByClassName(classname);
-    } else {
-        var regx = new RegExp("\\b" + classname + "\\b", "gi");
-        var has = null;
-        var elements = [];
-        getList(target);
-        return elements;
-    }
-
-    function getList(target) {
-        if (target.childNodes == null || target.childNodes.length == 0)  return;
-
-
-        var len = target.childNodes.length;
-
-        for (var i = 0; i < len; i++) {
-            var item = target.childNodes[i];
-            if (item.className != null) {
-                has = item.className.match(regx);
-                if (has != null && has.length > 0) {
-
-                    elements.push(item);
-                }
-            }
-            getList(item);
-        }
-
-    }
-}
-
-
 //public function at below=================
 
 
@@ -1163,7 +1233,7 @@ IWebapp.prototype._onPageInited = function (page) {
 
                     //If target page is  parent of current page,hidden target page.
                     if ($page.id == page._parentPageId) {
-//                        IWebapp.addClass($page.view.html, IWPPage.PAGE_CLASS_PAUSEPAGE);
+//                        Dom.addClass($page.view.html, IWPPage.PAGE_CLASS_PAUSEPAGE);
 //                        $page._status=IWPPage.STATUS_PAUSED;
 //                        $page.onPause();
                         var p = this._pages[i];
@@ -1221,7 +1291,7 @@ IWebapp.prototype._onPageInited = function (page) {
     }
 
 
-   // this._$container.append(page.view.html);
+    // this._$container.append(page.view.html);
 
     if (this._switchPlus != null) {
         if (page.type == IWPPage.PAGE_TYPE_NORMAL) {
@@ -1241,8 +1311,7 @@ IWebapp.prototype._onPageInited = function (page) {
 }
 
 
-
-IWebapp.prototype._addPageToStage=function(page){
+IWebapp.prototype._addPageToStage = function (page) {
     if (page == null || page.view == null || page.view.html == null) throw new Error(IWPError.PAGE_NOT_EXIST_VIEW);
     this._$container.append(page.view.html);
 }
@@ -1257,7 +1326,7 @@ IWebapp.prototype._hidePage = function (pageObj) {
         page = pageObj;
     }
 
-    IWebapp.addClass(page.view.html, IWPPage.PAGE_CLASS_PAUSEPAGE);
+    Dom.addClass(page.view.html, IWPPage.PAGE_CLASS_PAUSEPAGE);
     page._status = IWPPage.STATUS_PAUSED;
     page.onPause();
 
@@ -1275,7 +1344,7 @@ IWebapp.prototype._resumePage = function (pageObj) {
         page = pageObj;
     }
 
-    IWebapp.removeClass(page.view.html, IWPPage.PAGE_CLASS_PAUSEPAGE);
+    Dom.removeClass(page.view.html, IWPPage.PAGE_CLASS_PAUSEPAGE);
 
 //    var index = page._childPages.indexOf(page.id);
 //    if (index >= 0)  page._childPages.splice(index, 1);
@@ -1321,7 +1390,7 @@ IWebapp.prototype._destroyPage = function (page) {
     }
 
 
-    IWebapp.removeNode(page.view.html); //remove view from stage
+    Dom.removeNode(page.view.html); //remove view from stage
     delete context._pages[page.id]; //remove the object from page collection
     var index = context._pages.indexOf(page.id);
 
@@ -1377,8 +1446,8 @@ IWebapp.prototype._onTouchStart = function (e, context) {
     if (context._touchTarget != null) {
         var preTarget = context._touchTarget;
         preTarget.removeAttribute(context._tapEventTag);
-        IWebapp.removeClass(preTarget, context._touchTapAttr);
-        IWebapp.removeClass(preTarget, context._touchLongTapAttr);
+        Dom.removeClass(preTarget, context._touchTapAttr);
+        Dom.removeClass(preTarget, context._touchLongTapAttr);
 
 
         if (IWebapp.touchable == true) {
@@ -1448,28 +1517,28 @@ IWebapp.prototype._onTouching = function (target) {
             //IE8,IE7 has bug when use css selector: .classname[attr=""]
             //target.setAttribute(context._touchTapAttr, IWebapp.TAP_TYPE_SHORT);
 
-            IWebapp.addClass(target, context._touchTapAttr)
+            Dom.addClass(target, context._touchTapAttr)
             target.tap = IWebapp.TAP_TYPE_SHORT;
 
 
             //defualt set longtap to false
-            if(target.getAttribute(this._touchLongTapAttr) != "true"){
+            if (target.getAttribute(context._touchLongTapAttr) != "true") {
 
                 clearInterval(target.timer);
                 target.timer = null;
 
             }
 
-        } else if ((target.tap == IWebapp.TAP_TYPE_SHORT) && (delayTime >= context._touchLongTapTimeThreshold) && (IWebapp.hasClass(context._touchLongTapAttr) == false)) {
+        } else if ((target.tap == IWebapp.TAP_TYPE_SHORT) && (delayTime >= context._touchLongTapTimeThreshold) && (Dom.hasClass(context._touchLongTapAttr) == false)) {
             target.tap = IWebapp.TAP_TYPE_LONG;
 
             // target.setAttribute(context._touchTapAttr, IWebapp.TAP_TYPE_LONG);
 
-            IWebapp.addClass(target, context._touchLongTapAttr);
-            IWebapp.removeClass(target, context._touchTapAttr);
+            Dom.addClass(target, context._touchLongTapAttr);
+            Dom.removeClass(target, context._touchTapAttr);
             clearInterval(target.timer);
             target.timer = null;
-            if(target["onLongTap"]!=null){
+            if (target["onLongTap"] != null) {
                 target.onLongTap();
             }
             context._dispatchEvent(target, context._longTapEventTag)
@@ -1531,7 +1600,7 @@ IWebapp.prototype._onTouchEnd = function (e, context) {
         var distance = (target.touchXMov - target.touchX) * (target.touchXMov - target.touchX) + (target.touchYMov - target.touchY) * (target.touchYMov - target.touchY);
         //trace("x:"+target.touchXMov+"-"+target.touchX+",y:"+target.touchYMov+"-"+target.touchY+","+distance +"/"+context._touchDisThreshold+"   " +target.tap+"/"+IWebapp.TAP_TYPE_SHORT)
         if (distance < context._touchDisThreshold && target.tap == IWebapp.TAP_TYPE_SHORT) {
-            if(target["onTap"]!=null){
+            if (target["onTap"] != null) {
                 target.onTap();
             }
             context._dispatchEvent(target, context._tapEventTag);
@@ -1563,8 +1632,8 @@ IWebapp.prototype._onTouchEnd = function (e, context) {
 //    delete target["touchTime"];
 
     // target.setAttribute(context._touchTapAttr, "");
-    IWebapp.removeClass(target, context._touchTapAttr);
-    IWebapp.removeClass(target, context._touchLongTapAttr);
+    Dom.removeClass(target, context._touchTapAttr);
+    Dom.removeClass(target, context._touchLongTapAttr);
 
 
     context._touchTarget = null;
@@ -1611,8 +1680,8 @@ IWebapp.prototype._onMouseDown = function (e, context) {
     if (context._touchTarget != null) {
         var preTarget = context._touchTarget;
         preTarget.removeAttribute(context._tapEventTag);
-        IWebapp.removeClass(preTarget, context._touchTapAttr);
-        IWebapp.removeClass(preTarget, context._touchLongTapAttr);
+        Dom.removeClass(preTarget, context._touchTapAttr);
+        Dom.removeClass(preTarget, context._touchLongTapAttr);
 
 
         if (IWebapp.touchable == true) {
@@ -1711,7 +1780,13 @@ IWebapp.prototype._getTouchTarget = function (target) {
             // trace("===>"+target.nodeName +">>"+">"+( (target.getAttribute("disabled").value)==undefined)+">"+ (target.getAttribute(this._ignoreTouchTag) == null)+">"+(this._touchableNodes.indexOf(target.nodeName) >= 0 || target.getAttribute(this._touchableAttr) == this._touchableAttr))
 
             // trace("<"+target.getAttribute("disabled")+">")
-            target = target.parentNode;
+
+            if(target ==window.document.body){
+                return target;
+            }else{
+                target = target.parentNode;
+            }
+
         }
 
 
@@ -1775,7 +1850,6 @@ IWebapp.prototype._setHash = function (hash) {
     }
     this._currentPageAlias = hash;
     window.location.hash = hash;
-
 
 
 }
@@ -2079,7 +2153,7 @@ IWPPage.prototype._createViewElement = function (viewData) {
         container.innerHTML = this.view.text;
 
         if (this.type == IWPPage.PAGE_TYPE_DIALOG) {
-            IWebapp.addClass(container.childNodes[0], "dialogContent");
+            Dom.addClass(container.childNodes[0], "dialogContent");
         }
     }//end if
 
@@ -2295,7 +2369,6 @@ IWPAlert.prototype.onCreate = function (pageData) {
     }
     this.setView(this.viewId);
     var dataNode = this.view.html.childNodes[0].childNodes[0];
-
 
 
     this.msgTxt = this.findViewItem(dataNode.getAttribute("data-alert-msg"));
@@ -2619,7 +2692,6 @@ function IWPLoadItem() {
     this.alias = null;
 
 }
-
 
 
 /**

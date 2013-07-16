@@ -113,9 +113,9 @@ IWPTween._targets = [];
 IWPTween._count = 0;
 IWPTween._tweenId = 0;
 IWPTween._targetId = 0;
-IWPTween._transform = getsupportedprop(['transform', 'MozTransform', 'WebkitTransform', 'OTransform']);
+IWPTween._transform = getsupportedprop(['transform', 'MozTransform', 'WebkitTransform', 'OTransform','-ms-transform']);
 IWPTween._transition = getsupportedprop([ 'transition', 'MozTransition', 'WebkitTransition', 'OTransition']);
-IWPTween.hasTranslate3d = (IWPTween._transform != null || IWPTween._transition != null);
+IWPTween.hasTranslate3d = (IWPTween._transform != null && IWPTween._transition != null);
 //IWPTween.hasTranslate3d=false;
 IWPTween.useCssTimer = false;
 IWPTween._timer = null;
@@ -194,7 +194,8 @@ IWPTween.to = function (target, time, obj) {
     if (obj.css != null) {
         if (IWPTween.hasTranslate3d == true) {
             if (obj.css.x != null || obj.css.y != null || obj.css.z != null) {
-                var pos = IWPTween._getCurrentTransform(target);
+//                var pos = IWPTween._getCurrentTransform(target);
+                var pos = IWPTween.getCurrentTransform(target);
                 origin.css.x = pos[0]//-target["offsetLeft"];//add offset to x
                 origin.css.y = pos[1]//-target["offsetTop"];//add offset to y
                 origin.css.z = pos[2];
@@ -362,9 +363,10 @@ IWPTween.to = function (target, time, obj) {
 
 }
 
-IWPTween._getCurrentTransform = function (target) {
+IWPTween.getCurrentTransform = function (target) {
     var martix = window.getComputedStyle(target)[IWPTween._transform];
 
+    if(martix==null) return [0,0,0]
 
     if (martix != "none") {
         if (martix.indexOf("3d") > 0) {
