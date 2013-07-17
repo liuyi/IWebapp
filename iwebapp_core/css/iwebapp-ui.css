@@ -86,6 +86,7 @@
 }
 
 .ui-checkbox .ui-icon {
+    -webkit-border-radius: 8px;
     border-radius: 8px;
 }
 
@@ -95,9 +96,9 @@
     border-right: none;
     width: 55%;
     height: 25%;
-    display: block;
-    -webkit-transform: rotate(-45deg);
-    transform: rotate(-45deg);
+    display: inline-block;
+    -webkit-transform: rotate3D(0,0,1,-45deg) ;
+
 
     position: absolute;
     top: 25%;
@@ -125,6 +126,7 @@
 }
 
 .ui-radio .ui-icon-tick {
+    -webkit-border-radius: 50%;
     border-radius: 50%;
     width: 50%;
     height: 50%;
@@ -162,6 +164,9 @@
 .ui-button .ui-icon{ position: absolute;}
 
 .ui-dropbutton{ }
-.ui-list{  list-style: none; position: absolute ;  left: 0}
+.ui-dropbutton .ui-button{ width: 100%;}
+.ui-list{  list-style: none;   left: 0; width: 100%;}
 
-.ui-list-item{}
+.ui-list-item{background: #00f}
+.ui-dropbutton-list-item .ui-button{display: block; }
+.ui-dropbutton-scrollWrapper{ top:10%; bottom: 10%; }

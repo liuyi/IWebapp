@@ -644,10 +644,16 @@ function IWebUIDropButton(target, opts) {
     this.container = null;
     this.button = null;
     this.itemsContainer = null;
-    this.selected = null;
+    this.items = null;
+    this.selectedItem = null;
     this.data = null;
     this.value = null;
     this.isOpen = false;
+    this.onChange = null;
+    this.replaceLabelEnable = true;
+    this.iscroller = null;
+    this.scrollWrapper = null;
+    this.touchEvt = (IWebapp.touchable) ? "touchstart" : "mousedown";
 
     if (target != null) {
         this.create(target, opts);
@@ -660,9 +666,9 @@ IWebUIDropButton.prototype.create = function (target, opts, render) {
 
     if (render != false) {
         var text = [];
-        if (Dom.hasClass(target, "ui-dropbox") == false) {
+        if (Dom.hasClass(target, "ui-dropbutton") == false) {
             this.container = window.document.createElement("div");
-            this.container.className = "ui-dropbox";
+            this.container.className = "ui-dropbutton";
             target.appendChild(this.container);
         } else {
             this.container = target;
@@ -699,6 +705,10 @@ IWebUIDropButton.prototype.create = function (target, opts, render) {
         }
     }
 
+    if (this.scrollWrapper == null) {
+        this.scrollWrapper = window.document.createElement("div");
+        //this.scrollWrapper.className="scrollWrapper ui-dropbutton-scrollWrapper";
+    }
 
     this._updateItems(opts.data);
 
@@ -710,7 +720,44 @@ IWebUIDropButton.prototype.create = function (target, opts, render) {
         dropbutton.toogle();
     }
 
+    addEvent(this.itemsContainer, "tap", this._onItemTap, this)
 
+
+}
+IWebUIDropButton.prototype._onItemTap = function (e, context) {
+    var target = e.target || e.srcElement;
+    var item = null;
+    var selectItem = null;
+    var index = -1;
+    for (var i = 0; i < context.itemsContainer.childNodes.length; i++) {
+        item = context.itemsContainer.childNodes[i].childNodes[0];
+
+        // trace(item)
+        if (target == item) {
+            index = i;
+            selectItem = item;
+            break
+        }
+
+
+    }
+    // trace(target)
+    if (selectItem != null) {
+        // trace("you clicked a item:"+selectItem.text);
+        context.selectedItem = context.items[index];
+        context.value = (context.data[index] != null ) ? context.data[index].value : null;
+        context.close();
+
+        trace(context.value)
+
+        if (context.replaceLabelEnable == true) {
+            var text = (context.data[index] == null || context.data[index].text == null) ? "" : context.data[index].text;
+            context.button.setLabel(text);
+            trace("dddddddddd:" + text);
+            trace(context.button);
+        }
+
+    }
 }
 
 IWebUIDropButton.prototype.toogle = function () {
@@ -725,7 +772,7 @@ IWebUIDropButton.prototype.toogle = function () {
 
 }
 
-IWebUIDropButton.prototype.close=function(){
+IWebUIDropButton.prototype.close = function () {
     if (this.itemsContainer.parentNode == null) return;
     this.isOpen = false;
     this.itemsContainer.parentNode.removeChild(this.itemsContainer)
@@ -733,9 +780,70 @@ IWebUIDropButton.prototype.close=function(){
 }
 
 
-IWebUIDropButton.prototype.open=function(){
+IWebUIDropButton.prototype.open = function () {
     if (this.itemsContainer.parentNode != null)  return;
 
+    if (IWebapp.SCREEN_TYPE <= IWebapp.SCREEN_TYPE_SMALL) {
+        this._openInSmallScreen();
+    } else {
+        this._openInSmallScreen();
+    }
+
+    this.isOpen = true;
+    var context = this;
+
+    addEvent(window.document.body, this.touchEvt, function (e) {
+        context._onBodyTap(e)
+    })
+
+
+    addEvent(window.document.body, "mousewheel", function (e) {
+        context._onBodyTap(e)
+    })
+}
+
+IWebUIDropButton.prototype._openInSmallScreen = function () {
+
+
+    var pageHeight = Dom.getPageSize().pageHeight;
+    this.scrollWrapper.appendChild(this.itemsContainer)
+    window.document.body.appendChild(this.scrollWrapper);
+    trace("page height:" + this.itemsContainer.offsetHeight+"/"+pageHeight)
+    if (this.itemsContainer.offsetHeight < pageHeight) {
+        Dom.removeClass(this.scrollWrapper, "scrollWrapper")
+        Dom.removeClass(this.scrollWrapper, "ui-dropbutton-scrollWrapper")
+        this.scrollWrapper.style.top = "50%";
+        this.scrollWrapper.style.marginTop = -this.itemsContainer.offsetHeight * 0.5 + "px";
+
+        if( this.iscroller!=null){
+            this.iscroller.disable()
+        }
+    } else {
+        //add iscroll
+        trace("iscoll"+this.iscroller);
+        this.scrollWrapper.className = "scrollWrapper ui-dropbutton-scrollWrapper";
+        if (this.iscroller == null) {
+
+            this.iscroller = CreateScroller(this.scrollWrapper);
+        }else{
+            this.iscroller.enable()
+        }
+
+
+
+
+    }
+
+
+    this.scrollWrapper.style.left = "50%";
+    this.scrollWrapper.style.position="absolute"
+    this.scrollWrapper.style.width=this.button.container.offsetWidth+"px";
+    this.scrollWrapper.style.marginLeft = -this.itemsContainer.offsetWidth * 0.5 + "px";
+
+
+}
+
+IWebUIDropButton.prototype._openInNormalScreen = function () {
     window.document.body.appendChild(this.itemsContainer);
 
 
@@ -752,19 +860,6 @@ IWebUIDropButton.prototype.open=function(){
     this.itemsContainer.style.left = pos.x + "px";
 
 
-    //  trace(window.document.body.scrollHeight+", getPageSize:"+Dom.getPageSize().pageHeight)
-
-    //  trace("pos:"+height+", this.itemsContainer.offsetTop:"+this.itemsContainer.offsetTop+" top:"+scrollTop+" ,scroller.offsetHeight:"+scroller.offsetHeight)
-    //  trace("pos:"+pos+"="+"window.innerHeight:"+window.innerHeight+",getPageScrollY:"+Dom.getPageScrollY()+",itemsContainer.offsetTop:"+this.itemsContainer.offsetTop+",scrollTop:"+scrollTop+" pageYOffset:"+window.pageYOffset)
-    // trace(window)
-    // if(window.document.height-(this.itemsContainer.offsetHeight+))
-    //get iscroll height
-    this.isOpen = true;
-    var context=this;
-    addEvent(window.document.body, "tap", function(e){
-        context._onBodyTap(e)
-    })
-
 }
 
 IWebUIDropButton.prototype._onBodyTap = function (e) {
@@ -772,20 +867,20 @@ IWebUIDropButton.prototype._onBodyTap = function (e) {
     var target = e.target || e.srcElement;
 
 
-    var parent=target
-    var isOut=true;
-    while(parent){
-        if(parent==this.itemsContainer || parent==this.container || parent ==this.button.container){
-            isOut=false;
-            parent=null;
+    var parent = target;
+    var isOut = true;
+    while (parent) {
+        if (parent == this.itemsContainer || parent == this.container || parent == this.button.container) {
+            isOut = false;
+            parent = null;
             break;
-        }else{
-            parent=parent.parentNode;
+        } else {
+            parent = parent.parentNode;
         }
     }
 
 
-    if(isOut){
+    if (isOut) {
         this.close();
     }
 
@@ -802,10 +897,12 @@ IWebUIDropButton.prototype._updateItems = function (data) {
     var item = null;
     var clip = null;
     var obj = IWebUI.getView("ui-list");
+    this.items = [];
     for (var i = 0; i < data.length; i++) {
         clip = data[i];
         this.itemsContainer.innerHTML += obj.itemWrapper;
         item = new IWebUIButton(this.itemsContainer.childNodes[i], {text: clip.text});
+        this.items[i] = item;
     }
 
 }
@@ -856,7 +953,8 @@ IWebUIButton.prototype.create = function (target, opts, render) {
 
     if (opts != null) {
         if (opts.text != null) {
-            this.label.innerHTML = opts.text;
+            this.setLabel(opts.text);
+            //  this.label.innerHTML = opts.text;
         }
 
 
@@ -878,6 +976,10 @@ IWebUIButton.prototype.create = function (target, opts, render) {
 
 }
 
+IWebUIButton.prototype.setLabel = function (text) {
+    this.label.innerHTML = text;
+}
+
 IWebUIButton.prototype.disable = function () {
     this.container.addClass("disabled")
 }
@@ -892,7 +994,81 @@ IWebUI.views["button"] = {root: "<a class='ui-button'></a>", icon: "<span class=
 
 IWebUI.views["dropbutton"] = {root: "<ul class='ui-dropbutton'></ul>", item: "<li class='ui-item'></li>"}
 
-IWebUI.views["ui-list"] = {root: "<ul class='ui-list'></ul>", itemWrapper: "<li class='ui-list-item' tabindex='0'></li>"}
+IWebUI.views["ui-list"] = {root: "<ul class='ui-list'></ul>", itemWrapper: "<li class='ui-list-item ui-dropbutton-list-item' tabindex='0'></li>"}
 IWebUI.getView = function (type) {
     return IWebUI.views[type];
+}
+
+
+function CreateScroller(scrollTarget, opts) {
+    //we only need one scroll.
+    //if(myScroll!=null) {myScroll.destory();}
+    var bounce = true;
+    var hScroll = false;
+    var vScroll = true;
+    var snap = false;
+    var snapThreshold = 110;
+    var momentum = true;
+    var bounceLock = false;
+
+    var onScrollEnd = null;
+
+    if (opts != null && opts.bounce != null) {
+        bounce = opts.bounce;
+    }
+    if (opts != null && opts.bounceLock != null) {
+        bounce = opts.bounceLock;
+    }
+
+    if (opts != null && opts.hScroll != null) {
+        hScroll = opts.hScroll;
+    }
+
+    if (opts != null && opts.vScroll != null) {
+        vScroll = opts.vScroll;
+    }
+
+    if (opts != null && opts.snapThreshold != null) {
+        snap = opts.snapThreshold;
+    }
+    if (opts != null && opts.snap != null) {
+        snap = opts.snap;
+    }
+
+    if (opts != null && opts.momentum != null) {
+        momentum = opts.momentum;
+    }
+
+    if (opts != null && opts.onScrollEnd != null) {
+        onScrollEnd = opts.onScrollEnd;
+    }
+
+
+    return  new iScroll(scrollTarget, {
+
+
+        onBeforeScrollStart: function (e) {
+
+            var target = e.target;
+            while (target.nodeType != 1) target = target.parentNode;
+            if (target.tagName != 'SELECT' && target.tagName != 'INPUT' && target.tagName != 'TEXTAREA')
+                e.preventDefault();
+
+        },
+        hScrollbar: false,
+        vScrollbar: false,
+        zoom: false,
+        bounce: bounce,
+        bounceLock: bounceLock,
+        snap: snap,
+        snapThreshold: snapThreshold,
+        momentum: momentum,
+        handleClick: false,
+        hScroll: hScroll,
+        vScroll: vScroll,
+        onScrollEnd: onScrollEnd
+
+    });
+
+
 }

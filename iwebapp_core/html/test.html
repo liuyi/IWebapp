@@ -1,0 +1,40 @@
+<html>
+
+<head>
+    <title>TRANSLATE 3D ANDROID 2.X BUGS</title>
+    <style>
+        .TheClassThatBreaksItAll {
+            /* REMOVE THE TRANSFORMS AND THE ROTATION WILL WORK */
+            -webkit-transform: translate3d(0, 0, 0);
+            /*-moz-transform: translate3d(0, 0, 0);
+           -ms-transform: translate3d(0, 0, 0);
+           -o-transform: translate3d(0, 0, 0);
+           transform: translate3d(0, 0, 0);*/
+        }
+
+        #RotateBlock {
+            width: 200px;
+            height: 200px;
+            background-color: red;
+            -webkit-transform: rotate(45deg);
+            transform: rotate(45deg);
+            -webkit-transform: translate3d(0, 0, 0);
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+<div id="main" style="display:inline-block">
+    <div class="TheClassThatBreaksItAll"></div>
+    <div id="RotateBlock" style=""></div>
+</div>
+
+<canvas id="stage"></canvas>
+
+<script>
+
+
+</script>
+</body>
+</html>

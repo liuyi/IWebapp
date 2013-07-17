@@ -16,6 +16,7 @@
     color: #eeeeee;
     cursor: pointer;
 
+
 }
 
 .button[class~="tap"] {
@@ -237,6 +238,7 @@
 .ui-button{
     padding: 5px;
     border-radius: 8px;
+    height: 2em;
 
     background: #e2e2e2; /* Old browsers */
     /* IE9 SVG, needs conditional override of 'filter' to 'none' */
@@ -260,7 +262,7 @@
     top:10px;
 }
 
-.ui-button .ui-label{ margin-left: 2px;}
+.ui-button .ui-label{ margin-left: 2px; line-height: 2em;}
 .ui-button { padding-left: 15px;}
 
 .bitBtn {

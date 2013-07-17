@@ -359,6 +359,35 @@ IWebapp.checkTouchable = function () {
 
 }
 
+IWebapp.DIPS_WIDTH=0;
+IWebapp.DIPS_HEIGHT=0;
+IWebapp.SCREEN_TYPE_SMALL=1;
+IWebapp.SCREEN_TYPE_NORMAL=2;
+//IWebapp.SCREEN_TYPE_LARGE=3;
+IWebapp.SCREEN_TYPE=0;
+
+IWebapp.checkDIPS=function(){
+
+    var ratio=(window.devicePixelRatio==undefined)?1:window.devicePixelRatio;
+    if(window.navigator.userAgent.toLowerCase().indexOf("ios")>0){
+        IWebapp.DIPS_WIDTH=window.screen.width;
+        IWebapp.DIPS_HEIGHT=window.screen.height;
+    }else{
+        IWebapp.DIPS_WIDTH=window.screen.width/ratio;
+        IWebapp.DIPS_HEIGHT=window.screen.height/ratio;
+    }
+
+    if(IWebapp.DIPS_WIDTH<=720){
+        IWebapp.SCREEN_TYPE=IWebapp.SCREEN_TYPE_SMALL;
+    }else{
+        IWebapp.SCREEN_TYPE=IWebapp.SCREEN_TYPE_NORMAL;
+    }
+
+    trace(" IWebapp.SCREEN_TYPE:"+ IWebapp.SCREEN_TYPE)
+
+}
+
+IWebapp.checkDIPS();
 
 IWebapp._simpleCheckTouchEnable = function () {
 

@@ -117,9 +117,35 @@ LoginPage.prototype.onCreate = function (pageData) {
         Dom.addClass(this,"disabled")
     }});
 
-    this.dropbtn=new IWebUIDropButton(this.findViewItem("dropbtn"),{buttonOpts:{text:"Drop button",icon:"close"},data:[{text:"AAAA"},{text:"BBBBB"},{text:"CCCCC"},{text:"DDDDDDDDD"}]})
+    this.dropbtn=new IWebUIDropButton(this.findViewItem("dropbtn"),{
+        buttonOpts:{text:"Drop button",icon:"close"},
+        data:[
+            {text:"start",value:"ssss"},
+            {text:"BBBBB",value:"sdfsfs"},
+            {text:"CCCCC",value:"222"},
+            {text:"DDDDDDDDD",value:"nnnn"}
+            ,
+            {text:"AAAA",value:12312},
+            {text:"BBBBB",value:"sdfsfs"},
+            {text:"CCCCC",value:"222"},
+            {text:"DDDDDDDDD",value:"nnnn"},
+            {text:"AAAA",value:12312},
+            {text:"BBBBB",value:"sdfsfs"},
+            {text:"CCCCC",value:"222"},
+            {text:"DDDDDDDDD",value:"nnnn"},
+            {text:"AAAA",value:12312},
+            {text:"BBBBB",value:"sdfsfs"},
+            {text:"CCCCC",value:"222"},
+            {text:"DDDDDDDDD",value:"nnnn"},
+            {text:"AAAA",value:12312},
+            {text:"BBBBB",value:"sdfsfs"},
+            {text:"CCCCC",value:"222"},
+            {text:"end",value:"ennnndd"}
+        ]})
    // alert((t2-t)+" slider:"+(Date.now()-t2))
 
+
+    trace(window.devicePixelRatio)
 
 //    this.setValBtn=this.findViewItem("setValBtn");
 //    this.setPerBtn=this.findViewItem("setPerBtn");
@@ -397,78 +423,3 @@ ConfirmPage.prototype.onTap=function(e,context){
 
 
 
-
-function CreateScroller(scrollTarget,opts){
-    //we only need one scroll.
-    //if(myScroll!=null) {myScroll.destory();}
-    var bounce=false;
-    var hScroll=false;
-    var vScroll=true;
-    var snap= true;
-    var snapThreshold= 110;
-    var momentum= false;
-    var bounceLock=false;
-
-    var onScrollEnd=null;
-
-    if(opts!=null && opts.bounce!=null){
-        bounce=opts.bounce;
-    }
-    if(opts!=null && opts.bounceLock!=null){
-        bounce=opts.bounceLock;
-    }
-
-    if(opts!=null && opts.hScroll!=null){
-        hScroll=opts.hScroll;
-    }
-
-    if(opts!=null && opts.vScroll!=null){
-        vScroll=opts.vScroll;
-    }
-
-    if(opts!=null && opts.snapThreshold!=null){
-        snap=opts.snapThreshold;
-    }
-    if(opts!=null && opts.snap!=null){
-        snap=opts.snap;
-    }
-
-    if(opts!=null && opts.momentum!=null){
-        momentum=opts.momentum;
-    }
-
-    if(opts!=null&& opts.onScrollEnd!=null){
-        onScrollEnd=opts.onScrollEnd;
-    }
-
-
-
-
-    return  new iScroll(scrollTarget,{
-
-
-        onBeforeScrollStart:function(e){
-
-            var target = e.target;
-            while (target.nodeType != 1) target = target.parentNode;
-            if (target.tagName != 'SELECT' && target.tagName != 'INPUT' && target.tagName != 'TEXTAREA')
-                e.preventDefault();
-
-        },
-        hScrollbar: false,
-        vScrollbar: false,
-        zoom:false,
-        bounce:bounce,
-        bounceLock:bounceLock,
-        snap:snap,
-        snapThreshold:snapThreshold,
-        momentum:momentum,
-        handleClick:false,
-        hScroll:hScroll,
-        vScroll:vScroll,
-        onScrollEnd:onScrollEnd
-
-    });
-
-
-}
