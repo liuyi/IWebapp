@@ -145,7 +145,7 @@ LoginPage.prototype.onCreate = function (pageData) {
    // alert((t2-t)+" slider:"+(Date.now()-t2))
 
 
-    trace(window.devicePixelRatio)
+
 
 //    this.setValBtn=this.findViewItem("setValBtn");
 //    this.setPerBtn=this.findViewItem("setPerBtn");
@@ -197,6 +197,12 @@ LoginPage.prototype.onCreate = function (pageData) {
 }
 
 LoginPage.prototype.onDestroy = function () {
+    removeEvent(this.view.html, "tap", this.onTap);
+    removeEvent(this.view.html, "longtap", this.onLongTap);
+    this.dropbtn.destroy();
+    this.button.destroy();
+    this.slider.destroy();
+    this.switchBtn.destroy();
 
     this.loginBtn = null;
     this.regBtn = null;
@@ -205,8 +211,7 @@ LoginPage.prototype.onDestroy = function () {
     this.passwordTxt = null;
     this.learnLink = null;
     this.switchBtn=null;
-    removeEvent(this.view.html, "tap", this.onTap);
-    removeEvent(this.view.html, "longtap", this.onLongTap);
+
 
 
 }

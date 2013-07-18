@@ -179,7 +179,7 @@
     float: left;
     clear: both;
     position: absolute;
-
+    z-index: 1000;
 }
 
 /*fix android overflow bug, need set opacity to 0.99, can not be 1 or undefined*/

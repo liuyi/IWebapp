@@ -668,12 +668,26 @@ function IWebUIDropButton(target, opts) {
 
 }
 
-IWebUIDropButton.prototype.destroy=function(){
+IWebUIDropButton.prototype.destroy = function () {
 
+    removeEvent(window.document.body, this.touchEvt, this._onBodyTap, this);
 
+    if(this.iscroller!=null){
+        this.iscroller.destroy();
+        this.iscroller=null;
+    }
+    removeEvent(window.document.body, "mousewheel", this._onBodyTap, this)
     removeEvent(this.itemsContainer, "tap", this._onItemTap, this)
 
-    this.button.container.onTap=null;
+
+    for(var i=0;i<this.items.length;i++){
+        this.items[i].destroy();
+        this.items[i]=null;
+    }
+
+    this.button.destroy();
+
+
 
     this.container = null;
     this.button = null;
@@ -827,7 +841,7 @@ IWebUIDropButton.prototype._onItemTap = function (e, context) {
         }
 
 
-        if(this.onChange!=null){
+        if (this.onChange != null) {
             this.onChange(index);
         }
 
@@ -856,20 +870,16 @@ IWebUIDropButton.prototype.close = function () {
         this.iscroller.disable()
     }
 
-//    removeEvent(window.document.body, this.touchEvt, function (e) {
-//        context._onBodyTap(e)
-//    })
-//
-//
-//    removeEvent(window.document.body, "mousewheel", function (e) {
-//        context._onBodyTap(e)
-//    })
+    removeEvent(window.document.body, this.touchEvt, this._onBodyTap, this);
+
+
+    removeEvent(window.document.body, "mousewheel", this._onBodyTap, this)
 }
 
 
 IWebUIDropButton.prototype.open = function () {
 
-   // trace("open:" + this.listContainer.parentNode)
+    // trace("open:" + this.listContainer.parentNode)
     if (this.listContainer.parentNode != null)  return;
 
     if (IWebapp.SCREEN_TYPE <= IWebapp.SCREEN_TYPE_SMALL) {
@@ -881,14 +891,10 @@ IWebUIDropButton.prototype.open = function () {
     this.isOpen = true;
     var context = this;
 
-    addEvent(window.document.body, this.touchEvt, function (e) {
-        context._onBodyTap(e)
-    })
+    addEvent(window.document.body, this.touchEvt, this._onBodyTap, this);
 
 
-    addEvent(window.document.body, "mousewheel", function (e) {
-        context._onBodyTap(e)
-    })
+    addEvent(window.document.body, "mousewheel", this._onBodyTap, this)
 }
 
 IWebUIDropButton.prototype._openInSmallScreen = function () {
@@ -897,9 +903,9 @@ IWebUIDropButton.prototype._openInSmallScreen = function () {
     var pageHeight = Dom.getPageSize().pageHeight;
     // this.scrollWrapper.appendChild(this.itemsContainer)
     window.document.body.appendChild(this.listContainer);
-    var needScroll=true;
+    var needScroll = true;
     if (this.itemsContainer.offsetHeight < pageHeight) {
-        needScroll=false;
+        needScroll = false;
         Dom.removeClass(this.scrollWrapper, "scrollerWrapper")
         Dom.removeClass(this.scrollWrapper, "ui-dropbutton-scrollWrapper")
         this.listContainer.style.height = "auto";
@@ -929,7 +935,7 @@ IWebUIDropButton.prototype._openInSmallScreen = function () {
     this.listContainer.style.marginTop = -this.listContainer.offsetHeight * 0.5 + "px";
     //this.listContainer.style.marginTop = "-25%"
 
-    if(needScroll){
+    if (needScroll) {
         if (this.iscroller == null) {
 
             this.iscroller = CreateScroller(this.scrollWrapper);
@@ -943,7 +949,7 @@ IWebUIDropButton.prototype._openInSmallScreen = function () {
 }
 
 IWebUIDropButton.prototype._openInNormalScreen = function () {
-    this.listAnchor.style.padding="0";
+    this.listAnchor.style.padding = "0";
     window.document.body.appendChild(this.listContainer);
 
 
@@ -964,11 +970,9 @@ IWebUIDropButton.prototype._openInNormalScreen = function () {
     }
 
 
-
-
 }
 
-IWebUIDropButton.prototype._onBodyTap = function (e) {
+IWebUIDropButton.prototype._onBodyTap = function (e, context) {
 
     var target = e.target || e.srcElement;
 
@@ -987,7 +991,7 @@ IWebUIDropButton.prototype._onBodyTap = function (e) {
 
 
     if (isOut) {
-        this.close();
+        context.close();
     }
 
 }
@@ -1070,6 +1074,13 @@ IWebUIButton.prototype.disable = function () {
     this.container.addClass("disabled")
 }
 
+IWebUIButton.prototype.destroy=function(){
+    this.container.onTap = null;
+    this.container.onLongTap =null;
+    this.container = null;
+    this.label = null;
+    this.icon = null;
+}
 
 function IWebUI() {
 

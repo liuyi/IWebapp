@@ -1,14 +1,13 @@
 // JavaScript Document
 //if set debug to false, it would not print content to console.
 debug = true;
-showOutPanel=false;
+showOutPanel = false;
 /*Just don't want write too many codes */
 var outTxt = null;
 function trace(msg) {
 
 
-
-    if (outTxt == null && debug==true && showOutPanel) {
+    if (outTxt == null && debug == true && showOutPanel) {
         outTxt = window.document.createElement("textarea");
         window.document.body.appendChild(outTxt);
         outTxt.className = "outTxt";
@@ -21,8 +20,8 @@ function trace(msg) {
         } catch (e) {
         }
 
-       if(showOutPanel)
-       outTxt.innerHTML+=("\n"+msg);
+        if (showOutPanel)
+            outTxt.innerHTML += ("\n" + msg);
     }
 }//end function
 
@@ -37,7 +36,7 @@ String.prototype.len = function () {
     return this.replace(/[^\x00-\xff]/g, "00").length;
 }
 
-String.prototype.trim= function() {
+String.prototype.trim = function () {
 
     return this.replace(/^\s+|\s+$/g, "");
 }
@@ -370,7 +369,7 @@ function FrameAnim(targetTag, width, height, srcWidth, srcHeight) {
 
 //addEvent and removeEvent =========================
 
-function addEvent(element, type, handler,context) {
+function addEvent(element, type, handler, context) {
     if (!handler.$$guid) handler.$$guid = addEvent.guid++;
     if (!element.events) element.events = {};
     var handlers = element.events[type];
@@ -380,33 +379,65 @@ function addEvent(element, type, handler,context) {
             handlers[0] = element["on" + type];
         }
     }
+    if (context != null) {
+        if (element.contexts == null) {
+            element.contexts = {};
+        }
 
-    if(context) element.context=context;//define event context for this element;
+        var contexts = element.contexts[type];
+        if (!contexts) {
+            contexts = element.contexts[type] = {};
+        }
+
+        contexts[handler.$$guid] = context;
+    }
+
+
+    //if(context) element.context=context;//define event context for this element;
     handlers[handler.$$guid] = handler;
     element["on" + type] = handleEvent;
 
-   //trace("add event:"+type+">>"+element)
+    //trace("add event:"+type+">>"+element)
 }
 
 addEvent.guid = 1;
 
 function removeEvent(element, type, handler) {
 
-     if (element && element.events && element.events[type]) {
+    if (element && element.events && element.events[type]) {
         delete element.events[type][handler.$$guid];
 
-        var count=0;
-        for(var h in element.events[type] ){
+        if (element.contexts != null && element.contexts[type] != null) {
+           // trace("remove context>>>>:" + type)
+            if ((element.contexts[type][handler.$$guid]) != null) {
+               // trace("found context>>>>:" + type)
+                element.contexts[type][handler.$$guid] = null;
+                delete  element.contexts[type][handler.$$guid];
+            }
+
+
+            //trace( element.contexts)
+        }
+
+
+        var count = 0;
+        for (var h in element.events[type]) {
             count++
         }
+//        trace("element.events[type]==>" + type)
+//        trace(element.events[type])
+        if (count == 0) {
 
-        if(count==0){
+//            trace("clear events:" + type)
+//            trace(element.contexts)
+            element["on" + type] = null;
+            element.events[type] = null;
+            if (element.contexts != null)
+                element.contexts[type] = null;
 
-            element["on" + type]=null;
-            element.events[type]=null;
+
         }
     }
-
 
 
 }
@@ -415,10 +446,19 @@ function handleEvent(event) {
     var returnValue = true;
     event = event || fixEvent(window.event);
     var handlers = this.events[event.type];
-   // trace("handleEvent:"+event.type)
+    // trace("handleEvent:"+event.type)
     for (var i in handlers) {
         this.$$handleEvent = handlers[i];
-        if (this.$$handleEvent(event,this.context) === false) {
+        // if (this.$$handleEvent(event,this.context) === false) {
+
+        //get context
+        // trace(this.contexts)
+        var context = null;
+        if (this.contexts && this.contexts[event.type] != null) {
+            context = this.contexts[event.type][this.$$handleEvent.$$guid];
+        }
+
+        if (this.$$handleEvent(event, context) === false) {
             returnValue = false;
 
         }
@@ -426,7 +466,6 @@ function handleEvent(event) {
 //        trace("$$guid:");
 //        trace(this.$$handleEvent)
     }
-
 
 
     return returnValue;
@@ -437,14 +476,14 @@ function fixEvent(event) {
     event.stopPropagation = fixEvent.stopPropagation;
     return event;
 };
-fixEvent.preventDefault = function() {
+fixEvent.preventDefault = function () {
     this.returnValue = false;
 };
-fixEvent.stopPropagation = function() {
+fixEvent.stopPropagation = function () {
     this.cancelBubble = true;
 };
 
-function checkIEVersion(requireVersion){
+function checkIEVersion(requireVersion) {
     var userAgent = navigator.userAgent.toLowerCase();
     // Test if the browser is IE and check the version number is lower than 9
     if (/msie/.test(userAgent) &&
@@ -457,15 +496,15 @@ function checkIEVersion(requireVersion){
 }
 
 
-function getsupportedprop(proparray){
-    var root=document.documentElement; //reference root element of document
-    for (var i=0; i<proparray.length; i++){ //loop through possible properties
-        if (proparray[i] in root.style){ //if property exists on element (value will be string, empty string if not set)
+function getsupportedprop(proparray) {
+    var root = document.documentElement; //reference root element of document
+    for (var i = 0; i < proparray.length; i++) { //loop through possible properties
+        if (proparray[i] in root.style) { //if property exists on element (value will be string, empty string if not set)
             return proparray[i] //return that string
         }
     }
 
-    root=null;
+    root = null;
     return null;
 }
 
