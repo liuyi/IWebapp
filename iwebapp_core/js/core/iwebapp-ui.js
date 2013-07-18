@@ -641,9 +641,15 @@ IWebUIRadioGroup.destroy = function () {
 
 
 function IWebUIDropButton(target, opts) {
+    //html node
     this.container = null;
     this.button = null;
+    this.listContainer = null;
     this.itemsContainer = null;
+    this.itemWrapperText = null;
+    this.scrollWrapper = null;
+    this.listAnchor = null;
+    //html node end
     this.items = null;
     this.selectedItem = null;
     this.data = null;
@@ -652,7 +658,8 @@ function IWebUIDropButton(target, opts) {
     this.onChange = null;
     this.replaceLabelEnable = true;
     this.iscroller = null;
-    this.scrollWrapper = null;
+
+
     this.touchEvt = (IWebapp.touchable) ? "touchstart" : "mousedown";
 
     if (target != null) {
@@ -661,14 +668,42 @@ function IWebUIDropButton(target, opts) {
 
 }
 
+IWebUIDropButton.prototype.destroy=function(){
+
+
+    removeEvent(this.itemsContainer, "tap", this._onItemTap, this)
+
+    this.button.container.onTap=null;
+
+    this.container = null;
+    this.button = null;
+    this.listContainer = null;
+    this.itemsContainer = null;
+    this.itemWrapperText = null;
+    this.scrollWrapper = null;
+    this.listAnchor = null;
+    //html node end
+    this.items = null;
+    this.selectedItem = null;
+    this.data = null;
+    this.value = null;
+    this.isOpen = false;
+    this.onChange = null;
+    this.replaceLabelEnable = true;
+    this.iscroller = null;
+}
+
 
 IWebUIDropButton.prototype.create = function (target, opts, render) {
 
     if (render != false) {
-        var text = [];
+        var obj = IWebUI.getView("dropbutton");
+        var div = window.document.createElement("div");
         if (Dom.hasClass(target, "ui-dropbutton") == false) {
-            this.container = window.document.createElement("div");
-            this.container.className = "ui-dropbutton";
+            div.innerHTML = obj.root;
+            this.container = div.childNodes[0];
+//            this.container = window.document.createElement("div");
+//            this.container.className = "ui-dropbutton";
             target.appendChild(this.container);
         } else {
             this.container = target;
@@ -679,6 +714,12 @@ IWebUIDropButton.prototype.create = function (target, opts, render) {
         } else {
             this.button = new IWebUIButton(this.container);
         }
+
+        obj = IWebUI.getView("list");
+        div.innerHTML = obj.root;
+        this.listContainer = div.childNodes[0];
+
+        this.listContainer.innerHTML = obj.listContainer;
 
 
     } else {
@@ -691,9 +732,15 @@ IWebUIDropButton.prototype.create = function (target, opts, render) {
 
     }
 
+    this.itemsContainer = Dom.getElementsByClassName(this.listContainer, "ui-list-container")[0];
+    this.scrollWrapper = Dom.getElementsByClassName(this.listContainer, "ui-list-wrapper")[0];
+    this.listAnchor = Dom.getElementsByClassName(this.listContainer, "ui-list-anchor")[0];
+    this.itemWrapperText = obj.itemWrapper;
+    div.removeChild(this.listContainer)
+    div = null;
 
-    this.itemsContainer = window.document.createElement("ul");
-    this.itemsContainer.className = "ui-list";
+    //this.itemsContainer = window.document.createElement("ul");
+    // this.itemsContainer.className = "ui-list";
     if (opts != null) {
         this.data = (opts.data != null) ? opts.data : this.data;
 
@@ -705,10 +752,10 @@ IWebUIDropButton.prototype.create = function (target, opts, render) {
         }
     }
 
-    if (this.scrollWrapper == null) {
-        this.scrollWrapper = window.document.createElement("div");
-        //this.scrollWrapper.className="scrollWrapper ui-dropbutton-scrollWrapper";
-    }
+//    if (this.scrollWrapper == null) {
+//        this.scrollWrapper = window.document.createElement("div");
+//        //this.scrollWrapper.className="scrollWrapper ui-dropbutton-scrollWrapper";
+//    }
 
     this._updateItems(opts.data);
 
@@ -724,6 +771,30 @@ IWebUIDropButton.prototype.create = function (target, opts, render) {
 
 
 }
+
+/**
+ * data format:[{text:text,value:value}]
+ * @param data
+ * @private
+ */
+IWebUIDropButton.prototype._updateItems = function (data) {
+    if (data == null) return;
+    var item = null;
+    var clip = null;
+
+    this.items = [];
+    for (var i = 0; i < data.length; i++) {
+        clip = data[i];
+        this.itemsContainer.innerHTML += this.itemWrapperText;
+        item = new IWebUIButton(this.itemsContainer.childNodes[i], {text: clip.text});
+        this.items[i] = item;
+
+
+    }
+
+}
+
+
 IWebUIDropButton.prototype._onItemTap = function (e, context) {
     var target = e.target || e.srcElement;
     var item = null;
@@ -748,13 +819,16 @@ IWebUIDropButton.prototype._onItemTap = function (e, context) {
         context.value = (context.data[index] != null ) ? context.data[index].value : null;
         context.close();
 
-        trace(context.value)
 
         if (context.replaceLabelEnable == true) {
             var text = (context.data[index] == null || context.data[index].text == null) ? "" : context.data[index].text;
             context.button.setLabel(text);
-            trace("dddddddddd:" + text);
-            trace(context.button);
+
+        }
+
+
+        if(this.onChange!=null){
+            this.onChange(index);
         }
 
     }
@@ -762,7 +836,7 @@ IWebUIDropButton.prototype._onItemTap = function (e, context) {
 
 IWebUIDropButton.prototype.toogle = function () {
 
-    if (this.itemsContainer.parentNode != null) {
+    if (this.listContainer.parentNode != null) {
         this.close();
 
     } else {
@@ -773,20 +847,35 @@ IWebUIDropButton.prototype.toogle = function () {
 }
 
 IWebUIDropButton.prototype.close = function () {
-    if (this.itemsContainer.parentNode == null) return;
-    this.isOpen = false;
-    this.itemsContainer.parentNode.removeChild(this.itemsContainer)
 
+
+    if (this.listContainer.parentNode == null) return;
+    this.isOpen = false;
+    this.listContainer.parentNode.removeChild(this.listContainer)
+    if (this.iscroller != null) {
+        this.iscroller.disable()
+    }
+
+//    removeEvent(window.document.body, this.touchEvt, function (e) {
+//        context._onBodyTap(e)
+//    })
+//
+//
+//    removeEvent(window.document.body, "mousewheel", function (e) {
+//        context._onBodyTap(e)
+//    })
 }
 
 
 IWebUIDropButton.prototype.open = function () {
-    if (this.itemsContainer.parentNode != null)  return;
+
+   // trace("open:" + this.listContainer.parentNode)
+    if (this.listContainer.parentNode != null)  return;
 
     if (IWebapp.SCREEN_TYPE <= IWebapp.SCREEN_TYPE_SMALL) {
         this._openInSmallScreen();
     } else {
-        this._openInSmallScreen();
+        this._openInNormalScreen();
     }
 
     this.isOpen = true;
@@ -806,58 +895,75 @@ IWebUIDropButton.prototype._openInSmallScreen = function () {
 
 
     var pageHeight = Dom.getPageSize().pageHeight;
-    this.scrollWrapper.appendChild(this.itemsContainer)
-    window.document.body.appendChild(this.scrollWrapper);
-    trace("page height:" + this.itemsContainer.offsetHeight+"/"+pageHeight)
+    // this.scrollWrapper.appendChild(this.itemsContainer)
+    window.document.body.appendChild(this.listContainer);
+    var needScroll=true;
     if (this.itemsContainer.offsetHeight < pageHeight) {
-        Dom.removeClass(this.scrollWrapper, "scrollWrapper")
+        needScroll=false;
+        Dom.removeClass(this.scrollWrapper, "scrollerWrapper")
         Dom.removeClass(this.scrollWrapper, "ui-dropbutton-scrollWrapper")
-        this.scrollWrapper.style.top = "50%";
-        this.scrollWrapper.style.marginTop = -this.itemsContainer.offsetHeight * 0.5 + "px";
+        this.listContainer.style.height = "auto";
 
-        if( this.iscroller!=null){
+        if (this.iscroller != null) {
             this.iscroller.disable()
         }
     } else {
         //add iscroll
-        trace("iscoll"+this.iscroller);
-        this.scrollWrapper.className = "scrollWrapper ui-dropbutton-scrollWrapper";
+        //  trace("use iscroll>>>>>>>>")
+        Dom.addClass(this.scrollWrapper, "scrollerWrapper")
+        Dom.addClass(this.scrollWrapper, "ui-dropbutton-scrollWrapper")
+
+
+        this.listContainer.style.height = "80%";
+
+    }
+    this.scrollWrapper.style.width = this.button.container.offsetWidth + "px";
+    this.listAnchor.style.width = this.button.container.offsetWidth + "px";
+    // trace(this.button.container.offsetWidth+"px")
+    this.listContainer.style.left = "50%";
+    this.listContainer.style.position = "absolute";
+    // this.listContainer.style.width=this.button.container.offsetWidth+"px";
+    this.listContainer.style.marginLeft = -this.listContainer.offsetWidth * 0.5 + "px";
+
+    this.listContainer.style.top = "50%";
+    this.listContainer.style.marginTop = -this.listContainer.offsetHeight * 0.5 + "px";
+    //this.listContainer.style.marginTop = "-25%"
+
+    if(needScroll){
         if (this.iscroller == null) {
 
             this.iscroller = CreateScroller(this.scrollWrapper);
-        }else{
+        } else {
             this.iscroller.enable()
         }
 
-
-
-
     }
 
-
-    this.scrollWrapper.style.left = "50%";
-    this.scrollWrapper.style.position="absolute"
-    this.scrollWrapper.style.width=this.button.container.offsetWidth+"px";
-    this.scrollWrapper.style.marginLeft = -this.itemsContainer.offsetWidth * 0.5 + "px";
-
-
+    //this.scrollWrapper.style.visibility="hidden";
 }
 
 IWebUIDropButton.prototype._openInNormalScreen = function () {
-    window.document.body.appendChild(this.itemsContainer);
+    this.listAnchor.style.padding="0";
+    window.document.body.appendChild(this.listContainer);
 
 
     var pos = Dom.getPosition(this.container);
     var height = Dom.getPageSize().pageHeight - pos.y - this.button.container.offsetHeight;
 
-    if (height < this.itemsContainer.offsetHeight) {
 
-        this.itemsContainer.style.top = (pos.y - this.itemsContainer.offsetHeight) + "px"
+    this.scrollWrapper.style.width = this.button.container.offsetWidth + "px";
+    this.listAnchor.style.width = this.button.container.offsetWidth + "px";
+    this.listContainer.style.left = pos.x + "px";
+
+    if (height < this.listContainer.offsetHeight) {
+
+        this.listContainer.style.top = (pos.y - this.listContainer.offsetHeight) + "px"
     } else {
-        this.itemsContainer.style.top = (pos.y + this.container.offsetHeight) + "px";
+        this.listContainer.style.top = (pos.y + this.listContainer.offsetHeight) + "px";
 
     }
-    this.itemsContainer.style.left = pos.x + "px";
+
+
 
 
 }
@@ -870,7 +976,7 @@ IWebUIDropButton.prototype._onBodyTap = function (e) {
     var parent = target;
     var isOut = true;
     while (parent) {
-        if (parent == this.itemsContainer || parent == this.container || parent == this.button.container) {
+        if (parent == this.listContainer || parent == this.container) {
             isOut = false;
             parent = null;
             break;
@@ -886,26 +992,6 @@ IWebUIDropButton.prototype._onBodyTap = function (e) {
 
 }
 
-
-/**
- * data format:[{text:text,value:value}]
- * @param data
- * @private
- */
-IWebUIDropButton.prototype._updateItems = function (data) {
-    if (data == null) return;
-    var item = null;
-    var clip = null;
-    var obj = IWebUI.getView("ui-list");
-    this.items = [];
-    for (var i = 0; i < data.length; i++) {
-        clip = data[i];
-        this.itemsContainer.innerHTML += obj.itemWrapper;
-        item = new IWebUIButton(this.itemsContainer.childNodes[i], {text: clip.text});
-        this.items[i] = item;
-    }
-
-}
 
 function IWebUIButton(target, opts, render) {
     this.container = null;
@@ -992,9 +1078,9 @@ function IWebUI() {
 IWebUI.views = {};
 IWebUI.views["button"] = {root: "<a class='ui-button'></a>", icon: "<span class='ui-icon'></span>", label: "<span class='ui-label'></span>"};
 
-IWebUI.views["dropbutton"] = {root: "<ul class='ui-dropbutton'></ul>", item: "<li class='ui-item'></li>"}
+IWebUI.views["dropbutton"] = {root: "<div class='ui-dropbutton'></div>"}
 
-IWebUI.views["ui-list"] = {root: "<ul class='ui-list'></ul>", itemWrapper: "<li class='ui-list-item ui-dropbutton-list-item' tabindex='0'></li>"}
+IWebUI.views["list"] = {root: "<ul class='ui-list'></ul>", listContainer: "<div class='ui-list-anchor'><div class='ui-list-wrapper'><ul class='ui-list-container'></ul></div></div>", itemWrapper: "<li class='ui-list-item ui-dropbutton-list-item' tabindex='0'></li>"}
 IWebUI.getView = function (type) {
     return IWebUI.views[type];
 }

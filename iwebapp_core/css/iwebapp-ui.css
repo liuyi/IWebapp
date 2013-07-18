@@ -97,8 +97,7 @@
     width: 55%;
     height: 25%;
     display: inline-block;
-    -webkit-transform: rotate3D(0,0,1,-45deg) ;
-
+    -webkit-transform: rotate3D(0, 0, 1, -45deg);
 
     position: absolute;
     top: 25%;
@@ -106,8 +105,6 @@
 
     visibility: hidden;
 }
-
-
 
 .ui-checkbox[class~="selected"] .ui-icon-tick {
     visibility: visible;
@@ -151,6 +148,7 @@
 
 .ui-button {
     background: #333;
+
     border: #000 solid 1px;
     position: relative;
     width: auto;
@@ -160,13 +158,51 @@
 
 }
 
-.ui-icon{ display: block;   }
-.ui-button .ui-icon{ position: absolute;}
+.ui-icon {
+    display: block;
+}
 
-.ui-dropbutton{ }
-.ui-dropbutton .ui-button{ width: 100%;}
-.ui-list{  list-style: none;   left: 0; width: 100%;}
+.ui-button .ui-icon {
+    position: absolute;
+}
 
-.ui-list-item{background: #00f}
-.ui-dropbutton-list-item .ui-button{display: block; }
-.ui-dropbutton-scrollWrapper{ top:10%; bottom: 10%; }
+.ui-dropbutton {
+}
+
+.ui-dropbutton .ui-button {
+    width: 100%;
+}
+
+/*fix android overflow bug, the list can not has padding*/
+.ui-list {
+    width: auto;
+    float: left;
+    clear: both;
+    position: absolute;
+
+}
+
+/*fix android overflow bug, need set opacity to 0.99, can not be 1 or undefined*/
+.ui-list-anchor {
+    opacity: 0.99;
+    float: left;
+    padding: 10px;
+
+}
+
+.ui-list-container {
+    list-style: none;
+    left: 0;
+}
+
+.ui-list-item {
+}
+
+.ui-dropbutton-list-item .ui-button {
+    display: block;
+}
+
+.ui-dropbutton-scrollWrapper {
+    top: 20px;
+    bottom: 20px;
+}

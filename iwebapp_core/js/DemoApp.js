@@ -130,7 +130,7 @@ LoginPage.prototype.onCreate = function (pageData) {
             {text:"CCCCC",value:"222"},
             {text:"DDDDDDDDD",value:"nnnn"},
             {text:"AAAA",value:12312},
-            {text:"BBBBB",value:"sdfsfs"},
+         /*   {text:"BBBBB",value:"sdfsfs"},
             {text:"CCCCC",value:"222"},
             {text:"DDDDDDDDD",value:"nnnn"},
             {text:"AAAA",value:12312},
@@ -139,7 +139,7 @@ LoginPage.prototype.onCreate = function (pageData) {
             {text:"DDDDDDDDD",value:"nnnn"},
             {text:"AAAA",value:12312},
             {text:"BBBBB",value:"sdfsfs"},
-            {text:"CCCCC",value:"222"},
+            {text:"CCCCC",value:"222"},*/
             {text:"end",value:"ennnndd"}
         ]})
    // alert((t2-t)+" slider:"+(Date.now()-t2))
