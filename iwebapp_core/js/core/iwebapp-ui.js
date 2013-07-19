@@ -980,7 +980,7 @@ IWebUIDropButton.prototype._onBodyTap = function (e, context) {
     var parent = target;
     var isOut = true;
     while (parent) {
-        if (parent == this.listContainer || parent == this.container) {
+        if (parent == this.listContainer ||  parent == context.button.container||parent == this.container ) {
             isOut = false;
             parent = null;
             break;
